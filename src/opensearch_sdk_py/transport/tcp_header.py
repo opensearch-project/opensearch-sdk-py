@@ -18,6 +18,7 @@ class TcpHeader:
     BYTES_REQUIRED_FOR_VERSION = PRE_76_HEADER_SIZE
     HEADER_SIZE = PRE_76_HEADER_SIZE + VARIABLE_HEADER_SIZE
 
+
     def __init__(self, data: StreamInput):
         self.raw = data.raw
         self.prefix = data.read_bytes(2)
@@ -50,7 +51,7 @@ class TcpHeader:
     def is_request(self) -> bool:
         return (self.status & TransportStatus.STATUS_REQRES) == 0
 
-    def is_errror(self) -> bool:
+    def is_error(self) -> bool:
         return (self.status & TransportStatus.STATUS_ERROR) != 0
 
     def is_compress(self) -> bool:
