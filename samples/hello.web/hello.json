@@ -1,9 +1,0 @@
-{
-    "name":"hello-world",
-    "uniqueId":"hello-world",
-    "hostAddress":"127.0.0.1",
-    "port":"1234",
-    "version":"0.1.0",
-    "opensearchVersion":"3.0.0",
-    "minimumCompatibleVersion":"3.0.0"
-}
