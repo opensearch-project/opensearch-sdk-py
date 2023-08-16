@@ -18,35 +18,21 @@ class TcpHeader:
     BYTES_REQUIRED_FOR_VERSION = PRE_76_HEADER_SIZE
     HEADER_SIZE = PRE_76_HEADER_SIZE + VARIABLE_HEADER_SIZE
 
-
-    def __init__(self, data: StreamInput):
-        self.raw = data.raw
-        self.prefix = data.read_bytes(2)
-        self.size = data.read_int()
-        self.request_id = data.read_long()
-        self.status = data.read_byte()
-        self.version = Version(data.read_int())
-        self.variable_header_size = data.read_int()
-        # print(f"remaining: {data.read_bytes(self.variable_header_size)}")
+    def read_from(self, input: StreamInput):
+        self.raw = input.raw
+        self.prefix = input.read_bytes(2)
+        self.size = input.read_int()
+        self.request_id = input.read_long()
+        self.status = input.read_byte()
+        self.version = Version(input.read_int())
+        self.variable_header_size = input.read_int()
+        # print(f"remaining: {input.read_bytes(self.variable_header_size)}")
 
     def __str__(self):
-        return f"{self.prefix}, message={self.size} byte(s), request_id={self.request_id}, status={self.status}, version={self.version}"
+        return f"{self.statuses} {self.prefix}, message={self.size} byte(s), request_id={self.request_id}, status={self.status}, version={self.version}"
 
     def __bytes__(self):
         return self.raw
-        # frame = bytearray()
-        # for b in self.prefix:
-        #     frame.append(b)
-        # size = 20
-        # for b in size.to_bytes(4, byteorder='big'):
-        #     frame.append(b)
-        # for b in self.request_id.to_bytes(8, byteorder='big'):
-        #     frame.append(b)
-        # frame.append(self.status)
-        # for b in bytes(self.version):
-        #     frame.append(b)
-        # frame.append(0)
-        # return bytes(frame)
 
     def is_request(self) -> bool:
         return (self.status & TransportStatus.STATUS_REQRES) == 0
@@ -60,20 +46,15 @@ class TcpHeader:
     def is_handshake(self) -> bool:
         return (self.status & TransportStatus.STATUS_HANDSHAKE) != 0
 
-    # public static void writeHeader(
-    #     StreamOutput output,
-    #     long requestId,
-    #     byte status,
-    #     Version version,
-    #     int contentSize,
-    #     int variableHeaderSize
-    # ) throws IOException {
-    #     output.writeBytes(PREFIX);
-    #     // write the size, the size indicates the remaining message size, not including the size int
-    #     output.writeInt(contentSize + REQUEST_ID_SIZE + STATUS_SIZE + VERSION_ID_SIZE + VARIABLE_HEADER_SIZE);
-    #     output.writeLong(requestId);
-    #     output.writeByte(status);
-    #     output.writeInt(version.id);
-    #     assert variableHeaderSize != -1 : "Variable header size not set";
-    #     output.writeInt(variableHeaderSize);
-    # }
+    @property
+    def statuses(self) -> str:
+        result = []
+        if self.is_request():
+            result.append("request")
+        if self.is_error():
+            result.append("error")
+        if self.is_compress():
+            result.append("compressed")
+        if self.is_handshake():
+            result.append("handshake")
+        return result

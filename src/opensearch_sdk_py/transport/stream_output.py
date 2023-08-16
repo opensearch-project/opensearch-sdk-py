@@ -1,3 +1,5 @@
+from opensearch_sdk_py.transport.version import Version
+
 class StreamOutput:
     def __init__(self, loop, sock):
       self.loop = loop
@@ -9,6 +11,20 @@ class StreamOutput:
     #  writes an int as four bytes.
     def write_int(self, i: int):
         return self.write(i.to_bytes(4, byteorder='big'))
+
+    # writes an int in a variable-length format
+    def write_v_int(self, i: int):
+        result = ''
+        while True:
+            result = chr((i & 0x7f) | 0x80) + result
+            i >>= 7
+            if ((i & ~0x7F) == 0):
+                break
+        return self.write(result)
+      
+    # writes the OpenSearch {@link Version} to the output stream
+    def write_version(self, version: Version):
+        return self.write_v_int(version.id)
 
     # }
     # /**
@@ -868,11 +884,6 @@ class StreamOutput:
     #         }
     #         OpenSearchException.writeStackTraces(throwable, this, (o, t) -> o.writeException(rootException, t, nestedLevel + 1));
     #     }
-    # }
-
-    # /** Writes the OpenSearch {@link Version} to the output stream */
-    # def writeVersion(final Version version) throws IOException {
-    #     writeVInt(version.id);
     # }
 
     # /** Writes the OpenSearch {@link Build} informn to the output stream */

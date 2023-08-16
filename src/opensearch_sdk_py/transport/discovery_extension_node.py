@@ -1,6 +1,6 @@
-from stream_input import StreamInput
-from stream_output import StreamOutput
-from discovery_node import DiscoveryNode
+from opensearch_sdk_py.transport.stream_input import StreamInput
+from opensearch_sdk_py.transport.stream_output import StreamOutput
+from opensearch_sdk_py.transport.discovery_node import DiscoveryNode
 
 class DiscoveryExtensionNode(DiscoveryNode):
     def __init__(self):

@@ -1,19 +1,18 @@
-from stream_input import StreamInput
-from stream_output import StreamOutput
-from transport_response import TransportResponse
-from discovery_node import DiscoveryNode
-from cluster_name import ClusterName
+from opensearch_sdk_py.transport.stream_input import StreamInput
+from opensearch_sdk_py.transport.stream_output import StreamOutput
+from opensearch_sdk_py.transport.transport_response import TransportResponse
 
-from version import Version
+from opensearch_sdk_py.transport.version import Version
 
 class HandshakeResponse(TransportResponse):
-    def __init__(self, discovery_node: DiscoveryNode = None, cluster_name: ClusterName = None, version: Version = None):
-        self.discovery_node = discovery_node
-        self.cluster_name = cluster_name
+    def __init__(self, version: Version = None):
         self.version = version
     
     def read_from(self, input: StreamInput):
-        pass
+        super().read_from(input)
+        self.version = input.read_version()
 
     def write_to(self, output: StreamOutput):
-        pass
+        super().write_to(output)
+        output.write_version(self.version)
+

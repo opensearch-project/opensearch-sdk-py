@@ -1,8 +1,8 @@
-from stream_input import StreamInput
-from stream_output import StreamOutput
-from transport_request import TransportRequest
-from discovery_node import DiscoveryNode
-from discovery_extension_node import DiscoveryExtensionNode
+from opensearch_sdk_py.transport.stream_input import StreamInput
+from opensearch_sdk_py.transport.stream_output import StreamOutput
+from opensearch_sdk_py.transport.transport_request import TransportRequest
+from opensearch_sdk_py.transport.discovery_node import DiscoveryNode
+from opensearch_sdk_py.transport.discovery_extension_node import DiscoveryExtensionNode
 
 class InitializeExtensionRequest(TransportRequest):
     def __init__(self):
