@@ -6,12 +6,13 @@ from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
 from opensearch_sdk_py.transport.tcp_header import TcpHeader
 from opensearch_sdk_py.transport.handshake_request import HandshakeRequest
+from opensearch_sdk_py.transport.handshake_response import HandshakeResponse
 
 async def handle_connection(conn, loop):
     try:
         conn.setblocking(False)
         # out = StreamOutput(loop, conn)
-        while raw := await loop.sock_recv(conn, 1024):
+        while raw := await loop.sock_recv(conn, 1024 * 10):
             # output = StreamOutput(loop, conn)
             input = StreamInput(raw)
             print(f"\nreceived {input}, {len(raw)} byte(s)\n\t#{str(raw)}")
@@ -26,14 +27,31 @@ async def handle_connection(conn, loop):
             for i in range(2):
                 input.read_byte() # don't know what these 2 bytes are
 
-            print(f"\taction: {input.read_string()}")
+            if header.is_request():
+                action = input.read_string()
+                print(f"\taction: {action}")
 
-            if header.is_handshake():
+                if action == 'internal:tcp/handshake':
+                    # output = StreamOutput()
+                    # response_header = TcpHeader(request_id=header.request_id, status=header.status, size=48, version=header.version)
+                    # response_header.write_to(output)
+                    # for i in range(8):
+                    #     handshake_response = HandshakeResponse(version=header.version)
+                    #     handshake_response.write_to(output)
+                    # await loop.sock_sendall(conn, output.getvalue())
+                    await loop.sock_sendall(conn, raw)
+                else:
+                    print(f"\tparsed action {header}, not sure what to do with it")
+            elif header.is_handshake():
                 await loop.sock_sendall(conn, raw)
-            elif header.is_request():
-                pass
             else:
+                # just send back the same message
+                # await loop.sock_sendall(conn, raw)
                 print(f"\tparsed {header}, not sure what to do with it")
+
+            # read the rest of the message
+            # input.read_bytes(header.variable_header_size)
+
     except Exception as ex:
         logging.exception(ex)
     finally:

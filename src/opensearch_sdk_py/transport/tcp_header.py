@@ -1,6 +1,7 @@
 # https://github.com/opensearch-project/OpenSearch/blob/main/server/src/main/java/org/opensearch/transport/TcpHeader.java
 
 from opensearch_sdk_py.transport.stream_input import StreamInput
+from opensearch_sdk_py.transport.stream_output import StreamOutput
 from opensearch_sdk_py.transport.version import Version
 from opensearch_sdk_py.transport.transport_status import TransportStatus
 
@@ -18,6 +19,14 @@ class TcpHeader:
     BYTES_REQUIRED_FOR_VERSION = PRE_76_HEADER_SIZE
     HEADER_SIZE = PRE_76_HEADER_SIZE + VARIABLE_HEADER_SIZE
 
+    def __init__(self, prefix='ES', request_id=1, status=0, version=None, size=-1, variable_header_size=0):
+        self.prefix = prefix
+        self.request_id = request_id
+        self.status = TransportStatus.STATUS_HANDSHAKE
+        self.version = version
+        self.size = size
+        self.variable_header_size = variable_header_size
+
     def read_from(self, input: StreamInput):
         self.raw = input.raw
         self.prefix = input.read_bytes(2)
@@ -27,6 +36,14 @@ class TcpHeader:
         self.version = Version(input.read_int())
         self.variable_header_size = input.read_int()
         # print(f"remaining: {input.read_bytes(self.variable_header_size)}")
+
+    def write_to(self, output: StreamOutput):
+        output.write(bytes(self.prefix, 'ascii'))
+        output.write_int(self.size)
+        output.write_long(self.request_id)
+        output.write_byte(self.status)
+        output.write_version(self.version)
+        output.write_byte(self.variable_header_size)
 
     def __str__(self):
         return f"{self.statuses} {self.prefix}, message={self.size} byte(s), request_id={self.request_id}, status={self.status}, version={self.version}"

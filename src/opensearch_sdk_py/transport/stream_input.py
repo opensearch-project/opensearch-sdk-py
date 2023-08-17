@@ -161,7 +161,7 @@ class StreamInput:
        
     def read_string(self) -> str:
         char_count = self.read_array_size()
-        return str(self.read_bytes(char_count))
+        return str(self.read_bytes(char_count), 'ascii')
 
     def read_string_array(self) -> [str]:
         size = self.read_array_size()

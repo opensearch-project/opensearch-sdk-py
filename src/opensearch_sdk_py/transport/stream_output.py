@@ -1,12 +1,9 @@
+from io import BytesIO
 from opensearch_sdk_py.transport.version import Version
 
-class StreamOutput:
-    def __init__(self, loop, sock):
-      self.loop = loop
-      self.sock = sock
-    
-    def write(self, b: bytes):
-        return self.loop.sock_sendall(self.sock, b)
+class StreamOutput(BytesIO):
+    def write_byte(self, b: int):
+        return self.write(b.to_bytes(1))
 
     #  writes an int as four bytes.
     def write_int(self, i: int):
@@ -22,9 +19,11 @@ class StreamOutput:
                 break
         return self.write(result)
       
-    # writes the OpenSearch {@link Version} to the output stream
     def write_version(self, version: Version):
-        return self.write_v_int(version.id)
+        return self.write(bytes(version))
+
+    def write_long(self, i: int):
+        return self.write(i.to_bytes(8, byteorder='big'))
 
     # }
     # /**
