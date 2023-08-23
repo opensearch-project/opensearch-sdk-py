@@ -20,12 +20,20 @@ async def handle_connection(conn, loop):
             header.read_from(input)
             print(f"\t{header}")
 
+            if header.is_request():
+                request_headers = input.read_string_to_string_dict()
+                print(f"\trequest headers: {request_headers}")
+                if len(request_headers):
+                    print(f"\trequest headers: {request_headers}")
+
+                response_headers = input.read_string_to_string_array_dict()
+                print(f"\tresponse headers: {response_headers}")
+                if len(response_headers):
+                    print(f"\tresponse headers: {response_headers}")
+
             features = input.read_string_array()
             if len(features):
                 print(f"\tfeatures: {features}")
-
-            for i in range(2):
-                input.read_byte() # don't know what these 2 bytes are
 
             if header.is_request():
                 action = input.read_string()
