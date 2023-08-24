@@ -235,34 +235,13 @@ class StreamOutput(BytesIO):
     #         bytes.writeTo(this);
     #     }
     # }
-
-    # def writeString(String str) throws IOException {
-    #     final int charCount = str.length();
-    #     byte[] buffer = scratch.get();
-    #     int offset = 0;
-    #     writeVInt(charCount);
-    #     for (int i = 0; i < charCount; i++) {
-    #         final int c = str.charAt(i);
-    #         if (c <= 0x007F) {
-    #             buffer[offset++] = ((byte) c);
-    #         } else if (c > 0x07FF) {
-    #             buffer[offset++] = ((byte) (0xE0 | c >> 12 & 0x0F));
-    #             buffer[offset++] = ((byte) (0x80 | c >> 6 & 0x3F));
-    #             buffer[offset++] = ((byte) (0x80 | c >> 0 & 0x3F));
-    #         } else {
-    #             buffer[offset++] = ((byte) (0xC0 | c >> 6 & 0x1F));
-    #             buffer[offset++] = ((byte) (0x80 | c >> 0 & 0x3F));
-    #         }
-    #         // make sure any possible char can fit into the buffer in any possible iteration
-    #         // we need at most 3 bytes so we flush the buffer once we have less than 3 bytes
-    #         // left before we start another iteration
-    #         if (offset > buffer.length - 3) {
-    #             write_bytes(buffer, offset);
-    #             offset = 0;
-    #         }
-    #     }
-    #     write_bytes(buffer, offset);
-    # }
+      
+    # writes a utf-8 string
+    def write_string(self, s: str):
+        char_count = len(s.encode('utf-8'))
+        self.write_v_int(char_count)
+        if char_count > 0:
+            self.write(bytes(s, 'utf-8'))
 
     # def writeSecureString(SecureString secureStr) throws IOException {
     #     final byte[] secureStrBytes = CharArrays.toUtf8Bytes(secureStr.getChars());
