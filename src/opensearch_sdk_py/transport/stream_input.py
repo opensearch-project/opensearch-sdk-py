@@ -179,3 +179,29 @@ class StreamInput:
             return self.read_string_array()
         else:
             return None
+
+    def read_string_to_string_dict(self) -> dict[str, str]:
+        size = self.read_v_int()
+        if size == 0:
+            return {}
+
+        result = dict()      
+        for i in range(size):
+            key = self.read_string()
+            value = self.read_string()
+            result[key] = value
+
+        return result
+
+    def read_string_to_string_array_dict(self) -> dict[str, list[str]]:
+        size = self.read_v_int()
+        if size == 0:
+            return {}
+
+        result = dict()      
+        for i in range(size):
+            key = self.read_string()
+            value = self.read_string_array()
+            result[key] = value
+
+        return result
