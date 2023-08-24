@@ -53,21 +53,38 @@ class TcpHeader:
 
     def is_request(self) -> bool:
         return (self.status & TransportStatus.STATUS_REQRES) == 0
+    
+    def set_request(self):
+        self.status &= ~TransportStatus.STATUS_REQRES
+
+    def set_response(self):
+        self.status |= TransportStatus.STATUS_REQRES
 
     def is_error(self) -> bool:
         return (self.status & TransportStatus.STATUS_ERROR) != 0
 
+    def set_error(self):
+        self.status |= TransportStatus.STATUS_ERROR
+
     def is_compress(self) -> bool:
         return (self.status & TransportStatus.STATUS_COMPRESS) != 0
 
+    def set_compress(self):
+        self.status |= TransportStatus.STATUS_COMPRESS
+
     def is_handshake(self) -> bool:
         return (self.status & TransportStatus.STATUS_HANDSHAKE) != 0
+
+    def set_handshake(self):
+        self.status |= TransportStatus.STATUS_HANDSHAKE
 
     @property
     def statuses(self) -> str:
         result = []
         if self.is_request():
             result.append("request")
+        else:
+            result.append("response")
         if self.is_error():
             result.append("error")
         if self.is_compress():
