@@ -4,6 +4,7 @@ import asyncio, socket
 
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
+from opensearch_sdk_py.transport.task_id import TaskId
 from opensearch_sdk_py.transport.tcp_header import TcpHeader
 from opensearch_sdk_py.transport.version import Version
 from opensearch_sdk_py.transport.handshake_request import HandshakeRequest
@@ -25,12 +26,10 @@ async def handle_connection(conn, loop):
             # with the only difference being the action, but it broke the "response handshake"
             if header.is_request():
                 request_headers = input.read_string_to_string_dict()
-                print(f"\trequest headers: {request_headers}")
                 if len(request_headers):
                     print(f"\trequest headers: {request_headers}")
 
                 response_headers = input.read_string_to_string_array_dict()
-                print(f"\tresponse headers: {response_headers}")
                 if len(response_headers):
                     print(f"\tresponse headers: {response_headers}")
 
@@ -41,33 +40,44 @@ async def handle_connection(conn, loop):
             if header.is_request():
                 action = input.read_string()
                 print(f"\taction: {action}")
-                # TODO: action is always followed by a null byte. 
-                # Is read_string broken (are strings null terminated?)
-                input.read_byte()
+
+                task_id = TaskId()
+                task_id.read_from(input)
 
                 # TODO: need a better system of handling all these actions
                 # The additional bytes read inside this conditional are Writeables based on the specific request
                 if action == 'internal:tcp/handshake':
                     # Writeable data for this action is a BytesReference of length 4 which parses to vint version
-                    data_size = input.read_v_int()
-                    data = input.read_bytes(data_size)
+                    data = input.read_bytes(input.read_array_size())
                     # 0xa38eb741 -> 3000099
-                    # TODO: not sure I'm doing this right but it works, fix it or delete this comment :-)
-                    os_version_input = StreamInput(data)
-                    os_version_int = os_version_input.read_v_int()
+                    os_version_int = StreamInput(data).read_v_int()
                     os_version = Version(os_version_int)
-                    print(f"\tparsed TCP handshake, OpenSearch {os_version}, should return a response with this version")
+                                       
+                    # response_header = TcpHeader(request_id=header.request_id, status=header.status, size=TcpHeader.HEADER_SIZE, version=header.version)
+                    # response_header.set_response()
+                    #
+                    # variable_header = StreamOutput()
+                    # TODO not sure what these bytes are
+                    # variable_header.write_byte(2)
+                    # variable_header.write_byte(0)
+                    # variable_header.write_byte(0)
+                    #
+                    #variable_header.write_v_int(99 | 0x08000000)
+                    #
+                    # variable_bytes = variable_header.getvalue()
+                    # response_header.variable_header_size = len(variable_bytes)
+                    # response_header.size += response_header.variable_header_size
+                    #
                     # output = StreamOutput()
-                    # TODO: use setResponse on the status
-                    # TODO: append headers and features (or 3 0-bytes for temp)
-                    # TODO: add os_version_int to end
-                    # TODO: correct the size and variable size values for the above changes
-                    # response_header = TcpHeader(request_id=header.request_id, status=header.status, size=48, version=header.version)
                     # response_header.write_to(output)
-                    # for i in range(8):
-                    #     handshake_response = HandshakeResponse(version=header.version)
-                    #     handshake_response.write_to(output)
+                    # output.write(variable_bytes)
+                    #
+                    # print(f"\tparsed TCP handshake, OpenSearch {os_version}, returning a response:")
+                    # print(f"\t{response_header}, variable={variable_bytes}")
+                    #
                     # await loop.sock_sendall(conn, output.getvalue())
+                    #
+                    print(f"\tparsed TCP handshake, OpenSearch {os_version}, still don't know how to respond")
                     await loop.sock_sendall(conn, raw)
                 else:
                     print(f"\tparsed action {header}, not sure what to do with it")
