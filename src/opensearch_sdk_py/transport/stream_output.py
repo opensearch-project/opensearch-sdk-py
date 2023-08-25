@@ -11,11 +11,15 @@ class StreamOutput(BytesIO):
 
     # writes an int in a variable-length format
     def write_v_int(self, i: int):
-        result = ''
+        # shortcut single byte
+        if i < 0x80:
+            return self.write_byte(i)
+        result = bytearray(b'')
         while True:
-            result = chr((i & 0x7f) | 0x80) + result
+            result.append((i & 0x7f) | 0x80)
             i >>= 7
             if ((i & ~0x7F) == 0):
+                result.append(i)
                 break
         return self.write(result)
       
