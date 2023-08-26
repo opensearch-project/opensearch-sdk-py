@@ -47,12 +47,12 @@ async def handle_connection(conn, loop):
                 # TODO: need a better system of handling all these actions
                 # The additional bytes read inside this conditional are Writeables based on the specific request
                 if action == 'internal:tcp/handshake':
-                    # Writeable data for this action is a BytesReference of length 4 which parses to vint version
+                    # Writeable data for this action is a BytesReference of length 4
                     data = input.read_bytes(input.read_array_size())
-                    # 0xa38eb741 -> 3000099
-                    os_version_int = StreamInput(data).read_v_int()
+                    # Internally this is a vint 0xa38eb741 -> 3000099 ^ MASK                    
+                    os_version_int = StreamInput(data).read_v_int() ^ Version.MASK
                     os_version = Version(os_version_int)
-                                       
+
                     # response_header = TcpHeader(request_id=header.request_id, status=header.status, size=TcpHeader.HEADER_SIZE, version=header.version)
                     # response_header.set_response()
                     #
@@ -62,7 +62,7 @@ async def handle_connection(conn, loop):
                     # variable_header.write_byte(0)
                     # variable_header.write_byte(0)
                     #
-                    #variable_header.write_v_int(99 | 0x08000000)
+                    # variable_header.write_v_int(Version(300099).id)
                     #
                     # variable_bytes = variable_header.getvalue()
                     # response_header.variable_header_size = len(variable_bytes)

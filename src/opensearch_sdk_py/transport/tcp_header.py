@@ -33,7 +33,7 @@ class TcpHeader:
         self.size = input.read_int()
         self.request_id = input.read_long()
         self.status = input.read_byte()
-        self.version = Version(input.read_int())
+        self.version = Version(data = input.read_bytes(4))
         self.variable_header_size = input.read_int()
         # print(f"remaining: {input.read_bytes(self.variable_header_size)}")
 

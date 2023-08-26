@@ -1,10 +1,15 @@
 class Version:
     MASK = 0x08000000
 
-    def __init__(self, id: int):
-        self.data = id
-        self.id = id ^ Version.MASK
-        id &= 0xF7FFFFFF
+    def __init__(self, id: int=0, data:bytes=None):
+        if data == None:
+            # OpenSearch flips 25th bit to sort higher than legacy versions
+            self.id = id ^ Version.MASK
+        else:
+            # If we have data bytes use directly for id without bit-flip
+            self.id = int.from_bytes(data, "big")             
+        # String parsing strips 25th bit
+        id = self.id & 0xF7FFFFFF
         self.major = int((id / 1000000) % 100)
         self.minor = int((id / 10000) % 100)
         self.revision = int((id / 100) % 100)
@@ -14,4 +19,4 @@ class Version:
         return f"{self.major}.{self.minor}.{self.revision}.{self.build}"
             
     def __bytes__(self):
-        return self.data.to_bytes(4, byteorder='big')
+        return self.id.to_bytes(4, byteorder='big')
