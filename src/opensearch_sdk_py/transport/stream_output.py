@@ -3,7 +3,7 @@ from opensearch_sdk_py.transport.version import Version
 
 class StreamOutput(BytesIO):
     def write_byte(self, b: int):
-        return self.write(b.to_bytes(1))
+        return self.write(b.to_bytes(1, byteorder='big'))
 
     #  writes an int as four bytes.
     def write_int(self, i: int):

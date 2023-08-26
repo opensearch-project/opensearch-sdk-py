@@ -22,22 +22,21 @@ async def handle_connection(conn, loop):
             header.read_from(input)
             print(f"\t{header}")
 
-            # TODO: This is probably not correct, this is included in all request/response
-            # with the only difference being the action, but it broke the "response handshake"
+            # Thread Context written for both request and response
+            request_headers = input.read_string_to_string_dict()
+            if len(request_headers):
+                print(f"\trequest headers: {request_headers}")
+
+            response_headers = input.read_string_to_string_array_dict()
+            if len(response_headers):
+                print(f"\tresponse headers: {response_headers}")
+
+            # Features and actions only written for requests
             if header.is_request():
-                request_headers = input.read_string_to_string_dict()
-                if len(request_headers):
-                    print(f"\trequest headers: {request_headers}")
+                features = input.read_string_array()
+                if len(features):
+                    print(f"\tfeatures: {features}")
 
-                response_headers = input.read_string_to_string_array_dict()
-                if len(response_headers):
-                    print(f"\tresponse headers: {response_headers}")
-
-            features = input.read_string_array()
-            if len(features):
-                print(f"\tfeatures: {features}")
-
-            if header.is_request():
                 action = input.read_string()
                 print(f"\taction: {action}")
 
@@ -53,32 +52,36 @@ async def handle_connection(conn, loop):
                     os_version_int = StreamInput(data).read_v_int() ^ Version.MASK
                     os_version = Version(os_version_int)
 
-                    # response_header = TcpHeader(request_id=header.request_id, status=header.status, size=TcpHeader.HEADER_SIZE, version=header.version)
-                    # response_header.set_response()
-                    #
-                    # variable_header = StreamOutput()
-                    # TODO not sure what these bytes are
-                    # variable_header.write_byte(2)
-                    # variable_header.write_byte(0)
-                    # variable_header.write_byte(0)
-                    #
-                    # variable_header.write_v_int(Version(300099).id)
-                    #
-                    # variable_bytes = variable_header.getvalue()
-                    # response_header.variable_header_size = len(variable_bytes)
-                    # response_header.size += response_header.variable_header_size
-                    #
-                    # output = StreamOutput()
-                    # response_header.write_to(output)
-                    # output.write(variable_bytes)
-                    #
-                    # print(f"\tparsed TCP handshake, OpenSearch {os_version}, returning a response:")
-                    # print(f"\t{response_header}, variable={variable_bytes}")
-                    #
-                    # await loop.sock_sendall(conn, output.getvalue())
-                    #
-                    print(f"\tparsed TCP handshake, OpenSearch {os_version}, still don't know how to respond")
-                    await loop.sock_sendall(conn, raw)
+                    message_length = TcpHeader.HEADER_SIZE - TcpHeader.MARKER_BYTES_SIZE - TcpHeader.MESSAGE_LENGTH_SIZE
+                    response_header = TcpHeader(request_id=header.request_id, status=header.status, size=message_length, version=header.version)
+                    response_header.set_response()
+                    
+                    variable_header = StreamOutput()
+                    # These bytes are the context maps
+                    variable_header.write_byte(0)
+                    variable_header.write_byte(0)
+                    # No features on a response
+
+                    writeable_data = StreamOutput()
+                    # This is written last without any length bit
+                    writeable_data.write_v_int(Version(os_version_int).id)
+                    
+                    variable_bytes = variable_header.getvalue()
+                    response_header.variable_header_size = len(variable_bytes)
+                    response_header.size += response_header.variable_header_size
+
+                    writeable_bytes = writeable_data.getvalue()
+                    response_header.size += len(writeable_bytes)
+
+                    output = StreamOutput()
+                    response_header.write_to(output)
+                    output.write(variable_bytes)
+                    output.write(writeable_bytes)
+                                        
+                    raw_out = output.getvalue()
+                    print(f"\tparsed TCP handshake, OpenSearch {os_version}, returning a response, {len(raw_out)} byte(s):\n\t#{raw_out}\n\t{response_header}")
+                    
+                    await loop.sock_sendall(conn, output.getvalue())
                 else:
                     print(f"\tparsed action {header}, not sure what to do with it")
             elif header.is_handshake():

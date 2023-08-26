@@ -43,7 +43,7 @@ class TcpHeader:
         output.write_long(self.request_id)
         output.write_byte(self.status)
         output.write_version(self.version)
-        output.write_byte(self.variable_header_size)
+        output.write_int(self.variable_header_size)
 
     def __str__(self):
         return f"{self.statuses} {self.prefix}, message={self.size} byte(s), request_id={self.request_id}, status={self.status}, version={self.version}"
