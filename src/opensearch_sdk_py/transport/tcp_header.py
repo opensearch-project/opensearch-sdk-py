@@ -22,7 +22,7 @@ class TcpHeader:
     def __init__(self, prefix='ES', request_id=1, status=0, version=None, size=-1, variable_header_size=0):
         self.prefix = prefix
         self.request_id = request_id
-        self.status = TransportStatus.STATUS_HANDSHAKE
+        self.status = status
         self.version = version
         self.size = size
         self.variable_header_size = variable_header_size

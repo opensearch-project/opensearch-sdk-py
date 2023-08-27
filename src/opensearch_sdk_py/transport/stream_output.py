@@ -281,12 +281,9 @@ class StreamOutput(BytesIO):
     # private static byte ONE = 1;
     # private static byte TWO = 2;
 
-    # /**
-    #  Writes a boolean.
-    #  
-    # def write_boolean(boolean b) throws IOException {
-    #     write_byte(b ? ONE : ZERO);
-    # }
+    # writes a boolean
+    def write_boolean(self, b: bool):
+        return self.write_byte(1 if b else 0)
 
     # def writeOptionalBoolean(@Nullable Boolean b) throws IOException {
     #     if (b == null) {

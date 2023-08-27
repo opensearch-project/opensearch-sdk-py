@@ -11,6 +11,8 @@ from opensearch_sdk_py.transport.handshake_request import HandshakeRequest
 from opensearch_sdk_py.transport.handshake_response import HandshakeResponse
 
 async def handle_connection(conn, loop):
+    # TODO, probably should be a constant elsewhere
+    current_version_id = Version(3000099).id
     try:
         conn.setblocking(False)
         # out = StreamOutput(loop, conn)
@@ -52,6 +54,8 @@ async def handle_connection(conn, loop):
                     os_version_int = StreamInput(data).read_v_int() ^ Version.MASK
                     os_version = Version(os_version_int)
 
+                    # Standard response header and variable header, need to refactor from here to the interesting part
+                    # TODO: this should probably be a default size in the TcpHeader constructor or a constant or both
                     message_length = TcpHeader.HEADER_SIZE - TcpHeader.MARKER_BYTES_SIZE - TcpHeader.MESSAGE_LENGTH_SIZE
                     response_header = TcpHeader(request_id=header.request_id, status=header.status, size=message_length, version=header.version)
                     response_header.set_response()
@@ -62,10 +66,12 @@ async def handle_connection(conn, loop):
                     variable_header.write_byte(0)
                     # No features on a response
 
+                    # Here's the interesting part of this response.
                     writeable_data = StreamOutput()
-                    # This is written last without any length bit
-                    writeable_data.write_v_int(Version(os_version_int).id)
+                    # Version.CURRENT
+                    writeable_data.write_v_int(current_version_id)
                     
+                    # Interesting part complete, back to math to assemble the pieces
                     variable_bytes = variable_header.getvalue()
                     response_header.variable_header_size = len(variable_bytes)
                     response_header.size += response_header.variable_header_size
@@ -79,20 +85,95 @@ async def handle_connection(conn, loop):
                     output.write(writeable_bytes)
                                         
                     raw_out = output.getvalue()
-                    print(f"\tparsed TCP handshake, OpenSearch {os_version}, returning a response, {len(raw_out)} byte(s):\n\t#{raw_out}\n\t{response_header}")
+                    print(f"\tparsed TCP handshake, OpenSearch {os_version}, returning a response")
+                    print(f"\nsent handshake response , {len(raw_out)} byte(s):\n\t#{raw_out}\n\t{response_header}")
+                    
+                    await loop.sock_sendall(conn, output.getvalue())
+                elif action == 'internal:transport/handshake':
+                    # No writeable data for this request action, we just send a response
+
+                    # Standard response header and variable header, need to refactor from here to the interesting part
+                    # TODO: this should probably be a default size in the TcpHeader constructor or a constant or both
+                    message_length = TcpHeader.HEADER_SIZE - TcpHeader.MARKER_BYTES_SIZE - TcpHeader.MESSAGE_LENGTH_SIZE
+                    response_header = TcpHeader(request_id=header.request_id, status=header.status, size=message_length, version=header.version)
+                    response_header.set_response()
+                    
+                    variable_header = StreamOutput()
+                    # These bytes are the context maps
+                    variable_header.write_byte(0)
+                    variable_header.write_byte(0)
+                    # No features on a response
+
+                    # Here's the interesting part of this response.
+                    writeable_data = StreamOutput()
+                    # OptionalWriteable(DiscoveryNode)
+                    writeable_data.write_boolean(True) # optional is present
+                    # TODO: Refactor to an object
+                    # Begin DiscoveryNode object
+                    writeable_data.write_string("hello-world");
+                    writeable_data.write_string("nodeId");
+                    writeable_data.write_string("ephemeralId");
+                    writeable_data.write_string("127.0.0.1"); # hostName
+                    writeable_data.write_string("127.0.0.1"); # hostAddress
+                    # TODO: Refactor to an object
+                    # Begin TransportAddress object
+                    writeable_data.write_byte(4) # IP address has 4 bytes
+                    writeable_data.write_byte(127) # The address
+                    writeable_data.write_byte(0)
+                    writeable_data.write_byte(0)
+                    writeable_data.write_byte(1)
+                    writeable_data.write_string("127.0.0.1"); # address.getHostString
+                    writeable_data.write_int(1234) # The port
+                    # End TransportAddress object
+                    # Write attributes map: VInt size and key value string pairs
+                    writeable_data.write_v_int(0) # Empty attributes map
+                    # for att in range(): write_string(key), write_string(value)
+                    # Write roles. Vint size and triplets with name, abbr, canContainData
+                    writeable_data.write_v_int(4) 
+                    writeable_data.write_string("cluster_manager")
+                    writeable_data.write_string("m")
+                    writeable_data.write_boolean(True)
+                    writeable_data.write_string("data")
+                    writeable_data.write_string("d")
+                    writeable_data.write_boolean(True)
+                    writeable_data.write_string("ingest")
+                    writeable_data.write_string("i")
+                    writeable_data.write_boolean(False)
+                    writeable_data.write_string("remote_cluster_client")
+                    writeable_data.write_string("r")
+                    writeable_data.write_boolean(False)
+                    # Version
+                    writeable_data.write_v_int(current_version_id)
+                    # End DiscoveryNode Object
+
+                    # ClusterName
+                    writeable_data.write_string("opensearch")
+
+                    # Version.CURRENT
+                    writeable_data.write_v_int(current_version_id)
+
+                    # Interesting part complete, back to same math as before to assemble the pieces
+                    variable_bytes = variable_header.getvalue()
+                    response_header.variable_header_size = len(variable_bytes)
+                    response_header.size += response_header.variable_header_size
+
+                    writeable_bytes = writeable_data.getvalue()
+                    response_header.size += len(writeable_bytes)
+
+                    output = StreamOutput()
+                    response_header.write_to(output)
+                    output.write(variable_bytes)
+                    output.write(writeable_bytes)
+                                        
+                    raw_out = output.getvalue()
+                    print(f"\tparsed Transport handshake, returning a response")
+                    print(f"\nsent handshake response , {len(raw_out)} byte(s):\n\t#{raw_out}\n\t{response_header}")
                     
                     await loop.sock_sendall(conn, output.getvalue())
                 else:
-                    print(f"\tparsed action {header}, not sure what to do with it")
-            elif header.is_handshake():
-                await loop.sock_sendall(conn, raw)
+                    print(f"\tparsed action {header}, haven't yet written what to do with it")
             else:
-                # just send back the same message
-                # await loop.sock_sendall(conn, raw)
-                print(f"\tparsed {header}, not sure what to do with it")
-
-            # read the rest of the message
-            # input.read_bytes(header.variable_header_size)
+                print(f"\tparsed {header}, this is a response to something I sent, haven't yet written what to do with it")
 
     except Exception as ex:
         logging.exception(ex)
