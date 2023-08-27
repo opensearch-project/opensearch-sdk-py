@@ -70,3 +70,24 @@ class TestStreamOutput(unittest.TestCase):
         out.write_boolean(True)
         out.write_boolean(False)
         self.assertEqual(out.getvalue(), b'\x01\x00')
+
+    def test_write_string_array(self):
+        out = StreamOutput()
+        out.write_string_array(['foo', 'bar'])
+        self.assertEqual(out.getvalue(), b'\x02\x03foo\x03bar')
+
+    def test_write_string_to_string_dict(self):
+        d = dict()
+        d['foo'] = 'bar'
+        d['baz'] = 'qux'
+        out = StreamOutput()
+        out.write_string_to_string_dict(d)
+        self.assertEqual(out.getvalue(), b'\x02\x03foo\x03bar\x03baz\x03qux')
+
+    def test_write_string_to_string_array_dict(self):
+        d = dict()
+        d['foo'] = ['bar', 'baz']
+        d['qux'] = []
+        out = StreamOutput()
+        out.write_string_to_string_array_dict(d)
+        self.assertEqual(out.getvalue(), b'\x02\x03foo\x02\x03bar\x03baz\x03qux\x00')

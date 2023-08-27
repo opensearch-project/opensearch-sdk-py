@@ -85,16 +85,10 @@ async def handle_connection(conn, loop):
                     
                     # TODO: Variable header writing should be part of OutboundMessage class per earlier comment
                     variable_header = StreamOutput()
-                    # These bytes are the context maps
+
                     # TODO: Refactor this by implementing writing the thread context 
-                    variable_header.write_v_int(len(request_headers))
-                    for key in request_headers:
-                        variable_header.write_string(key)
-                        variable_header.write_string(request_headers[key])
-                    variable_header.write_v_int(len(response_headers))
-                    for key in response_headers:
-                        variable_header.write_string(key)
-                        variable_header.write_string_array(response_headers[key])
+                    variable_header.write_string_to_string_dict(request_headers)
+                    variable_header.write_string_to_string_array_dict(response_headers)
 
                     # TODO: Here we switch from NetworkMessage subclass to TransportMessage subclass
                     # Bytes here don't count against variable header length but are added to total message length
@@ -144,16 +138,10 @@ async def handle_connection(conn, loop):
                     response_header.set_response()
                     
                     variable_header = StreamOutput()
-                    # These bytes are the context maps
+
                     # TODO: Refactor this by implementing writing the thread context 
-                    variable_header.write_v_int(len(request_headers))
-                    for key in request_headers:
-                        variable_header.write_string(key)
-                        variable_header.write_string(request_headers[key])
-                    variable_header.write_v_int(len(response_headers))
-                    for key in response_headers:
-                        variable_header.write_string(key)
-                        variable_header.write_string_array(response_headers[key])
+                    variable_header.write_string_to_string_dict(request_headers)
+                    variable_header.write_string_to_string_array_dict(response_headers)
 
                     # TODO: Here we switch from NetworkMessage subclass to TransportMessage subclass
                     # Bytes here don't count against variable header length but are added to total message length
@@ -254,16 +242,10 @@ async def handle_connection(conn, loop):
 
                     # TODO: Variable header writing should be part of OutboundMessage class per earlier comment
                     variable_header = StreamOutput()
-                    # These bytes are the context maps
+
                     # TODO: Refactor this by implementing writing the thread context 
-                    variable_header.write_v_int(len(request_headers))
-                    for key in request_headers:
-                        variable_header.write_string(key)
-                        variable_header.write_string(request_headers[key])
-                    variable_header.write_v_int(len(response_headers))
-                    for key in response_headers:
-                        variable_header.write_string(key)
-                        variable_header.write_string_array(response_headers[key])
+                    variable_header.write_string_to_string_dict(request_headers)
+                    variable_header.write_string_to_string_array_dict(response_headers)
 
                     # TODO: Here we switch from NetworkMessage subclass to TransportMessage subclass
                     # Bytes here don't count against variable header length but are added to total message length
@@ -273,10 +255,7 @@ async def handle_connection(conn, loop):
                     # Extension name comes from ExtensionSettings
                     writeable_data.write_string('hello-world')
                     # Implemented interfaces are collection of java class names
-                    # TODO: Implement write string array in Stream Output
-                    writeable_data.write_v_int(2)
-                    writeable_data.write_string('Extension')
-                    writeable_data.write_string('ActionExtension')
+                    writeable_data.write_string_array(['Extension', 'ActionExtension'])
                     
                     # Done with the NetworkMessage and TransportMessage
 

@@ -327,19 +327,11 @@ class StreamOutput(BytesIO):
     #     }
     # }
 
-    # /**
-    #  Writes a string array, for nullable string, writes it as 0 (empty string).
-    #  
-    # def writeStringArrayNullable(@Nullable String[] array) throws IOException {
-    #     if (array == null) {
-    #         writeVInt(0);
-    #     } else {
-    #         writeVInt(array.length);
-    #         for (String s : array) {
-    #             writeString(s);
-    #         }
-    #     }
-    # }
+    # writes a string array
+    def write_string_array(self, a: [str]):
+        self.write_v_int(len(a))
+        for s in a:
+            self.write_string(s)
 
     # /**
     #  Writes a string array, for nullable string, writes false.
@@ -356,6 +348,18 @@ class StreamOutput(BytesIO):
     # def writeMap(@Nullable Map<String, Object> map) throws IOException {
     #     writeGenericValue(map);
     # }
+
+    def write_string_to_string_dict(self, d: dict[str, str]):
+        self.write_v_int(len(d))
+        for k in d:
+            self.write_string(k)
+            self.write_string(d[k])
+
+    def write_string_to_string_array_dict(self, d: dict[str, list[str]]):
+        self.write_v_int(len(d))
+        for k in d:
+            self.write_string(k)
+            self.write_string_array(d[k])
 
     # /**
     #  write map to stream with consistent order
