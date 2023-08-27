@@ -86,7 +86,7 @@ async def handle_connection(conn, loop):
                                         
                     raw_out = output.getvalue()
                     print(f"\tparsed TCP handshake, OpenSearch {os_version}, returning a response")
-                    print(f"\nsent handshake response , {len(raw_out)} byte(s):\n\t#{raw_out}\n\t{response_header}")
+                    print(f"\nsent handshake response, {len(raw_out)} byte(s):\n\t#{raw_out}\n\t{response_header}")
                     
                     await loop.sock_sendall(conn, output.getvalue())
                 elif action == 'internal:transport/handshake':
@@ -132,7 +132,7 @@ async def handle_connection(conn, loop):
                     writeable_data.write_v_int(4) 
                     writeable_data.write_string("cluster_manager")
                     writeable_data.write_string("m")
-                    writeable_data.write_boolean(True)
+                    writeable_data.write_boolean(False)
                     writeable_data.write_string("data")
                     writeable_data.write_string("d")
                     writeable_data.write_boolean(True)
@@ -167,7 +167,7 @@ async def handle_connection(conn, loop):
                                         
                     raw_out = output.getvalue()
                     print(f"\tparsed Transport handshake, returning a response")
-                    print(f"\nsent handshake response , {len(raw_out)} byte(s):\n\t#{raw_out}\n\t{response_header}")
+                    print(f"\nsent handshake response, {len(raw_out)} byte(s):\n\t#{raw_out}\n\t{response_header}")
                     
                     await loop.sock_sendall(conn, output.getvalue())
                 else:

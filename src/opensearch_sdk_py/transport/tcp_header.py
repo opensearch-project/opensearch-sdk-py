@@ -33,7 +33,7 @@ class TcpHeader:
         self.size = input.read_int()
         self.request_id = input.read_long()
         self.status = input.read_byte()
-        self.version = Version(data = input.read_bytes(4))
+        self.version = Version(data = input.read_bytes(4)) # always 4 bytes big-endian
         self.variable_header_size = input.read_int()
         # print(f"remaining: {input.read_bytes(self.variable_header_size)}")
 
@@ -42,7 +42,7 @@ class TcpHeader:
         output.write_int(self.size)
         output.write_long(self.request_id)
         output.write_byte(self.status)
-        output.write_version(self.version)
+        output.write(bytes(self.version)) # always 4 bytes big-endian
         output.write_int(self.variable_header_size)
 
     def __str__(self):

@@ -24,7 +24,7 @@ class StreamOutput(BytesIO):
         return self.write(result)
       
     def write_version(self, version: Version):
-        return self.write(bytes(version))
+        return self.write_v_int(version.id)
 
     def write_long(self, i: int):
         return self.write(i.to_bytes(8, byteorder='big'))

@@ -14,6 +14,7 @@ class TestStreamOutput(unittest.TestCase):
         out = StreamOutput()
         out.write_int(42)
         self.assertEqual(out.getvalue(), b'\x00\x00\x00\x2a')
+        self.assertRaises(OverflowError, out.write_int, 4294967296)
 
     def test_write_v_int(self):
         out = StreamOutput()
@@ -52,7 +53,7 @@ class TestStreamOutput(unittest.TestCase):
         out = StreamOutput()
         v = Version(2100099)
         out.write_version(v)
-        self.assertEqual(out.getvalue(), b'\x08\x20\x0b\x83')
+        self.assertEqual(out.getvalue(), b'\x83\x97\x80\x41')
 
     def test_write_long(self):
         out = StreamOutput()
@@ -64,7 +65,7 @@ class TestStreamOutput(unittest.TestCase):
         out.write_string("test")
         self.assertEqual(out.getvalue(), b'\x04test')
 
-    def test_write_long(self):
+    def test_write_boolean(self):
         out = StreamOutput()
         out.write_boolean(True)
         out.write_boolean(False)
