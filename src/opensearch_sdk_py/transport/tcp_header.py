@@ -20,7 +20,7 @@ class TcpHeader:
     HEADER_SIZE = PRE_76_HEADER_SIZE + VARIABLE_HEADER_SIZE
     MESSAGE_SIZE = HEADER_SIZE - BYTES_REQUIRED_FOR_MESSAGE_SIZE
 
-    def __init__(self, prefix='ES', request_id=1, status=0, version=None, size=MESSAGE_SIZE, variable_header_size=0):
+    def __init__(self, prefix=b'ES', request_id=1, status=0, version=None, size=MESSAGE_SIZE, variable_header_size=0):
         self.prefix = prefix
         self.request_id = request_id
         self.status = status
@@ -39,7 +39,7 @@ class TcpHeader:
         # print(f"remaining: {input.read_bytes(self.variable_header_size)}")
 
     def write_to(self, output: StreamOutput):
-        output.write(bytes(self.prefix, 'ascii'))
+        output.write(self.prefix)
         output.write_int(self.size)
         output.write_long(self.request_id)
         output.write_byte(self.status)
