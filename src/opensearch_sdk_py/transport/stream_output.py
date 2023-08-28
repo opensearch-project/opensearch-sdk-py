@@ -3,7 +3,7 @@ from opensearch_sdk_py.transport.version import Version
 
 class StreamOutput(BytesIO):
     def write_byte(self, b: int):
-        return self.write(b.to_bytes(1))
+        return self.write(b.to_bytes(1, byteorder='big'))
 
     #  writes an int as four bytes.
     def write_int(self, i: int):
@@ -24,7 +24,7 @@ class StreamOutput(BytesIO):
         return self.write(result)
       
     def write_version(self, version: Version):
-        return self.write(bytes(version))
+        return self.write_v_int(version.id)
 
     def write_long(self, i: int):
         return self.write(i.to_bytes(8, byteorder='big'))
@@ -281,12 +281,9 @@ class StreamOutput(BytesIO):
     # private static byte ONE = 1;
     # private static byte TWO = 2;
 
-    # /**
-    #  Writes a boolean.
-    #  
-    # def write_boolean(boolean b) throws IOException {
-    #     write_byte(b ? ONE : ZERO);
-    # }
+    # writes a boolean
+    def write_boolean(self, b: bool):
+        return self.write_byte(1 if b else 0)
 
     # def writeOptionalBoolean(@Nullable Boolean b) throws IOException {
     #     if (b == null) {
@@ -330,19 +327,11 @@ class StreamOutput(BytesIO):
     #     }
     # }
 
-    # /**
-    #  Writes a string array, for nullable string, writes it as 0 (empty string).
-    #  
-    # def writeStringArrayNullable(@Nullable String[] array) throws IOException {
-    #     if (array == null) {
-    #         writeVInt(0);
-    #     } else {
-    #         writeVInt(array.length);
-    #         for (String s : array) {
-    #             writeString(s);
-    #         }
-    #     }
-    # }
+    # writes a string array
+    def write_string_array(self, a: [str]):
+        self.write_v_int(len(a))
+        for s in a:
+            self.write_string(s)
 
     # /**
     #  Writes a string array, for nullable string, writes false.
@@ -359,6 +348,18 @@ class StreamOutput(BytesIO):
     # def writeMap(@Nullable Map<String, Object> map) throws IOException {
     #     writeGenericValue(map);
     # }
+
+    def write_string_to_string_dict(self, d: dict[str, str]):
+        self.write_v_int(len(d))
+        for k in d:
+            self.write_string(k)
+            self.write_string(d[k])
+
+    def write_string_to_string_array_dict(self, d: dict[str, list[str]]):
+        self.write_v_int(len(d))
+        for k in d:
+            self.write_string(k)
+            self.write_string_array(d[k])
 
     # /**
     #  write map to stream with consistent order

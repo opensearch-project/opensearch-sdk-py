@@ -18,11 +18,12 @@ class TcpHeader:
     PRE_76_HEADER_SIZE = VERSION_POSITION + VERSION_ID_SIZE
     BYTES_REQUIRED_FOR_VERSION = PRE_76_HEADER_SIZE
     HEADER_SIZE = PRE_76_HEADER_SIZE + VARIABLE_HEADER_SIZE
+    MESSAGE_SIZE = HEADER_SIZE - BYTES_REQUIRED_FOR_MESSAGE_SIZE
 
-    def __init__(self, prefix='ES', request_id=1, status=0, version=None, size=-1, variable_header_size=0):
+    def __init__(self, prefix=b'ES', request_id=1, status=0, version=None, size=MESSAGE_SIZE, variable_header_size=0):
         self.prefix = prefix
         self.request_id = request_id
-        self.status = TransportStatus.STATUS_HANDSHAKE
+        self.status = status
         self.version = version
         self.size = size
         self.variable_header_size = variable_header_size
@@ -33,17 +34,17 @@ class TcpHeader:
         self.size = input.read_int()
         self.request_id = input.read_long()
         self.status = input.read_byte()
-        self.version = Version(input.read_int())
+        self.version = Version(data = input.read_bytes(4)) # always 4 bytes big-endian
         self.variable_header_size = input.read_int()
         # print(f"remaining: {input.read_bytes(self.variable_header_size)}")
 
     def write_to(self, output: StreamOutput):
-        output.write(bytes(self.prefix, 'ascii'))
+        output.write(self.prefix)
         output.write_int(self.size)
         output.write_long(self.request_id)
         output.write_byte(self.status)
-        output.write_version(self.version)
-        output.write_byte(self.variable_header_size)
+        output.write(bytes(self.version)) # always 4 bytes big-endian
+        output.write_int(self.variable_header_size)
 
     def __str__(self):
         return f"{self.statuses} {self.prefix}, message={self.size} byte(s), request_id={self.request_id}, status={self.status}, version={self.version}"

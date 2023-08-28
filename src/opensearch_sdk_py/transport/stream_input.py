@@ -4,23 +4,20 @@ from opensearch_sdk_py.transport.version import Version
 
 class StreamInput:
     def __init__(self, input):
-      self.raw = input
-      self.data = io.BytesIO(input)
+        self.raw = input
+        self.data = io.BytesIO(input)
 
     def read_byte(self) -> int:
-      return self.data.read(1)[0]
+        return self.data.read(1)[0]
     
     def read_bytes(self, len: int):
-      return self.data.read(len)
+        return self.data.read(len)
     
     def read_int(self) -> int:
-       return ((self.read_byte() & 0xFF) << 24) | ((self.read_byte() & 0xFF) << 16) | ((self.read_byte() & 0xFF) << 8) | (self.read_byte() & 0xFF)
-
-    def read_long(self) -> int:
-      return self.read_int() << 32 | self.read_int() & 0xFFFFFFFF
+        return ((self.read_byte() & 0xFF) << 24) | ((self.read_byte() & 0xFF) << 16) | ((self.read_byte() & 0xFF) << 8) | (self.read_byte() & 0xFF)
 
     def read_short(self) -> int:    
-      return (((self.read_byte() & 0xFF) << 8) | (self.read_byte() & 0xFF))
+        return (((self.read_byte() & 0xFF) << 8) | (self.read_byte() & 0xFF))
 
     def read_boolean(self):
         value = self.read_byte()
@@ -82,7 +79,7 @@ class StreamInput:
     # reads eight bytes and returns a long
     def read_long(self) -> int:
         return self.read_int() << 32 | self.read_int() & 0xFFFFFFFF
-    
+
     # reads a long stored in variable-length format
     def read_v_long(self) -> int:
         b = self.read_byte()
@@ -163,7 +160,7 @@ class StreamInput:
         char_count = self.read_array_size()
         return str(self.read_bytes(char_count), 'ascii')
 
-    def read_string_array(self) -> [str]:
+    def read_string_array(self) -> list[str]:
         size = self.read_array_size()
         if size == 0:
             return []
@@ -174,7 +171,7 @@ class StreamInput:
 
         return result
 
-    def read_optional_string_array(self) -> [str]:
+    def read_optional_string_array(self) -> list[str]:
         if self.read_boolean():
             return self.read_string_array()
         else:

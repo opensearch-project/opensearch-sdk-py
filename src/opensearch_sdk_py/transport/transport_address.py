@@ -1,27 +1,24 @@
+import ipaddress
+
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
 
-class TransportAddress:
-    def __init__(self):
-        super().__init__(self)
+class TransportAddress(ipaddress.IPv4Address):
+    def __init__(self, address: any='0.0.0.0', port:int=0, host_name=None):
+        self.address = ipaddress.IPv4Address(address)
+        self.host_name = host_name if host_name else str(self.address)
+        self.port = port
 
     def read_from(self, input: StreamInput):
-        # final int len = in.readByte();
-        # final byte[] a = new byte[len]; // 4 bytes (IPv4) or 16 bytes (IPv6)
-        # in.readFully(a);
-        # String host = in.readString(); // the host string was serialized so we can ignore the passed in version
-        # final InetAddress inetAddress = InetAddress.getByAddress(host, a);
-        # int port = in.readInt();
-        # this.address = new InetSocketAddress(inetAddress, port);
-        pass
+        addr_bytes = input.read_byte()
+        if (addr_bytes != 4):
+            raise Exception(f"Invalid address byte size")
+        self.address = ipaddress.IPv4Address(input.read_int())
+        self.host_name = input.read_string()
+        self.port = input.read_int()
 
     def write_to(self, output: StreamOutput):
-        # byte[] bytes = address.getAddress().getAddress();  // 4 bytes (IPv4) or 16 bytes (IPv6)
-        # out.writeByte((byte) bytes.length); // 1 byte
-        # out.write(bytes, 0, bytes.length);
-        # out.writeString(address.getHostString());
-        # // don't serialize scope ids over the network!!!!
-        # // these only make sense with respect to the local machine, and will only formulate
-        # // the address incorrectly remotely.
-        # out.writeInt(address.getPort());
-        pass
+        output.write_byte(4)
+        output.write_int(int(self.address))
+        output.write_string(self.host_name)
+        output.write_int(self.port)
