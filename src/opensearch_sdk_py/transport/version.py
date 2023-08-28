@@ -1,5 +1,6 @@
 class Version:
     MASK = 0x08000000
+    CURRENT = MASK | 3000099
 
     def __init__(self, id: int=0, data:bytes=None):
         if data == None:

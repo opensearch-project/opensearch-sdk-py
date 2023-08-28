@@ -12,8 +12,6 @@ from opensearch_sdk_py.transport.handshake_response import HandshakeResponse
 from opensearch_sdk_py.transport.transport_address import TransportAddress
 
 async def handle_connection(conn, loop):
-    # TODO, probably should be a constant elsewhere
-    current_version_id = Version(3000099).id
     try:
         conn.setblocking(False)
         # out = StreamOutput(loop, conn)
@@ -95,8 +93,7 @@ async def handle_connection(conn, loop):
                     # TODO: refactor into HandshakeResponse class. Note OpenSearch has two HandshakeResponse classes.
                     # This one is o.o.transport.TransportHandshaker.HandshakeResponse
                     # Unlike the request which wraps version in a BytesReference we just directly write vint
-                    # Version.CURRENT
-                    writeable_data.write_v_int(current_version_id)
+                    writeable_data.write_v_int(Version.CURRENT)
                     
                     # Done with the NetworkMessage and TransportMessage
 
@@ -173,14 +170,14 @@ async def handle_connection(conn, loop):
                         writeable_data.write_string(r[1])
                         writeable_data.write_boolean(r[2])
                     # Version
-                    writeable_data.write_v_int(current_version_id)
+                    writeable_data.write_v_int(Version.CURRENT)
                     # End DiscoveryNode Object
 
                     # ClusterName
                     writeable_data.write_string("opensearch")
 
                     # Version.CURRENT
-                    writeable_data.write_v_int(current_version_id)
+                    writeable_data.write_v_int(Version.CURRENT)
 
                     # Done with the NetworkMessage and TransportMessage
 

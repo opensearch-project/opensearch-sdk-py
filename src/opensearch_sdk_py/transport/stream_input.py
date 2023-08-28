@@ -160,7 +160,7 @@ class StreamInput:
         char_count = self.read_array_size()
         return str(self.read_bytes(char_count), 'ascii')
 
-    def read_string_array(self) -> [str]:
+    def read_string_array(self) -> list[str]:
         size = self.read_array_size()
         if size == 0:
             return []
@@ -171,7 +171,7 @@ class StreamInput:
 
         return result
 
-    def read_optional_string_array(self) -> [str]:
+    def read_optional_string_array(self) -> list[str]:
         if self.read_boolean():
             return self.read_string_array()
         else:
