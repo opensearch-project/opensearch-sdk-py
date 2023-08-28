@@ -18,8 +18,9 @@ class TcpHeader:
     PRE_76_HEADER_SIZE = VERSION_POSITION + VERSION_ID_SIZE
     BYTES_REQUIRED_FOR_VERSION = PRE_76_HEADER_SIZE
     HEADER_SIZE = PRE_76_HEADER_SIZE + VARIABLE_HEADER_SIZE
+    MESSAGE_SIZE = HEADER_SIZE - BYTES_REQUIRED_FOR_MESSAGE_SIZE
 
-    def __init__(self, prefix='ES', request_id=1, status=0, version=None, size=-1, variable_header_size=0):
+    def __init__(self, prefix='ES', request_id=1, status=0, version=None, size=MESSAGE_SIZE, variable_header_size=0):
         self.prefix = prefix
         self.request_id = request_id
         self.status = status

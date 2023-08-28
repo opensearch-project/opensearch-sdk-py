@@ -78,9 +78,7 @@ async def handle_connection(conn, loop):
 
                     # Standard response header and variable header are part of NetworkMessage and subclasses
                     # TODO: This TcpHeader should probably be part of NetworkMessage class per earlier comment
-                    # TODO: this length should probably be a default size in the TcpHeader constructor or a constant or both
-                    message_length = TcpHeader.HEADER_SIZE - TcpHeader.MARKER_BYTES_SIZE - TcpHeader.MESSAGE_LENGTH_SIZE
-                    response_header = TcpHeader(request_id=header.request_id, status=header.status, size=message_length, version=header.version)
+                    response_header = TcpHeader(request_id=header.request_id, status=header.status, version=header.version)
                     response_header.set_response()
                     
                     # TODO: Variable header writing should be part of OutboundMessage class per earlier comment
@@ -132,9 +130,7 @@ async def handle_connection(conn, loop):
                     # and begin creating a response (NetworkMessage subclass followed by TransportMessage subclass)
 
                     # Standard response header and variable header are part of NetworkMessage and subclasses
-                    # Copied from above (obvious refactor candidate!)
-                    message_length = TcpHeader.HEADER_SIZE - TcpHeader.MARKER_BYTES_SIZE - TcpHeader.MESSAGE_LENGTH_SIZE
-                    response_header = TcpHeader(request_id=header.request_id, status=header.status, size=message_length, version=header.version)
+                    response_header = TcpHeader(request_id=header.request_id, status=header.status, version=header.version)
                     response_header.set_response()
                     
                     variable_header = StreamOutput()
@@ -235,9 +231,7 @@ async def handle_connection(conn, loop):
 
                     # Standard response header and variable header are part of NetworkMessage and subclasses
                     # TODO: This TcpHeader should probably be part of NetworkMessage class per earlier comment
-                    # TODO: this length should probably be a default size in the TcpHeader constructor or a constant or both
-                    message_length = TcpHeader.HEADER_SIZE - TcpHeader.MARKER_BYTES_SIZE - TcpHeader.MESSAGE_LENGTH_SIZE
-                    response_header = TcpHeader(request_id=header.request_id, status=header.status, size=message_length, version=header.version)
+                    response_header = TcpHeader(request_id=header.request_id, status=header.status, version=header.version)
                     response_header.set_response()
 
                     # TODO: Variable header writing should be part of OutboundMessage class per earlier comment
