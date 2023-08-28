@@ -9,6 +9,7 @@ from opensearch_sdk_py.transport.tcp_header import TcpHeader
 from opensearch_sdk_py.transport.version import Version
 from opensearch_sdk_py.transport.handshake_request import HandshakeRequest
 from opensearch_sdk_py.transport.handshake_response import HandshakeResponse
+from opensearch_sdk_py.transport.transport_address import TransportAddress
 
 async def handle_connection(conn, loop):
     # TODO, probably should be a constant elsewhere
@@ -157,33 +158,20 @@ async def handle_connection(conn, loop):
                     writeable_data.write_string("ephemeralId");
                     writeable_data.write_string("127.0.0.1"); # hostName
                     writeable_data.write_string("127.0.0.1"); # hostAddress
-                    # TODO: Refactor to TransportAddress object. transport_address.py exists but needs the below code.
-                    # Begin TransportAddress object
-                    writeable_data.write_byte(4) # IP address has 4 bytes
-                    writeable_data.write_byte(127) # The address
-                    writeable_data.write_byte(0)
-                    writeable_data.write_byte(0)
-                    writeable_data.write_byte(1)
-                    writeable_data.write_string("127.0.0.1"); # address.getHostString
-                    writeable_data.write_int(1234) # The port
-                    # End TransportAddress object
-                    # Write attributes map: VInt size and key value string pairs
-                    writeable_data.write_v_int(0) # Empty attributes map
-                    # for att in range(): write_string(key), write_string(value)
+                    TransportAddress('127.0.0.1', 1234).write_to(writeable_data) # address
+                    # Write attributes map
+                    attributes = dict()
+                    writeable_data.write_string_to_string_dict(attributes)
                     # Write roles. Vint size and triplets with name, abbr, canContainData
-                    writeable_data.write_v_int(4) 
-                    writeable_data.write_string("cluster_manager")
-                    writeable_data.write_string("m")
-                    writeable_data.write_boolean(False)
-                    writeable_data.write_string("data")
-                    writeable_data.write_string("d")
-                    writeable_data.write_boolean(True)
-                    writeable_data.write_string("ingest")
-                    writeable_data.write_string("i")
-                    writeable_data.write_boolean(False)
-                    writeable_data.write_string("remote_cluster_client")
-                    writeable_data.write_string("r")
-                    writeable_data.write_boolean(False)
+                    roles = [['cluster_manager', 'm', False],
+                             ['data', 'd', True],
+                             ['ingest', 'i', False],
+                             ['remote_cluster_client', 'r', False]]
+                    writeable_data.write_v_int(len(roles))
+                    for r in roles:
+                        writeable_data.write_string(r[0])
+                        writeable_data.write_string(r[1])
+                        writeable_data.write_boolean(r[2])
                     # Version
                     writeable_data.write_v_int(current_version_id)
                     # End DiscoveryNode Object
