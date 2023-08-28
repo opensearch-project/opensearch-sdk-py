@@ -22,3 +22,6 @@ class TestTaskId(unittest.TestCase):
         ti = TaskId()
         self.assertEqual(ti.node_id, '')
         self.assertEqual(ti.id, -1)
+        out = StreamOutput()
+        ti.write_to(out)
+        self.assertEqual(out.getvalue(), b'\x00')
