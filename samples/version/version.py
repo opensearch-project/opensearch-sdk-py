@@ -2,4 +2,4 @@
 
 from opensearch_sdk_py.transport.version import Version
 
-print(Version(136317827))
+print(Version(2100099))

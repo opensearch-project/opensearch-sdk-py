@@ -14,7 +14,8 @@ class TestVersion(unittest.TestCase):
         self.assertEqual(bytes(v), b'\x08 \x0b\x83')
 
     def test_2_10_0_99_data(self):
-        v = Version(data = b'\x08 \x0b\x83')
+        v = Version()
+        v.from_bytes(b'\x08 \x0b\x83')
         self.assertEqual(v.id, 136317827)
         self.assertEqual(v.major, 2)
         self.assertEqual(v.minor, 10)
