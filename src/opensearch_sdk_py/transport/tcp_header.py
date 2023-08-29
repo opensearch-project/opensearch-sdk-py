@@ -34,9 +34,9 @@ class TcpHeader:
         self.size = input.read_int()
         self.request_id = input.read_long()
         self.status = input.read_byte()
-        self.version = Version(data = input.read_bytes(4)) # always 4 bytes big-endian
+        self.version = Version()
+        self.version.from_bytes(input.read_bytes(4)) # always 4 bytes big-endian
         self.variable_header_size = input.read_int()
-        # print(f"remaining: {input.read_bytes(self.variable_header_size)}")
 
     def write_to(self, output: StreamOutput):
         output.write(self.prefix)
