@@ -26,12 +26,12 @@ class OutboundMessage(NetworkMessage):
         self.tcp_header.size += variable_len
         self.tcp_header.variable_header_size += variable_len
         
-        transport_message = StreamOutput()
+        message_out = StreamOutput()
         if self.message:
-            transport_message.write_to(self.message)
-        message_len = len(transport_message.getvalue())
+            self.message.write_to(message_out)
+        message_len = len(message_out.getvalue())
         self.tcp_header.size += message_len
 
         self.tcp_header.write_to(output)
         output.write(variable_header.getvalue())
-        output.write(transport_message.getvalue())
+        output.write(message_out.getvalue())

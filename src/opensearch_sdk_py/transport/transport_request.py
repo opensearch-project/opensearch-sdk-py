@@ -1,14 +1,15 @@
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
 from opensearch_sdk_py.transport.task_id import TaskId
+from opensearch_sdk_py.transport.transport_message import TransportMessage
 
-class TransportRequest:
+class TransportRequest(TransportMessage):
     def __init__(self, data:bytes):        
         super().__init__()
         # TODO: Implementing this as a temporary way of getting writeable content from subclasses
         # to enable end-to-end testing.  This will probably be replaced by passing the bytes 
         # directly to write_to.  Will write test classes once that's done.
-        self.bytes = bytes
+        self.data = data
         self.parent_task_id = TaskId()
 
     def read_from(self, input: StreamInput):
@@ -17,5 +18,4 @@ class TransportRequest:
 
     def write_to(self, output: StreamOutput):
         self.parent_task_id.write_to(output)
-        output.write(self.bytes)
-
+        output.write(self.data)
