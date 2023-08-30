@@ -328,7 +328,13 @@ class StreamOutput(BytesIO):
     # }
 
     # writes a string array
-    def write_string_array(self, a: [str]):
+    def write_string_array(self, a: list[str]):
+        self.write_v_int(len(a))
+        for s in a:
+            self.write_string(s)
+
+    # writes a string set
+    def write_string_set(self, a: set[str]):
         self.write_v_int(len(a))
         for s in a:
             self.write_string(s)
@@ -360,6 +366,12 @@ class StreamOutput(BytesIO):
         for k in d:
             self.write_string(k)
             self.write_string_array(d[k])
+
+    def write_string_to_string_set_dict(self, d: dict[str, set[str]]):
+        self.write_v_int(len(d))
+        for k in d:
+            self.write_string(k)
+            self.write_string_set(d[k])
 
     # /**
     #  write map to stream with consistent order

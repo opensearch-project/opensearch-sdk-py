@@ -202,3 +202,18 @@ class StreamInput:
             result[key] = value
 
         return result
+
+    def read_string_to_string_set_dict(self) -> dict[str, set[str]]:
+        size = self.read_v_int()
+        if size == 0:
+            return {}
+
+        result = dict()      
+        for i in range(size):
+            key = self.read_string()
+            value = set()
+            for v in self.read_string_array():
+                value.add(v)
+            result[key] = value
+
+        return result

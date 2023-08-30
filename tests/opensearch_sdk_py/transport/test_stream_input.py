@@ -145,3 +145,10 @@ class TestStreamInput(unittest.TestCase):
         self.assertEqual(len(dict), 2)
         self.assertEqual(dict['foo'], ['bar', 'baz'])
         self.assertEqual(dict['qux'], [])
+
+    def test_read_string_to_string_set_dict(self):
+        input = StreamInput(b'\x02\x03foo\x03\x03bar\x03baz\x03bar\x03qux\x00')
+        dict = input.read_string_to_string_set_dict()
+        self.assertEqual(len(dict), 2)
+        self.assertSetEqual(dict['foo'], {'bar', 'baz'})
+        self.assertSetEqual(dict['qux'], set())
