@@ -6,7 +6,7 @@ class TransportMessage():
         pass
 
     def read_from(self, input: StreamInput):
-        pass # NO-OP, subclasses do this
+        pass # NO-OP, subclasses implement this
 
     def write_to(self, output: StreamOutput):
-        pass # NO-OP, subclasses do this
+        pass # NO-OP, subclasses implement this

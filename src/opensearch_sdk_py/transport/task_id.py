@@ -21,4 +21,4 @@ class TaskId:
             output.write_long(self.id)
 
     def __str__(self):
-        return f"{self.node_id} , id={self.id}"
+        return f"{self.node_id}, id={self.id}"

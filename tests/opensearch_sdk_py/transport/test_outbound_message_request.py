@@ -30,12 +30,9 @@ class TestOutboundMessageRequest(unittest.TestCase):
         self.assertTrue(omr.is_handshake())
 
     def test_outbound_message_request_stream(self):
-        message_out = StreamOutput()
-        message_out.write_string('test')
-        message = TransportRequest(message_out.getvalue())
         omr = OutboundMessageRequest(
                         features=['foo', 'bar'],
-                        message=message,
+                        message=FakeTransportRequest(),
                         action='internal:test/handshake',
                         request_id=2, version=Version(3000099),
                         is_handshake=True)
@@ -60,3 +57,12 @@ class TestOutboundMessageRequest(unittest.TestCase):
         self.assertEqual(omr.tcp_header.variable_header_size,
                          + omr.tcp_header.size - 6 # transport message (task id + strlen + str) included in header size
                          + TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE - TcpHeader.HEADER_SIZE) # base header size
+        
+class FakeTransportRequest(TransportRequest):
+    def __init__(self):
+        super().__init__()
+
+    def write_to(self, output: StreamOutput):
+        fake_out = StreamOutput()
+        fake_out.write_string('test')
+        super().write_to(output, fake_out)
