@@ -9,6 +9,7 @@ from opensearch_sdk_py.transport.stream_output import StreamOutput
 from opensearch_sdk_py.transport.task_id import TaskId
 from opensearch_sdk_py.transport.tcp_header import TcpHeader
 from opensearch_sdk_py.transport.transport_handshaker_handshake_request import TransportHandshakerHandshakeRequest
+from opensearch_sdk_py.transport.transport_service_handshake_request import TransportServiceHandshakeRequest
 from opensearch_sdk_py.transport.transport_status import TransportStatus
 from opensearch_sdk_py.transport.version import Version
 from opensearch_sdk_py.transport.handshake_request import HandshakeRequest
@@ -94,15 +95,8 @@ async def handle_connection(conn, loop):
                     
                     await loop.sock_sendall(conn, output.getvalue())
                 elif request.action == 'internal:transport/handshake':
-                    # TODO: These will be part of the TransportMessage subclass implemented here
-                    task_id = TaskId()
-                    task_id.read_from(input)
-
-                    # TODO: refactor into HandshakeRequest class. Note OpenSearch has two HandshakeRequest classes.
-                    # This one is o.o.transport.HandshakeRequest. Doesn't read anything in.
-
-                    # TODO: Here we end the reading of the request writeables (TransportMessage subclass)
-                    # and begin creating a response (NetworkMessage subclass followed by TransportMessage subclass)
+                    transport_handshake = TransportServiceHandshakeRequest()
+                    transport_handshake.read_from(input)
 
                     # Standard response header and variable header are part of NetworkMessage and subclasses
                     # TODO: This will be part of a Response subclass of NetworkMessage
