@@ -1,4 +1,5 @@
 import unittest
+from opensearch_sdk_py.transport.outbound_message import OutboundMessage
 from opensearch_sdk_py.transport.outbound_message_request import OutboundMessageRequest
 
 from opensearch_sdk_py.transport.stream_input import StreamInput
@@ -49,7 +50,7 @@ class TestOutboundMessageRequest(unittest.TestCase):
         self.assertEqual(len(out.getvalue()), omr.tcp_header.size + TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE)
 
         omr = OutboundMessageRequest()
-        omr.read_from(input=StreamInput(out.getvalue()))
+        omr.read_from(StreamInput(out.getvalue()))
         self.assertEqual(omr.get_request_id(), 2)
         self.assertTrue(omr.is_handshake())
         self.assertEqual(omr.tcp_header.size, len(out.getvalue()) - TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE)
@@ -57,7 +58,25 @@ class TestOutboundMessageRequest(unittest.TestCase):
         self.assertEqual(omr.tcp_header.variable_header_size,
                          + omr.tcp_header.size - 6 # transport message (task id + strlen + str) included in header size
                          + TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE - TcpHeader.HEADER_SIZE) # base header size
-        
+
+        # test two-part reading with optional argument
+        input = StreamInput(out.getvalue())
+        om = OutboundMessage()
+        om.read_from(input)
+
+        omr = OutboundMessageRequest()
+        omr.read_from(input, om)
+        self.assertEqual(omr.get_request_id(), 2)
+        self.assertTrue(omr.is_handshake())
+        self.assertListEqual(omr.features, ['foo', 'bar'])
+        self.assertEqual(omr.action, 'internal:test/handshake')
+        self.assertEqual(omr.tcp_header.size, len(out.getvalue()) - TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE)
+        self.assertEqual(omr.tcp_header.variable_header_size, 2 + 9 + 24) # context + features string array + action
+        self.assertEqual(omr.tcp_header.variable_header_size,
+                         + omr.tcp_header.size - 6 # transport message (task id + strlen + str) included in header size
+                         + TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE - TcpHeader.HEADER_SIZE) # base header size
+
+
 class FakeTransportRequest(TransportRequest):
     def __init__(self):
         super().__init__()
