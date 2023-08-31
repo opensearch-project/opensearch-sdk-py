@@ -52,8 +52,10 @@ class TestStreamInput(unittest.TestCase):
         self.assertRaises(Exception, input.read_v_int)
 
     def test_read_version(self):
-        input = StreamInput(b'\x83\x97\x80\x41')        
-        self.assertEqual(str(input.read_version()), '2.10.0.99')
+        input = StreamInput(b'\x83\x97\x80\x41')
+        v = input.read_version()
+        self.assertEqual(v.id, 136317827)
+        self.assertEqual(str(v), '2.10.0.99')
 
     def test_read_optional_int(self):
         input = StreamInput(b'\x01\x00\x00\x00\x2a\x00\x01')

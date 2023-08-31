@@ -67,7 +67,7 @@ class StreamInput:
 
     # reads the OpenSearch Version from the input stream
     def read_version(self) -> Version:
-        return Version(self.read_v_int())
+        return Version(self.read_v_int() ^ Version.MASK)
 
     # reads an optional int
     def read_optional_int(self) -> int:
