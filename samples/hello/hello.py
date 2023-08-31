@@ -2,6 +2,8 @@
 import logging
 import asyncio, socket
 
+from opensearch_sdk_py.transport.outbound_message import OutboundMessage
+from opensearch_sdk_py.transport.outbound_message_request import OutboundMessageRequest
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
 from opensearch_sdk_py.transport.task_id import TaskId
@@ -16,36 +18,26 @@ async def handle_connection(conn, loop):
         conn.setblocking(False)
         # out = StreamOutput(loop, conn)
         while raw := await loop.sock_recv(conn, 1024 * 10):
-            # output = StreamOutput(loop, conn)
             input = StreamInput(raw)
             print(f"\nreceived {input}, {len(raw)} byte(s)\n\t#{str(raw)}")
-
-            # TODO: Refactor TcpHeader reading into NetworkMessage class
-            header = TcpHeader()
+        
+            header = OutboundMessage()
             header.read_from(input)
-            print(f"\t{header}")
-
-            # TODO: Refactor headers into a ThreadContext class
-            # TODO: Refactor Thread Context reading into OutboundMessage(NetworkMessage) class
-            # Thread Context written for both request and response
-            request_headers = input.read_string_to_string_dict()
-            if len(request_headers):
-                print(f"\trequest headers: {request_headers}")
-
-            response_headers = input.read_string_to_string_array_dict()
-            if len(response_headers):
-                print(f"\tresponse headers: {response_headers}")
+            print(f"\t{header.tcp_header}")
+            if header.thread_context_struct.request_headers or header.thread_context_struct.response_headers:
+                print(f"\t{header.thread_context_struct}")
 
             # Features and actions only written for requests
             if header.is_request():
-                # TODO: Refactor reading features and action name into Request(OutboundMessage) class
-                # TODO: Also create a Response(OutboundMessage) class that doesn't read these
-                features = input.read_string_array()
-                if len(features):
-                    print(f"\tfeatures: {features}")
-
-                action = input.read_string()
-                print(f"\taction: {action}")
+                # Re-read from start of stream
+                # TODO: need a better way to partially read and continue in case of request
+                input = StreamInput(raw)
+                request = OutboundMessageRequest()
+                request.read_from(input)
+                if request.features:
+                    print(f"\tfeatures: {request.features}")
+                if request.action:
+                    print(f"\taction: {request.action}")
 
                 # TODO: We switch here from NetworkMessage subclasses to TransportMessage subclasses
                 # Bytes read in NetworkMessage are added to both message and variable header length
@@ -57,9 +49,9 @@ async def handle_connection(conn, loop):
                 task_id = TaskId()
                 task_id.read_from(input)
 
-                # TODO: Need a better way of mathing these action names to reading their classes
+                # TODO: Need a better way of matching these action names to reading their classes
                 # The additional bytes read inside this conditional are Writeables based on the specific request
-                if action == 'internal:tcp/handshake':
+                if request.action == 'internal:tcp/handshake':
                     # TODO: refactor into HandshakeRequest class. Note OpenSearch has two HandshakeRequest classes.
                     # This one is o.o.transport.TransportHandshaker.HandshakeRequest. 
                     # It reads/writes vint vesrsion wrapped in BytesReference
@@ -76,16 +68,18 @@ async def handle_connection(conn, loop):
                     # and begin creating a response (NetworkMessage subclass followed by TransportMessage subclass)
 
                     # Standard response header and variable header are part of NetworkMessage and subclasses
-                    # TODO: This TcpHeader should probably be part of NetworkMessage class per earlier comment
-                    response_header = TcpHeader(request_id=header.request_id, status=header.status, version=header.version)
+                    # TODO: This will be part of a Response subclass of NetworkMessage
+                    response_header = TcpHeader(request_id=header.get_request_id(), status=0, version=header.get_version())
                     response_header.set_response()
+                    if header.is_handshake():
+                        response_header.set_handshake()
                     
                     # TODO: Variable header writing should be part of OutboundMessage class per earlier comment
                     variable_header = StreamOutput()
 
                     # TODO: Refactor this by implementing writing the thread context 
-                    variable_header.write_string_to_string_dict(request_headers)
-                    variable_header.write_string_to_string_array_dict(response_headers)
+                    variable_header.write_string_to_string_dict(header.thread_context_struct.request_headers)
+                    variable_header.write_string_to_string_array_dict(header.thread_context_struct.response_headers)
 
                     # TODO: Here we switch from NetworkMessage subclass to TransportMessage subclass
                     # Bytes here don't count against variable header length but are added to total message length
@@ -120,7 +114,7 @@ async def handle_connection(conn, loop):
                     print(f"\nsent handshake response, {len(raw_out)} byte(s):\n\t#{raw_out}\n\t{response_header}")
                     
                     await loop.sock_sendall(conn, output.getvalue())
-                elif action == 'internal:transport/handshake':
+                elif request.action == 'internal:transport/handshake':
                     # TODO: refactor into HandshakeRequest class. Note OpenSearch has two HandshakeRequest classes.
                     # This one is o.o.transport.HandshakeRequest. Doesn't read anything in.
 
@@ -128,14 +122,17 @@ async def handle_connection(conn, loop):
                     # and begin creating a response (NetworkMessage subclass followed by TransportMessage subclass)
 
                     # Standard response header and variable header are part of NetworkMessage and subclasses
-                    response_header = TcpHeader(request_id=header.request_id, status=header.status, version=header.version)
+                    # TODO: This will be part of a Response subclass of NetworkMessage
+                    response_header = TcpHeader(request_id=header.get_request_id(), status=0, version=header.get_version())
                     response_header.set_response()
+                    if header.is_handshake():
+                        response_header.set_handshake()
                     
                     variable_header = StreamOutput()
 
                     # TODO: Refactor this by implementing writing the thread context 
-                    variable_header.write_string_to_string_dict(request_headers)
-                    variable_header.write_string_to_string_array_dict(response_headers)
+                    variable_header.write_string_to_string_dict(header.thread_context_struct.request_headers)
+                    variable_header.write_string_to_string_array_dict(header.thread_context_struct.response_headers)
 
                     # TODO: Here we switch from NetworkMessage subclass to TransportMessage subclass
                     # Bytes here don't count against variable header length but are added to total message length
@@ -199,14 +196,14 @@ async def handle_connection(conn, loop):
                     print(f"\nsent handshake response, {len(raw_out)} byte(s):\n\t#{raw_out}\n\t{response_header}")
                     
                     await loop.sock_sendall(conn, output.getvalue())
-                elif action == 'internal:discovery/extensions':
+                elif request.action == 'internal:discovery/extensions':
                     # TODO: implement InitializeExtensionRequest. Totally skipping reading the request 
                     # until we have the DiscoveryNode and DiscoveryExtensionNode classes
                     # we would also then send multiple requests to OpenSearch to implement extension points
                     # before sending a response.
                     # sometime between tcp and transport handshakes the uniqueId gets added to the thread context
                     # so adding that here so it will get added to response headers
-                    request_headers['extension_unique_id'] = 'hello-world'
+                    header.thread_context_struct.request_headers['extension_unique_id'] = 'hello-world'
 
                     # for now other than that thread context, we will just send the response to make OpenSearch 
                     # happy that we initialized
@@ -215,16 +212,18 @@ async def handle_connection(conn, loop):
                     # and begin creating a response (NetworkMessage subclass followed by TransportMessage subclass)
 
                     # Standard response header and variable header are part of NetworkMessage and subclasses
-                    # TODO: This TcpHeader should probably be part of NetworkMessage class per earlier comment
-                    response_header = TcpHeader(request_id=header.request_id, status=header.status, version=header.version)
+                    # TODO: This will be part of a Response subclass of NetworkMessage
+                    response_header = TcpHeader(request_id=header.get_request_id(), status=0, version=header.get_version())
                     response_header.set_response()
+                    if header.is_handshake():
+                        response_header.set_handshake()
 
                     # TODO: Variable header writing should be part of OutboundMessage class per earlier comment
                     variable_header = StreamOutput()
 
                     # TODO: Refactor this by implementing writing the thread context 
-                    variable_header.write_string_to_string_dict(request_headers)
-                    variable_header.write_string_to_string_array_dict(response_headers)
+                    variable_header.write_string_to_string_dict(header.thread_context_struct.request_headers)
+                    variable_header.write_string_to_string_array_dict(header.thread_context_struct.response_headers)
 
                     # TODO: Here we switch from NetworkMessage subclass to TransportMessage subclass
                     # Bytes here don't count against variable header length but are added to total message length
