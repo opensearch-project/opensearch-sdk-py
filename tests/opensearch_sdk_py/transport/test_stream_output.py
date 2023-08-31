@@ -91,3 +91,11 @@ class TestStreamOutput(unittest.TestCase):
         out = StreamOutput()
         out.write_string_to_string_array_dict(d)
         self.assertEqual(out.getvalue(), b'\x02\x03foo\x02\x03bar\x03baz\x03qux\x00')
+
+    def test_write_string_to_string_set_dict(self):
+        d = dict()
+        d['foo'] = {'bar', 'baz'}
+        d['qux'] = {}
+        out = StreamOutput()
+        out.write_string_to_string_set_dict(d)
+        self.assertIn(out.getvalue(), [b'\x02\x03foo\x02\x03bar\x03baz\x03qux\x00', b'\x02\x03foo\x02\x03baz\x03bar\x03qux\x00'])

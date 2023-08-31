@@ -67,7 +67,7 @@ class StreamInput:
 
     # reads the OpenSearch Version from the input stream
     def read_version(self) -> Version:
-        return Version(self.read_v_int())
+        return Version(self.read_v_int() ^ Version.MASK)
 
     # reads an optional int
     def read_optional_int(self) -> int:
@@ -199,6 +199,21 @@ class StreamInput:
         for i in range(size):
             key = self.read_string()
             value = self.read_string_array()
+            result[key] = value
+
+        return result
+
+    def read_string_to_string_set_dict(self) -> dict[str, set[str]]:
+        size = self.read_v_int()
+        if size == 0:
+            return {}
+
+        result = dict()      
+        for i in range(size):
+            key = self.read_string()
+            value = set()
+            for v in self.read_string_array():
+                value.add(v)
             result[key] = value
 
         return result
