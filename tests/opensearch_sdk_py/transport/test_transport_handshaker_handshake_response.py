@@ -6,7 +6,7 @@ from opensearch_sdk_py.transport.transport_handshaker_handshake_response import 
 from opensearch_sdk_py.transport.version import Version
 
 class TestTransportHandshakerHandshakeResponse(unittest.TestCase):
-    def test_transport_response(self):
+    def test_transport_handshaker_handshake_response(self):
         thhr = TransportHandshakerHandshakeResponse(Version(2100099))
         self.assertEqual(thhr.version.id, 136317827)
 
@@ -14,7 +14,7 @@ class TestTransportHandshakerHandshakeResponse(unittest.TestCase):
         thhr.write_to(out)
         self.assertEqual(out.getvalue(), b'\x83\x97\x80\x41')
 
-        thhr = TransportHandshakerHandshakeResponse()
-        thhr.read_from(StreamInput(out.getvalue()))
+        input = StreamInput(out.getvalue())
+        thhr = TransportHandshakerHandshakeResponse().read_from(input)
         self.assertEqual(thhr.version.id, 136317827)
         self.assertEqual(str(thhr.version), '2.10.0.99')
