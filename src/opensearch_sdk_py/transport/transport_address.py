@@ -16,6 +16,7 @@ class TransportAddress(ipaddress.IPv4Address):
         self.address = ipaddress.IPv4Address(input.read_int())
         self.host_name = input.read_string()
         self.port = input.read_int()
+        return self
 
     def write_to(self, output: StreamOutput):
         output.write_byte(4)

@@ -12,10 +12,7 @@ from opensearch_sdk_py.transport.tcp_header import TcpHeader
 from opensearch_sdk_py.transport.transport_handshaker_handshake_request import TransportHandshakerHandshakeRequest
 from opensearch_sdk_py.transport.transport_handshaker_handshake_response import TransportHandshakerHandshakeResponse
 from opensearch_sdk_py.transport.transport_service_handshake_request import TransportServiceHandshakeRequest
-from opensearch_sdk_py.transport.transport_status import TransportStatus
 from opensearch_sdk_py.transport.version import Version
-from opensearch_sdk_py.transport.handshake_request import HandshakeRequest
-from opensearch_sdk_py.transport.handshake_response import HandshakeResponse
 from opensearch_sdk_py.transport.transport_address import TransportAddress
 
 async def handle_connection(conn, loop):
@@ -116,14 +113,14 @@ async def handle_connection(conn, loop):
                         writeable_data.write_string(r[1])
                         writeable_data.write_boolean(r[2])
                     # Version
-                    writeable_data.write_v_int(Version.CURRENT)
+                    writeable_data.write_v_int(Version.CURRENT_ID)
                     # End DiscoveryNode Object
 
                     # ClusterName
                     writeable_data.write_string("opensearch")
 
                     # Version.CURRENT
-                    writeable_data.write_v_int(Version.CURRENT)
+                    writeable_data.write_v_int(Version.CURRENT_ID)
 
                     # Done with the NetworkMessage and TransportMessage
 
