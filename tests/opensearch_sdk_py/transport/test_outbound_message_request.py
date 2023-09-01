@@ -35,11 +35,11 @@ class TestOutboundMessageRequest(unittest.TestCase):
                         features=['foo', 'bar'],
                         message=FakeTransportRequest(),
                         action='internal:test/handshake',
-                        request_id=2, version=Version(3000099),
+                        request_id=2,
+                        version=Version(3000099),
                         is_handshake=True)
         out = StreamOutput()
         omr.write_to(out)
-        print(out.getvalue())
         self.assertEqual(out.getvalue(),
                         b'ES\x00\x00\x00\x3a\x00\x00\x00\x00\x00\x00\x00\x02\x08\x08\x2d\xc7\x23\x00\x00\x00\x23' # tcp header
                         + b'\x00\x00' # context

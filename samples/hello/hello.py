@@ -4,11 +4,13 @@ import asyncio, socket
 
 from opensearch_sdk_py.transport.outbound_message import OutboundMessage
 from opensearch_sdk_py.transport.outbound_message_request import OutboundMessageRequest
+from opensearch_sdk_py.transport.outbound_message_response import OutboundMessageResponse
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
 from opensearch_sdk_py.transport.task_id import TaskId
 from opensearch_sdk_py.transport.tcp_header import TcpHeader
 from opensearch_sdk_py.transport.transport_handshaker_handshake_request import TransportHandshakerHandshakeRequest
+from opensearch_sdk_py.transport.transport_handshaker_handshake_response import TransportHandshakerHandshakeResponse
 from opensearch_sdk_py.transport.transport_service_handshake_request import TransportServiceHandshakeRequest
 from opensearch_sdk_py.transport.transport_status import TransportStatus
 from opensearch_sdk_py.transport.version import Version
@@ -47,54 +49,21 @@ async def handle_connection(conn, loop):
                     tcp_handshake.read_from(input)
                     print(f"\topensearch_version: {tcp_handshake.version}")
 
-                    # TODO: Here we end the reading of the request writeables (TransportMessage subclass)
-                    # and begin creating a response (NetworkMessage subclass followed by TransportMessage subclass)
+                    response = OutboundMessageResponse(
+                        request.thread_context_struct,
+                        request.features,
+                        TransportHandshakerHandshakeResponse(request.get_version()),
+                        request.get_version(),
+                        request.get_request_id(),
+                        request.is_handshake(),
+                        request.is_compress())
 
-                    # Standard response header and variable header are part of NetworkMessage and subclasses
-                    # TODO: This will be part of a Response subclass of NetworkMessage
-                    response_header = TcpHeader(request_id=request.get_request_id(), status=0, version=request.get_version())
-                    response_header.set_response()
-                    if request.is_handshake():
-                        response_header.set_handshake()
-                    
-                    # TODO: Variable header writing should be part of OutboundMessage class per earlier comment
-                    variable_header = StreamOutput()
-
-                    # TODO: Refactor this by implementing writing the thread context 
-                    variable_header.write_string_to_string_dict(request.thread_context_struct.request_headers)
-                    variable_header.write_string_to_string_array_dict(request.thread_context_struct.response_headers)
-
-                    # TODO: Here we switch from NetworkMessage subclass to TransportMessage subclass
-                    # Bytes here don't count against variable header length but are added to total message length
-                    writeable_data = StreamOutput()
-                    # TODO: refactor into HandshakeResponse class. Note OpenSearch has two HandshakeResponse classes.
-                    # This one is o.o.transport.TransportHandshaker.HandshakeResponse
-                    # Unlike the request which wraps version in a BytesReference we just directly write vint
-                    writeable_data.write_v_int(Version.CURRENT)
-                    
-                    # Done with the NetworkMessage and TransportMessage
-
-                    # TODO: Doing math here to set values in TCP header but this math should be refactored to be accounted for
-                    # in the NetworkMessage (response & variable header) and TransportMessage (writeable bytes) classes
-                    # Note we need to know the header lengths for the initial response header class before writing it to
-                    # the overall stream. 
-                    variable_bytes = variable_header.getvalue()
-                    response_header.variable_header_size = len(variable_bytes)
-                    response_header.size += response_header.variable_header_size
-
-                    writeable_bytes = writeable_data.getvalue()
-                    response_header.size += len(writeable_bytes)
-
-                    # In OpenSearch these values are written by skipping the header in the stream and then going back
-                    # to start of stream to write it. Here we just assemble the parts and write together at the end.
                     output = StreamOutput()
-                    response_header.write_to(output)
-                    output.write(variable_bytes)
-                    output.write(writeable_bytes)
+                    response.write_to(output)
                                         
                     raw_out = output.getvalue()
                     print(f"\tparsed TCP handshake, returning a response")
-                    print(f"\nsent handshake response, {len(raw_out)} byte(s):\n\t#{raw_out}\n\t{response_header}")
+                    print(f"\nsent handshake response, {len(raw_out)} byte(s):\n\t#{raw_out}\n\t{response.tcp_header}")
                     
                     await loop.sock_sendall(conn, output.getvalue())
                 elif request.action == 'internal:transport/handshake':
