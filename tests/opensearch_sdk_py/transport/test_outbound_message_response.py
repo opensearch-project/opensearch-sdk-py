@@ -38,9 +38,8 @@ class TestOutboundMessageResponse(unittest.TestCase):
         omr.write_to(out)
         print(out.getvalue())
         self.assertEqual(out.getvalue(),
-                        b'ES\x00\x00\x00\x21\x00\x00\x00\x00\x00\x00\x00\x02\x09\x08\x2d\xc7\x23\x00\x00\x00\x0b' # tcp header
+                        b'ES\x00\x00\x00\x18\x00\x00\x00\x00\x00\x00\x00\x02\x09\x08\x2d\xc7\x23\x00\x00\x00\x02' # tcp header
                         + b'\x00\x00' # context
-                        + b'\x02\x03foo\x03bar' # features
                         + b'\x04test') # transport message
         self.assertEqual(len(out.getvalue()), omr.tcp_header.size + TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE)
 
@@ -49,7 +48,7 @@ class TestOutboundMessageResponse(unittest.TestCase):
         self.assertEqual(omr.get_request_id(), 2)
         self.assertTrue(omr.is_handshake())
         self.assertEqual(omr.tcp_header.size, len(out.getvalue()) - TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE)
-        self.assertEqual(omr.tcp_header.variable_header_size, 2 + 9) # context + features string array
+        self.assertEqual(omr.tcp_header.variable_header_size, 2) # context
         self.assertEqual(omr.tcp_header.variable_header_size,
                          + omr.tcp_header.size - 5 # transport message (strlen + str) included in header size
                          + TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE - TcpHeader.HEADER_SIZE) # base header size

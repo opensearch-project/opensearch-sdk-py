@@ -24,9 +24,7 @@ class OutboundMessageResponse(OutboundMessage):
 
     def read_from(self, input: StreamInput):
         super().read_from(input)
-        self.features = input.read_string_array()
 
     def write_to(self, output: StreamOutput):
         variable_bytes = StreamOutput()
-        variable_bytes.write_string_array(self.features)
         super().write_to(output, variable_bytes)
