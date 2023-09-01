@@ -4,14 +4,13 @@ from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
 from opensearch_sdk_py.transport.transport_response import TransportResponse
 
-from opensearch_sdk_py.transport.version import Version
 
 class InitializeExtensionResponse(TransportResponse):
-    def __init__(self, name: str='', implemented_interfaces: list[str]=[]):
+    def __init__(self, name: str = "", implemented_interfaces: list[str] = []):
         super().__init__()
         self.name = name
         self.implemented_interfaces = implemented_interfaces
-    
+
     def read_from(self, input: StreamInput):
         super().read_from(input)
         self.name = input.read_string()

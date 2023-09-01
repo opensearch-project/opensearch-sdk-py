@@ -6,8 +6,9 @@ from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
 from opensearch_sdk_py.transport.transport_request import TransportRequest
 
+
 class TransportServiceHandshakeRequest(TransportRequest):
-    def __init__(self):        
+    def __init__(self):
         super().__init__()
 
     def read_from(self, input: StreamInput):

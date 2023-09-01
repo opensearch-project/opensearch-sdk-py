@@ -3,8 +3,9 @@
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
 
+
 class TaskId:
-    def __init__(self, node_id='', id=-1):
+    def __init__(self, node_id="", id=-1):
         self.node_id = node_id
         self.id = id
 

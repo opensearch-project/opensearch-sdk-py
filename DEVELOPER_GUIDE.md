@@ -6,6 +6,7 @@
     - [Poetry](#poetry)
   - [Install Dependencies](#install-dependencies)
   - [Run Tests](#run-tests)
+  - [Cleanup Code](#cleanup-code)
 
 ## Forking and Cloning
 
@@ -62,4 +63,14 @@ poetry install
 
 ```
 poetry run pytest -v
+```
+
+### Cleanup Code
+
+The [lint workflow](.github/workflows/lint.ml) runs `flake8`. Make sure `poetry run flake8 .` is clean before making pull requests. Use the following to auto-clean and auto-format.
+
+```
+poetry run isort .
+poetry run black .
+poetry run autoflake -r --in-place --remove-unused-variables --remove-all-unused-imports .
 ```

@@ -8,8 +8,14 @@ from opensearch_sdk_py.transport.stream_output import StreamOutput
 from opensearch_sdk_py.transport.transport_response import TransportResponse
 from opensearch_sdk_py.transport.version import Version
 
+
 class TransportServiceHandshakeResponse(TransportResponse):
-    def __init__(self, discovery_node: DiscoveryNode=None, cluster_name: str='', version:Version = None):        
+    def __init__(
+        self,
+        discovery_node: DiscoveryNode = None,
+        cluster_name: str = "",
+        version: Version = None,
+    ):
         super().__init__()
         self.discovery_node = discovery_node
         self.cluster_name = cluster_name

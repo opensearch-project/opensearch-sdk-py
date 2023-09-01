@@ -5,7 +5,13 @@ class DiscoveryNodeRole:
     REMOTE_CLUSTER_CLIENT_ROLE = ("remote_cluster_client", "r", False)
     SEARCH_ROLE = ("search", "s", True)
 
-    BUILT_IN_ROLES = [DATA_ROLE, INGEST_ROLE, CLUSTER_MANAGER_ROLE, REMOTE_CLUSTER_CLIENT_ROLE, SEARCH_ROLE]
+    BUILT_IN_ROLES = [
+        DATA_ROLE,
+        INGEST_ROLE,
+        CLUSTER_MANAGER_ROLE,
+        REMOTE_CLUSTER_CLIENT_ROLE,
+        SEARCH_ROLE,
+    ]
 
     def __init__(self):
         self.role_dict = dict()

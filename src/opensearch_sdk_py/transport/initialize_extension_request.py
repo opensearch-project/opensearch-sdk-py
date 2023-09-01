@@ -1,13 +1,18 @@
 # https://github.com/opensearch-project/OpenSearch/blob/main/server/src/main/java/org/opensearch/discovery/InitializeExtensionRequest.java
 
+from opensearch_sdk_py.transport.discovery_extension_node import DiscoveryExtensionNode
+from opensearch_sdk_py.transport.discovery_node import DiscoveryNode
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
 from opensearch_sdk_py.transport.transport_request import TransportRequest
-from opensearch_sdk_py.transport.discovery_node import DiscoveryNode
-from opensearch_sdk_py.transport.discovery_extension_node import DiscoveryExtensionNode
+
 
 class InitializeExtensionRequest(TransportRequest):
-    def __init__(self, source_node: DiscoveryNode=None, extension: DiscoveryExtensionNode=None):
+    def __init__(
+        self,
+        source_node: DiscoveryNode = None,
+        extension: DiscoveryExtensionNode = None,
+    ):
         super().__init__()
         self.source_node = source_node
         self.extension = extension
@@ -23,4 +28,3 @@ class InitializeExtensionRequest(TransportRequest):
         self.source_node.write_to(request_bytes)
         self.extension.write_to(request_bytes)
         super().write_to(output, request_bytes)
-

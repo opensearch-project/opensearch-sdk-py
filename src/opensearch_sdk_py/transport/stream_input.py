@@ -2,6 +2,7 @@ import io
 
 from opensearch_sdk_py.transport.version import Version
 
+
 class StreamInput:
     def __init__(self, input):
         self.raw = input
@@ -9,15 +10,20 @@ class StreamInput:
 
     def read_byte(self) -> int:
         return self.data.read(1)[0]
-    
+
     def read_bytes(self, len: int):
         return self.data.read(len)
-    
-    def read_int(self) -> int:
-        return ((self.read_byte() & 0xFF) << 24) | ((self.read_byte() & 0xFF) << 16) | ((self.read_byte() & 0xFF) << 8) | (self.read_byte() & 0xFF)
 
-    def read_short(self) -> int:    
-        return (((self.read_byte() & 0xFF) << 8) | (self.read_byte() & 0xFF))
+    def read_int(self) -> int:
+        return (
+            ((self.read_byte() & 0xFF) << 24)
+            | ((self.read_byte() & 0xFF) << 16)
+            | ((self.read_byte() & 0xFF) << 8)
+            | (self.read_byte() & 0xFF)
+        )
+
+    def read_short(self) -> int:
+        return ((self.read_byte() & 0xFF) << 8) | (self.read_byte() & 0xFF)
 
     def read_boolean(self):
         value = self.read_byte()
@@ -46,22 +52,22 @@ class StreamInput:
     def read_v_int(self) -> int:
         b = self.read_byte()
         i = b & 0x7F
-        if ((b & 0x80) == 0):
+        if (b & 0x80) == 0:
             return i
         b = self.read_byte()
         i |= (b & 0x7F) << 7
-        if ((b & 0x80) == 0):
+        if (b & 0x80) == 0:
             return i
         b = self.read_byte()
         i |= (b & 0x7F) << 14
-        if ((b & 0x80) == 0):
+        if (b & 0x80) == 0:
             return i
         b = self.read_byte()
         i |= (b & 0x7F) << 21
-        if ((b & 0x80) == 0):
+        if (b & 0x80) == 0:
             return i
         b = self.read_byte()
-        if ((b & 0x80) != 0):
+        if (b & 0x80) != 0:
             raise Exception(f"Invalid vInt (({b} & 0x7f) << 28) | {i}")
         return i | ((b & 0x7F) << 28)
 
@@ -72,9 +78,9 @@ class StreamInput:
     # reads an optional int
     def read_optional_int(self) -> int:
         if self.read_boolean():
-          return self.read_int()
+            return self.read_int()
         else:
-          return None
+            return None
 
     # reads eight bytes and returns a long
     def read_long(self) -> int:
@@ -115,7 +121,7 @@ class StreamInput:
         if (b & 0x80) == 0:
             return i
         b = self.read_byte()
-        i |= ((b & 0x7F) << 56)
+        i |= (b & 0x7F) << 56
         if (b & 0x80) == 0:
             return i
         b = self.read_byte()
@@ -127,9 +133,9 @@ class StreamInput:
 
     def read_optional_v_long(self) -> int:
         if self.read_boolean():
-          return self.read_v_long()
+            return self.read_v_long()
         else:
-          return None
+            return None
 
     def read_optional_long(self) -> int:
         if self.read_boolean():
@@ -155,17 +161,17 @@ class StreamInput:
         # ensureCanReadBytes(arraySize);
 
         return array_size
-       
+
     def read_string(self) -> str:
         char_count = self.read_array_size()
-        return str(self.read_bytes(char_count), 'utf-8')
+        return str(self.read_bytes(char_count), "utf-8")
 
     def read_string_array(self) -> list[str]:
         size = self.read_array_size()
         if size == 0:
             return []
 
-        result = []        
+        result = []
         for i in range(size):
             result.append(self.read_string())
 
@@ -182,7 +188,7 @@ class StreamInput:
         if size == 0:
             return {}
 
-        result = dict()      
+        result = dict()
         for i in range(size):
             key = self.read_string()
             value = self.read_string()
@@ -195,7 +201,7 @@ class StreamInput:
         if size == 0:
             return {}
 
-        result = dict()      
+        result = dict()
         for i in range(size):
             key = self.read_string()
             value = self.read_string_array()
@@ -208,7 +214,7 @@ class StreamInput:
         if size == 0:
             return {}
 
-        result = dict()      
+        result = dict()
         for i in range(size):
             key = self.read_string()
             value = set()

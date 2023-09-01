@@ -1,24 +1,29 @@
+from opensearch_sdk_py.transport.discovery_node import DiscoveryNode
 from opensearch_sdk_py.transport.extension_dependency import ExtensionDependency
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
-from opensearch_sdk_py.transport.discovery_node import DiscoveryNode
 from opensearch_sdk_py.transport.transport_address import TransportAddress
 from opensearch_sdk_py.transport.version import Version
 
+
 class DiscoveryExtensionNode(DiscoveryNode):
-    def __init__(self,
-                 node_name: str='',
-                 node_id: str='',
-                 address: TransportAddress=None,
-                 attributes: dict[str, str]=dict(),
-                 version: Version=Version(),
-                 minimum_compatible_version: Version=Version(),
-                 dependencies: list[ExtensionDependency]=[]):
-        super().__init__(node_name=node_name,
-                         node_id=node_id,
-                         address=address,
-                         attributes=attributes,
-                         version=version)
+    def __init__(
+        self,
+        node_name: str = "",
+        node_id: str = "",
+        address: TransportAddress = None,
+        attributes: dict[str, str] = dict(),
+        version: Version = Version(),
+        minimum_compatible_version: Version = Version(),
+        dependencies: list[ExtensionDependency] = [],
+    ):
+        super().__init__(
+            node_name=node_name,
+            node_id=node_id,
+            address=address,
+            attributes=attributes,
+            version=version,
+        )
         self.minimum_compatible_version = minimum_compatible_version
         self.dependencies = dependencies
 

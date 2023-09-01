@@ -1,5 +1,6 @@
 import re
 
+
 #
 # Read netty-formatted log data.
 #
@@ -15,7 +16,7 @@ class NettyTraceData:
     class InvalidTraceDataFormat(Exception):
         pass
 
-    def __init__(self, data = None):
+    def __init__(self, data=None):
         self.data = data
 
     def load_from(self, filename: str):
@@ -28,21 +29,21 @@ class NettyTraceData:
             while line:
                 match = self.__read_data_line(line)
                 if match:
-                    data = match.groupdict()['data']
+                    data = match.groupdict()["data"]
                     self.data.extend(bytearray.fromhex(data))
                 line = f.readline()
 
-    def __read_separator(self, line: str, plus_count = 2):
-        pattern = ''.join(['[\+][\-]+' for x in range(plus_count - 1)]) + '[\+]'
+    def __read_separator(self, line: str, plus_count=2):
+        pattern = "".join([r"[\+][\-]+" for x in range(plus_count - 1)]) + r"[\+]"
         return self.__read_line(line, pattern)
-    
+
     def __read_header(self, line: str):
-        pattern = '\|  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f \|'
+        pattern = r"\|  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f \|"
         return self.__read_line(line, pattern)
-    
+
     def __read_data_line(self, line: str):
-        if line[0] == '|':
-            pattern = '\|(?P<offset>.[0-9a-fA-F]+)\| (?P<data>.[0-9a-fA-F\ ]+) \|(?P<text>..+)\|'
+        if line[0] == "|":
+            pattern = r"\|(?P<offset>.[0-9a-fA-F]+)\| (?P<data>.[0-9a-fA-F\ ]+) \|(?P<text>..+)\|"
             return self.__read_line(line, pattern)
         else:
             self.__read_separator(line, 4)
@@ -60,4 +61,3 @@ class NettyTraceData:
         data = NettyTraceData()
         data.load_from(filename)
         return data
-

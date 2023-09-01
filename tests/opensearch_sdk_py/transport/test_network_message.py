@@ -3,6 +3,7 @@ import unittest
 from opensearch_sdk_py.transport.network_message import NetworkMessage
 from opensearch_sdk_py.transport.version import Version
 
+
 class TestNetworkMessage(unittest.TestCase):
     def test_network_message(self):
         nm = NetworkMessage(version=Version(2100099))
