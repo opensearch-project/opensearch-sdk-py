@@ -24,12 +24,15 @@ async def handle_connection(conn, loop):
             input = StreamInput(raw)
             print(f"\nreceived {input}, {len(raw)} byte(s)\n\t#{str(raw)}")
 
-            # Quick check on request vs. response
-            is_request = raw[TcpHeader.VERSION_POSITION - 1] & TransportStatus.STATUS_REQRES == 0
+            header = OutboundMessage()
+            header.read_from(input)
+            print(f"\t{header.tcp_header}")
+            if header.thread_context_struct.request_headers or header.thread_context_struct.response_headers:
+                print(f"\t{header.thread_context_struct}")
 
-            if is_request:
+            if header.is_request():
                 request = OutboundMessageRequest()
-                request.read_from(input)
+                request.read_from(input, header)
                 print(f"\t{request.tcp_header}")
                 if request.thread_context_struct.request_headers or request.thread_context_struct.response_headers:
                     print(f"\t{request.thread_context_struct}")
@@ -241,9 +244,9 @@ async def handle_connection(conn, loop):
                     print(f"\nsent init response, {len(raw_out)} byte(s):\n\t#{raw_out}\n\t{response_header}")
 
                 else:
-                    print(f"\tparsed action {request.tcp_header}, haven't yet written what to do with it")
+                    print(f"\tparsed action {header.tcp_header}, haven't yet written what to do with it")
             else:
-                print(f"\tparsed {request.tcp_header}, this is a response to something I sent, haven't yet written what to do with it")
+                print(f"\tparsed {header.tcp_header}, this is a response to something I sent, haven't yet written what to do with it")
 
     except Exception as ex:
         logging.exception(ex)
