@@ -13,7 +13,7 @@ class TransportServiceHandshakeResponse(TransportResponse):
         super().__init__()
         self.discovery_node = discovery_node
         self.cluster_name = cluster_name
-        self.version = version
+        self.version = version if version else Version(Version.CURRENT)
 
     def read_from(self, input: StreamInput):
         super().read_from(input)

@@ -16,6 +16,7 @@ class OutboundMessage(NetworkMessage):
     def read_from(self, input: StreamInput):
         self.tcp_header.read_from(input)
         self.thread_context_struct.read_from(input)
+        return self
 
     # subclasses create stream of variable attributes and pass here
     def write_to(self, output: StreamOutput, variable_bytes: StreamOutput):

@@ -2,6 +2,8 @@
 import logging
 import asyncio, socket
 
+from opensearch_sdk_py.transport.discovery_node import DiscoveryNode
+from opensearch_sdk_py.transport.discovery_node_role import DiscoveryNodeRole
 from opensearch_sdk_py.transport.outbound_message import OutboundMessage
 from opensearch_sdk_py.transport.outbound_message_request import OutboundMessageRequest
 from opensearch_sdk_py.transport.outbound_message_response import OutboundMessageResponse
@@ -12,6 +14,7 @@ from opensearch_sdk_py.transport.tcp_header import TcpHeader
 from opensearch_sdk_py.transport.transport_handshaker_handshake_request import TransportHandshakerHandshakeRequest
 from opensearch_sdk_py.transport.transport_handshaker_handshake_response import TransportHandshakerHandshakeResponse
 from opensearch_sdk_py.transport.transport_service_handshake_request import TransportServiceHandshakeRequest
+from opensearch_sdk_py.transport.transport_service_handshake_response import TransportServiceHandshakeResponse
 from opensearch_sdk_py.transport.version import Version
 from opensearch_sdk_py.transport.transport_address import TransportAddress
 
@@ -23,15 +26,13 @@ async def handle_connection(conn, loop):
             input = StreamInput(raw)
             print(f"\nreceived {input}, {len(raw)} byte(s)\n\t#{str(raw)}")
 
-            header = OutboundMessage()
-            header.read_from(input)
+            header = OutboundMessage().read_from(input)
             print(f"\t{header.tcp_header}")
             if header.thread_context_struct.request_headers or header.thread_context_struct.response_headers:
                 print(f"\t{header.thread_context_struct}")
 
             if header.is_request():
-                request = OutboundMessageRequest()
-                request.read_from(input, header)
+                request = OutboundMessageRequest().read_from(input, header)
                 print(f"\t{request.tcp_header}")
                 if request.thread_context_struct.request_headers or request.thread_context_struct.response_headers:
                     print(f"\t{request.thread_context_struct}")
@@ -42,8 +43,7 @@ async def handle_connection(conn, loop):
 
                 # TODO: Need a better way of matching these action names to reading their classes
                 if request.action == 'internal:tcp/handshake':
-                    tcp_handshake = TransportHandshakerHandshakeRequest()
-                    tcp_handshake.read_from(input)
+                    tcp_handshake = TransportHandshakerHandshakeRequest().read_from(input)
                     print(f"\topensearch_version: {tcp_handshake.version}")
 
                     response = OutboundMessageResponse(
@@ -64,82 +64,30 @@ async def handle_connection(conn, loop):
                     
                     await loop.sock_sendall(conn, output.getvalue())
                 elif request.action == 'internal:transport/handshake':
-                    transport_handshake = TransportServiceHandshakeRequest()
-                    transport_handshake.read_from(input)
+                    transport_handshake = TransportServiceHandshakeRequest().read_from(input)
 
-                    # Standard response header and variable header are part of NetworkMessage and subclasses
-                    # TODO: This will be part of a Response subclass of NetworkMessage
-                    response_header = TcpHeader(request_id=request.get_request_id(), status=0, version=request.get_version())
-                    response_header.set_response()
-                    if request.is_handshake():
-                        response_header.set_handshake()
+                    response = OutboundMessageResponse(
+                        request.thread_context_struct,
+                        request.features,
+                        TransportServiceHandshakeResponse(
+                            DiscoveryNode(node_name='hello-world',
+                                            node_id='hello-world',
+                                            address=TransportAddress('127.0.0.1', 1234),
+                                            roles={DiscoveryNodeRole.CLUSTER_MANAGER_ROLE,
+                                                    DiscoveryNodeRole.DATA_ROLE,
+                                                    DiscoveryNodeRole.INGEST_ROLE,
+                                                    DiscoveryNodeRole.REMOTE_CLUSTER_CLIENT_ROLE})),
+                        request.get_version(),
+                        request.get_request_id(),
+                        request.is_handshake(),
+                        request.is_compress())
                     
-                    variable_header = StreamOutput()
-
-                    # TODO: Refactor this by implementing writing the thread context 
-                    variable_header.write_string_to_string_dict(request.thread_context_struct.request_headers)
-                    variable_header.write_string_to_string_array_dict(request.thread_context_struct.response_headers)
-
-                    # TODO: Here we switch from NetworkMessage subclass to TransportMessage subclass
-                    # Bytes here don't count against variable header length but are added to total message length
-                    writeable_data = StreamOutput()
-
-                    # TODO: refactor into HandshakeResponse class. Note OpenSearch has two HandshakeResponse classes.
-                    # This one is o.o.transport.HandshakeResponse
-                    # It writes am (Optional) DiscoveryNode, ClusterName (wraps a string), and Version
-
-                    # OptionalWriteable(DiscoveryNode)
-                    writeable_data.write_boolean(True) # optional is present
-                    # TODO: Refactor to a DiscoveryNode object. 
-                    # The discovery_extension_node implies one was written but not committed
-                    # Begin DiscoveryNode object
-                    writeable_data.write_string("hello-world");
-                    writeable_data.write_string("nodeId");
-                    writeable_data.write_string("ephemeralId");
-                    writeable_data.write_string("127.0.0.1"); # hostName
-                    writeable_data.write_string("127.0.0.1"); # hostAddress
-                    TransportAddress('127.0.0.1', 1234).write_to(writeable_data) # address
-                    # Write attributes map
-                    attributes = dict()
-                    writeable_data.write_string_to_string_dict(attributes)
-                    # Write roles. Vint size and triplets with name, abbr, canContainData
-                    roles = [['cluster_manager', 'm', False],
-                             ['data', 'd', True],
-                             ['ingest', 'i', False],
-                             ['remote_cluster_client', 'r', False]]
-                    writeable_data.write_v_int(len(roles))
-                    for r in roles:
-                        writeable_data.write_string(r[0])
-                        writeable_data.write_string(r[1])
-                        writeable_data.write_boolean(r[2])
-                    # Version
-                    writeable_data.write_v_int(Version.CURRENT_ID)
-                    # End DiscoveryNode Object
-
-                    # ClusterName
-                    writeable_data.write_string("opensearch")
-
-                    # Version.CURRENT
-                    writeable_data.write_v_int(Version.CURRENT_ID)
-
-                    # Done with the NetworkMessage and TransportMessage
-
-                    # Back to same math as before to assemble the pieces
-                    variable_bytes = variable_header.getvalue()
-                    response_header.variable_header_size = len(variable_bytes)
-                    response_header.size += response_header.variable_header_size
-
-                    writeable_bytes = writeable_data.getvalue()
-                    response_header.size += len(writeable_bytes)
-
                     output = StreamOutput()
-                    response_header.write_to(output)
-                    output.write(variable_bytes)
-                    output.write(writeable_bytes)
-                                        
+                    response.write_to(output)
+
                     raw_out = output.getvalue()
                     print(f"\tparsed Transport handshake, returning a response")
-                    print(f"\nsent handshake response, {len(raw_out)} byte(s):\n\t#{raw_out}\n\t{response_header}")
+                    print(f"\nsent handshake response, {len(raw_out)} byte(s):\n\t#{raw_out}\n\t{response.tcp_header}")
                     
                     await loop.sock_sendall(conn, output.getvalue())
                 elif request.action == 'internal:discovery/extensions':
