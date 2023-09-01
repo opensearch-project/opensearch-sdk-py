@@ -16,4 +16,6 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
-pythonpath = "src"
+pythonpath = ["src", "tests"]
+log_cli = true
+log_cli_level = "DEBUG"
