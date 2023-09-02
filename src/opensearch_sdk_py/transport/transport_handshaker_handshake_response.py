@@ -8,7 +8,7 @@ from opensearch_sdk_py.transport.transport_response import TransportResponse
 from opensearch_sdk_py.transport.version import Version
 
 class TransportHandshakerHandshakeResponse(TransportResponse):
-    def __init__(self, version:Version = None):        
+    def __init__(self, version:Version = None):
         super().__init__()
         self.version = version
 
