@@ -72,5 +72,5 @@ The [lint workflow](.github/workflows/lint.ml) runs `flake8`. Make sure `poetry 
 ```
 poetry run isort .
 poetry run black .
-poetry run autoflake -r --in-place --remove-unused-variables --remove-all-unused-imports .
+poetry run autoflake .
 ```

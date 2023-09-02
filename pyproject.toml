@@ -14,10 +14,23 @@ isort = "*"
 flake8 = "*"
 black = "*"
 autoflake = "*"
+protobuf = "^3"
+2to3 = "*"
 
 [tool.isort]
 profile = "black"
 known_first_party = "poetry"
+skip = ["protobuf"]
+
+[tool.black]
+exclude = ["protobuf"]
+
+[tool.autoflake]
+recursive = true
+in-place = true
+remove-unused-variables = true
+remove-all-unused-imports = true
+exclude = ["protobuf"]
 
 [build-system]
 requires = ["poetry-core"]

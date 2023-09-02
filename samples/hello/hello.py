@@ -3,6 +3,7 @@ import asyncio
 import logging
 import socket
 
+from opensearch_sdk_py.transport.acknowledged_response import AcknowledgedResponse
 from opensearch_sdk_py.transport.discovery_node import DiscoveryNode
 from opensearch_sdk_py.transport.discovery_node_role import DiscoveryNodeRole
 from opensearch_sdk_py.transport.initialize_extension_request import (
@@ -15,6 +16,9 @@ from opensearch_sdk_py.transport.outbound_message import OutboundMessage
 from opensearch_sdk_py.transport.outbound_message_request import OutboundMessageRequest
 from opensearch_sdk_py.transport.outbound_message_response import (
     OutboundMessageResponse,
+)
+from opensearch_sdk_py.transport.register_rest_actions_request import (
+    RegisterRestActionsRequest,
 )
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
@@ -31,6 +35,10 @@ from opensearch_sdk_py.transport.transport_service_handshake_request import (
 from opensearch_sdk_py.transport.transport_service_handshake_response import (
     TransportServiceHandshakeResponse,
 )
+
+# TODO: set up a class to track pending request_ids. For now just hard-coding this.
+register_rest_request_id = 101  # TODO: auto-increment
+init_response_request_id = -1
 
 
 async def handle_connection(conn, loop):
@@ -84,9 +92,10 @@ async def handle_connection(conn, loop):
 
                     await loop.sock_sendall(conn, output.getvalue())
                 elif request.action == "internal:transport/handshake":
-                    transport_handshake = (  # noqa: F841 we may want to access task_id
-                        TransportServiceHandshakeRequest().read_from(input)
+                    transport_handshake = TransportServiceHandshakeRequest().read_from(
+                        input
                     )
+                    print(f"\ttask_id: {transport_handshake.parent_task_id}")
 
                     response = OutboundMessageResponse(
                         request.thread_context_struct,
@@ -131,14 +140,50 @@ async def handle_connection(conn, loop):
                         + f":{initialize_extension_request.extension.address.port}"
                     )
 
-                    # TODO: In reality a lot of other initialization work happens here.
-                    # Skipping for now so that OpenSearch won't fail initialization.
-                    #
                     # Sometime between tcp and transport handshakes and the eventual response,
                     # the uniqueId gets added to the thread context.
                     request.thread_context_struct.request_headers[
                         "extension_unique_id"
                     ] = "hello-world"
+
+                    # TODO: Other initialization, ideally async
+
+                    # TODO: Do this better than evil global variable
+                    global init_response_request_id
+                    init_response_request_id = request.get_request_id()
+
+                    rest_request = OutboundMessageRequest(
+                        request.thread_context_struct,
+                        request.features,
+                        RegisterRestActionsRequest(
+                            "hello-world", ["GET /hello hw_greeting"]
+                        ),
+                        request.get_version(),
+                        "internal:discovery/registerrestactions",
+                        register_rest_request_id,
+                        False,
+                        False,
+                    )
+
+                    output = StreamOutput()
+                    rest_request.write_to(output)
+
+                    raw_out = output.getvalue()
+                    print("\tparsed Init Request, returning REST registration request")
+                    print(
+                        f"\nsent REST registration request, {len(raw_out)} byte(s):\n\t#{raw_out}\n\t{rest_request.tcp_header}"
+                    )
+                    await loop.sock_sendall(conn, output.getvalue())
+                else:
+                    print(
+                        f"\tparsed action {header.tcp_header}, haven't yet written what to do with it"
+                    )
+            else:
+                if header.get_request_id() == register_rest_request_id:
+                    ack_response = AcknowledgedResponse().read_from(input)
+                    print(
+                        f"\trequest {header.get_request_id()} acknowledged: {ack_response.status}"
+                    )
 
                     response = OutboundMessageResponse(
                         request.thread_context_struct,
@@ -157,20 +202,16 @@ async def handle_connection(conn, loop):
 
                     raw_out = output.getvalue()
                     print(
-                        "\tparsed Extension initialization request, returning a response"
+                        "\tparsed Acknowledged response for REST registration, returning init response"
                     )
                     print(
                         f"\nsent init response, {len(raw_out)} byte(s):\n\t#{raw_out}\n\t{response.tcp_header}"
                     )
-
+                    await loop.sock_sendall(conn, output.getvalue())
                 else:
                     print(
-                        f"\tparsed action {header.tcp_header}, haven't yet written what to do with it"
+                        f"\tparsed {header.tcp_header}, this is a response to something I haven't sent"
                     )
-            else:
-                print(
-                    f"\tparsed {header.tcp_header}, this is a response to something I sent, haven't yet written what to do with it"
-                )
 
     except Exception as ex:
         logging.exception(ex)
