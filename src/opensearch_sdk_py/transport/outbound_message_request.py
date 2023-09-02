@@ -32,6 +32,7 @@ class OutboundMessageRequest(OutboundMessage):
             super().read_from(input)
         self.features = input.read_string_array()
         self.action = input.read_string()
+        return self
 
     def write_to(self, output: StreamOutput):
         variable_bytes = StreamOutput()

@@ -8,13 +8,14 @@ from opensearch_sdk_py.transport.transport_response import TransportResponse
 from opensearch_sdk_py.transport.version import Version
 
 class TransportHandshakerHandshakeResponse(TransportResponse):
-    def __init__(self, version:Version = None):        
+    def __init__(self, version:Version = None):
         super().__init__()
         self.version = version
 
     def read_from(self, input: StreamInput):
         super().read_from(input)
         self.version = input.read_version()
+        return self
 
     def write_to(self, output: StreamOutput):
         response_bytes = StreamOutput()

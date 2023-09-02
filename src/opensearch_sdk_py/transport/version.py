@@ -1,6 +1,7 @@
 class Version:
     MASK = 0x08000000
-    CURRENT = MASK | 3000099
+    CURRENT = 3000099
+    CURRENT_ID = CURRENT ^ MASK
 
     def __init__(self, id: int=0):
         # OpenSearch flips 25th bit to sort higher than legacy versions

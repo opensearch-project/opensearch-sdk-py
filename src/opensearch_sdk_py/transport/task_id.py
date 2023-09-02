@@ -14,6 +14,7 @@ class TaskId:
             self.id = input.read_long()
         else:
             self.id = -1
+        return self
 
     def write_to(self, output: StreamOutput):
         output.write_string(self.node_id)

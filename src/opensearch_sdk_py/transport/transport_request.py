@@ -10,8 +10,7 @@ class TransportRequest(TransportMessage):
 
     # subclasses call super.read_from first
     def read_from(self, input: StreamInput):
-        self.parent_task_id = TaskId()
-        self.parent_task_id.read_from(input)
+        self.parent_task_id = TaskId().read_from(input)
 
     # subclasses pass their writeable bytes as stream
     def write_to(self, output: StreamOutput, request_output: StreamOutput=None):
