@@ -7,8 +7,16 @@ from opensearch_sdk_py.transport.thread_context_struct import ThreadContextStruc
 from opensearch_sdk_py.transport.transport_message import TransportMessage
 from opensearch_sdk_py.transport.version import Version
 
+
 class OutboundMessage(NetworkMessage):
-    def __init__(self, thread_context: ThreadContextStruct=None, version: Version=None, status: int=0, request_id: int=1, message: TransportMessage=None):
+    def __init__(
+        self,
+        thread_context: ThreadContextStruct = None,
+        version: Version = None,
+        status: int = 0,
+        request_id: int = 1,
+        message: TransportMessage = None,
+    ):
         super().__init__(thread_context, version, status, request_id)
         self.message = message
 
@@ -26,7 +34,7 @@ class OutboundMessage(NetworkMessage):
         variable_len = len(variable_header.getvalue())
         self.tcp_header.size += variable_len
         self.tcp_header.variable_header_size += variable_len
-        
+
         message_out = StreamOutput()
         if self.message:
             self.message.write_to(message_out)

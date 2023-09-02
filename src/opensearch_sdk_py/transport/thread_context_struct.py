@@ -3,6 +3,7 @@
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
 
+
 class ThreadContextStruct:
     def __init__(self):
         self.request_headers = dict[str, str]()

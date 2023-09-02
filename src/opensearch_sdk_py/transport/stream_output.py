@@ -1,39 +1,41 @@
 from io import BytesIO
+
 from opensearch_sdk_py.transport.version import Version
+
 
 class StreamOutput(BytesIO):
     def write_byte(self, b: int):
-        return self.write(b.to_bytes(1, byteorder='big'))
+        return self.write(b.to_bytes(1, byteorder="big"))
 
     #  writes an int as four bytes.
     def write_int(self, i: int):
-        return self.write(i.to_bytes(4, byteorder='big'))
+        return self.write(i.to_bytes(4, byteorder="big"))
 
     # writes an int in a variable-length format
     def write_v_int(self, i: int):
         # shortcut single byte
         if i < 0x80:
             return self.write_byte(i)
-        result = bytearray(b'')
+        result = bytearray(b"")
         while True:
-            result.append((i & 0x7f) | 0x80)
+            result.append((i & 0x7F) | 0x80)
             i >>= 7
-            if ((i & ~0x7F) == 0):
+            if (i & ~0x7F) == 0:
                 result.append(i)
                 break
         return self.write(result)
-      
+
     def write_version(self, version: Version):
         return self.write_v_int(version.id)
 
     def write_long(self, i: int):
-        return self.write(i.to_bytes(8, byteorder='big'))
+        return self.write(i.to_bytes(8, byteorder="big"))
 
     # }
     # /**
     #  Writes an array of bytes.
     #      #  @param b the bytes to write
-    #  
+    #
     # def write_byteArray(byte[] b) throws IOException {
     #     writeVInt(b.length);
     #     write_bytes(b, 0, b.length);
@@ -41,7 +43,7 @@ class StreamOutput(BytesIO):
 
     # /**
     #  Writes the bytes reference, including a length header.
-    #  
+    #
     # def write_bytesReference(@Nullable BytesReference bytes) throws IOException {
     #     if (bytes == null) {
     #         writeVInt(0);
@@ -54,7 +56,7 @@ class StreamOutput(BytesIO):
     # /**
     #  Writes an optional bytes reference including a length header. Use this if you need to differentiate between null and empty bytes
     #  references. Use {@link #write_bytesReference(BytesReference)} and {@link StreamInput#readBytesReference()} if you do not.
-    #  
+    #
     # def writeOptionalBytesReference(@Nullable BytesReference bytes) throws IOException {
     #     if (bytes == null) {
     #         writeVInt(0);
@@ -82,11 +84,9 @@ class StreamOutput(BytesIO):
     #     write_bytes(buffer, 0, 2);
     # }
 
-
-
     # /**
     #  Writes a long as eight bytes.
-    #  
+    #
     # def writeLong(long i) throws IOException {
     #     final byte[] buffer = scratch.get();
     #     buffer[0] = (byte) (i >> 56);
@@ -104,7 +104,7 @@ class StreamOutput(BytesIO):
     #  Writes a non-negative long in a variable-length format. Writes between one and ten bytes. Smaller values take fewer bytes. Negative
     #  numbers use ten bytes and trip assertions (if running in tests) so prefer {@link #writeLong(long)} or {@link #writeZLong(long)} for
     #  negative numbers.
-    #  
+    #
     # def writeVLong(long i) throws IOException {
     #     if (i < 0) {
     #         throw new IllegalStateException("Negative longs unsupported, use writeLong or writeZLong for negative numbers [" + i + "]");
@@ -124,7 +124,7 @@ class StreamOutput(BytesIO):
     # /**
     #  Writes a long in a variable-length format without first checking if it is negative. Package private for testing. Use
     #  {@link #writeVLong(long)} instead.
-    #  
+    #
     # def writeVLongNoCheck(long i) throws IOException {
     #     final byte[] buffer = scratch.get();
     #     int index = 0;
@@ -142,7 +142,7 @@ class StreamOutput(BytesIO):
     #  e.g., 0 -;&gt; 0, -1 -;&gt; 1, 1 -;&gt; 2, ..., Long.MIN_VALUE -;&gt; -1, Long.MAX_VALUE -;&gt; -2
     #  Numbers with small absolute value will have a small encoding
     #  If the numbers are known to be non-negative, use {@link #writeVLong(long)}
-    #  
+    #
     # def writeZLong(long i) throws IOException {
     #     final byte[] buffer = scratch.get();
     #     int index = 0;
@@ -189,7 +189,7 @@ class StreamOutput(BytesIO):
 
     # /**
     #  Writes an optional {@link Integer}.
-    #  
+    #
     # def writeOptionalInt(@Nullable Integer integer) throws IOException {
     #     if (integer == null) {
     #         write_boolean(false);
@@ -239,13 +239,13 @@ class StreamOutput(BytesIO):
     #         bytes.writeTo(this);
     #     }
     # }
-      
+
     # writes a utf-8 string
     def write_string(self, s: str):
-        char_count = len(s.encode('utf-8'))
+        char_count = len(s.encode("utf-8"))
         self.write_v_int(char_count)
         if char_count > 0:
-            self.write(bytes(s, 'utf-8'))
+            self.write(bytes(s, "utf-8"))
 
     # def writeSecureString(SecureString secureStr) throws IOException {
     #     final byte[] secureStrBytes = CharArrays.toUtf8Bytes(secureStr.getChars());
@@ -295,14 +295,14 @@ class StreamOutput(BytesIO):
 
     # /**
     #  Forces any buffered output to be written.
-    #  
+    #
     # @Override
     # def flush(self, ):
     #     pass
 
     # /**
     #  Closes this stream to further operations.
-    #  
+    #
     # @Override
     # def close(self, ):
     #     pass
@@ -341,7 +341,7 @@ class StreamOutput(BytesIO):
 
     # /**
     #  Writes a string array, for nullable string, writes false.
-    #  
+    #
     # def writeOptionalStringArray(@Nullable String[] array) throws IOException {
     #     if (array == null) {
     #         write_boolean(false);
@@ -378,7 +378,7 @@ class StreamOutput(BytesIO):
     #  to make sure every map generated bytes order are same.
     #  This method is compatible with {@code StreamInput.readMap} and {@code StreamInput.readGenericValue}
     #  This method only will handle the map keys order, not maps contained within the map
-    #  
+    #
     # def writeMapWithConsistentOrder(@Nullable Map<String, ? extends Object> map) throws IOException {
     #     if (map == null) {
     #         write_byte((byte) -1);
@@ -406,7 +406,7 @@ class StreamOutput(BytesIO):
     #  </code></pre>
     #      #  @param keyWriter The key writer
     #  @param valueWriter The value writer
-    #  
+    #
     # public final <K, V> void writeMapOfLists(final Map<K, List<V>> map, final Writer<K> keyWriter, final Writer<V> valueWriter)
     #     throws IOException {
     #     writeMap(map, keyWriter, (stream, list) -> {
@@ -425,7 +425,7 @@ class StreamOutput(BytesIO):
     #  </code></pre>
     #      #  @param keyWriter The key writer
     #  @param valueWriter The value writer
-    #  
+    #
     # public final <K, V> void writeMap(final Map<K, V> map, final Writer<K> keyWriter, final Writer<V> valueWriter) throws IOException {
     #     writeVInt(map.size());
     #     for (final Map.Entry<K, V> entry : map.entrySet()) {
@@ -436,7 +436,7 @@ class StreamOutput(BytesIO):
 
     # /**
     #  Writes an {@link Instant} to the stream with nanosecond resolution
-    #  
+    #
     # public final void writeInstant(Instant instant) throws IOException {
     #     writeLong(instant.getEpochSecond());
     #     writeInt(instant.getNano());
@@ -444,7 +444,7 @@ class StreamOutput(BytesIO):
 
     # /**
     #  Writes an {@link Instant} to the stream, which could possibly be null
-    #  
+    #
     # public final void writeOptionalInstant(@Nullable Instant instant) throws IOException {
     #     if (instant == null) {
     #         write_boolean(false);
@@ -605,7 +605,7 @@ class StreamOutput(BytesIO):
     #  different key-value orders, they will maybe have different stream order.
     #  If want to keep stream out map and stream in map have the same stream order when stream,
     #  can use {@code writeMapWithConsistentOrder}
-    #  
+    #
     # def writeGenericValue(@Nullable Object value) throws IOException {
     #     if (value == null) {
     #         write_byte((byte) -1);
@@ -710,7 +710,7 @@ class StreamOutput(BytesIO):
     #  @param array  the array
     #  @param <T>    the type of the elements of the array
     #  @throws IOException if an I/O exception occurs while writing the array
-    #  
+    #
     # public <T> void writeArray(final Writer<T> writer, final T[] array) throws IOException {
     #     writeVInt(array.length);
     #     for (T value : array) {
@@ -721,7 +721,7 @@ class StreamOutput(BytesIO):
     # /**
     #  Same as {@link #writeArray(Writer, Object[])} but the provided array may be null. An additional boolean value is
     #  serialized to indicate whether the array was null or not.
-    #  
+    #
     # public <T> void writeOptionalArray(final Writer<T> writer, final @Nullable T[] array) throws IOException {
     #     if (array == null) {
     #         write_boolean(false);
@@ -735,7 +735,7 @@ class StreamOutput(BytesIO):
     #  Writes the specified array of {@link Writeable}s. This method can be seen as
     #  writer version of {@link StreamInput#readArray(Writeable.Reader, IntFunction)}. The length of array encoded as a variable-length
     #  integer is first written to the stream, and then the elements of the array are written to the stream.
-    #  
+    #
     # public <T extends Writeable> void writeArray(T[] array) throws IOException {
     #     writeArray((out, value) -> value.writeTo(out), array);
     # }
@@ -743,7 +743,7 @@ class StreamOutput(BytesIO):
     # /**
     #  Same as {@link #writeArray(Writeable[])} but the provided array may be null. An additional boolean value is
     #  serialized to indicate whether the array was null or not.
-    #  
+    #
     # public <T extends Writeable> void writeOptionalArray(@Nullable T[] array) throws IOException {
     #     writeOptionalArray((out, value) -> value.writeTo(out), array);
     # }
@@ -900,7 +900,7 @@ class StreamOutput(BytesIO):
 
     # /**
     #  Writes a {@link NamedWriteable} to the current stream, by first writing its name and then the object itself
-    #  
+    #
     # def writeNamedWriteable(NamedWriteable namedWriteable) throws IOException {
     #     writeString(namedWriteable.getWriteableName());
     #     namedWriteable.writeTo(this);
@@ -908,7 +908,7 @@ class StreamOutput(BytesIO):
 
     # /**
     #  Write an optional {@link NamedWriteable} to the stream.
-    #  
+    #
     # def writeOptionalNamedWriteable(@Nullable NamedWriteable namedWriteable) throws IOException {
     #     if (namedWriteable == null) {
     #         write_boolean(false);
@@ -920,14 +920,14 @@ class StreamOutput(BytesIO):
 
     # /**
     #  Write a {@linkplain ZoneId} to the stream.
-    #  
+    #
     # def writeZoneId(ZoneId timeZone) throws IOException {
     #     writeString(timeZone.getId());
     # }
 
     # /**
     #  Write an optional {@linkplain ZoneId} to the stream.
-    #  
+    #
     # def writeOptionalZoneId(@Nullable ZoneId timeZone) throws IOException {
     #     if (timeZone == null) {
     #         write_boolean(false);
@@ -942,14 +942,14 @@ class StreamOutput(BytesIO):
     #  {@link StreamInput#readList(Writeable.Reader)}.
     #      #  @param collection the collection to write to this stream
     #  @throws IOException if an I/O exception occurs writing the collection
-    #  
+    #
     # def writeCollection(final Collection<? extends Writeable> collection) throws IOException {
     #     writeCollection(collection, (o, v) -> v.writeTo(o));
     # }
 
     # /**
     #  Writes a list of {@link Writeable} objects
-    #  
+    #
     # def writeList(List<? extends Writeable> list) throws IOException {
     #     writeCollection(list);
     # }
@@ -958,7 +958,7 @@ class StreamOutput(BytesIO):
     #  Writes a collection of objects via a {@link Writer}.
     #      #  @param collection the collection of objects
     #  @throws IOException if an I/O exception occurs writing the collection
-    #  
+    #
     # public <T> void writeCollection(final Collection<T> collection, final Writer<T> writer) throws IOException {
     #     writeVInt(collection.size());
     #     for (final T val : collection) {
@@ -971,7 +971,7 @@ class StreamOutput(BytesIO):
     #  {@link StreamInput#readList(Writeable.Reader)}.
     #      #  @param collection the collection of strings
     #  @throws IOException if an I/O exception occurs writing the collection
-    #  
+    #
     # def writeStringCollection(final Collection<String> collection) throws IOException {
     #     writeCollection(collection, StreamOutput::writeString);
     # }
@@ -981,7 +981,7 @@ class StreamOutput(BytesIO):
     #  {@link StreamInput#readList(Writeable.Reader)}.
     #      #  @param collection the collection of strings
     #  @throws IOException if an I/O exception occurs writing the collection
-    #  
+    #
     # def writeOptionalStringCollection(final Collection<String> collection) throws IOException {
     #     if (collection != null) {
     #         write_boolean(true);
@@ -993,7 +993,7 @@ class StreamOutput(BytesIO):
 
     # /**
     #  Writes a list of {@link NamedWriteable} objects.
-    #  
+    #
     # def writeNamedWriteableList(List<? extends NamedWriteable> list) throws IOException {
     #     writeVInt(list.size());
     #     for (NamedWriteable obj : list) {
@@ -1003,14 +1003,14 @@ class StreamOutput(BytesIO):
 
     # /**
     #  Writes an enum with type E based on its ordinal value
-    #  
+    #
     # public <E extends Enum<E>> void writeEnum(E enumValue) throws IOException {
     #     writeVInt(enumValue.ordinal());
     # }
 
     # /**
     #  Writes an EnumSet with type E that by serialized it based on it's ordinal value
-    #  
+    #
     # public <E extends Enum<E>> void writeEnumSet(EnumSet<E> enumSet) throws IOException {
     #     writeVInt(enumSet.size());
     #     for (E e : enumSet) {
@@ -1020,7 +1020,7 @@ class StreamOutput(BytesIO):
 
     # /**
     #  Write a {@link TimeValue} to the stream
-    #  
+    #
     # def writeTimeValue(TimeValue timeValue) throws IOException {
     #     writeZLong(timeValue.duration());
     #     write_byte((byte) timeValue.timeUnit().ordinal());
@@ -1028,7 +1028,7 @@ class StreamOutput(BytesIO):
 
     # /**
     #  Write an optional {@link TimeValue} to the stream.
-    #  
+    #
     # def writeOptionalTimeValue(@Nullable TimeValue timeValue) throws IOException {
     #     if (timeValue == null) {
     #         write_boolean(false);

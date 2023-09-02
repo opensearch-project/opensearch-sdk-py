@@ -10,6 +10,14 @@ readme = "README.md"
 python = "^3.7"
 aiohttp = "*"
 pytest = "*"
+isort = "*"
+flake8 = "*"
+black = "*"
+autoflake = "*"
+
+[tool.isort]
+profile = "black"
+known_first_party = "poetry"
 
 [build-system]
 requires = ["poetry-core"]

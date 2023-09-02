@@ -7,14 +7,15 @@ from opensearch_sdk_py.transport.stream_output import StreamOutput
 from opensearch_sdk_py.transport.transport_request import TransportRequest
 from opensearch_sdk_py.transport.version import Version
 
+
 class TransportHandshakerHandshakeRequest(TransportRequest):
-    def __init__(self, version:Version = None):        
+    def __init__(self, version: Version = None):
         super().__init__()
         self.version = version
 
     def read_from(self, input: StreamInput):
         super().read_from(input)
-        size = input.read_v_int()
+        input.read_v_int()
         self.version = input.read_version()
         return self
 

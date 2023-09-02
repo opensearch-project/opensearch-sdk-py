@@ -1,28 +1,35 @@
-import uuid
 import base64
+import uuid
 
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
 from opensearch_sdk_py.transport.transport_address import TransportAddress
 from opensearch_sdk_py.transport.version import Version
 
-class DiscoveryNode():
-    def __init__(self, 
-                 node_name: str='',
-                 node_id: str=None,
-                 ephemeral_id: str=None,
-                 host_name: str=None,
-                 host_address: str=None,
-                 address: TransportAddress=None,
-                 attributes: dict[str, str]=dict(),
-                 roles: set[tuple]=set(), # DiscoveryNodeRole
-                 version: Version=None):
+
+class DiscoveryNode:
+    def __init__(
+        self,
+        node_name: str = "",
+        node_id: str = None,
+        ephemeral_id: str = None,
+        host_name: str = None,
+        host_address: str = None,
+        address: TransportAddress = None,
+        attributes: dict[str, str] = dict(),
+        roles: set[tuple] = set(),  # DiscoveryNodeRole
+        version: Version = None,
+    ):
         # node_id and address are required unless we are just initializing for read_from
         if node_id and address:
             self.node_id = node_id
             self.node_name = node_name
             # OpenSearch uses Encoder.RFC4648_URLSAFE and strips the last 2 bytes of padding
-            self.ephemeral_id = ephemeral_id if ephemeral_id else base64.urlsafe_b64encode(uuid.uuid4().bytes)[:-2].decode()
+            self.ephemeral_id = (
+                ephemeral_id
+                if ephemeral_id
+                else base64.urlsafe_b64encode(uuid.uuid4().bytes)[:-2].decode()
+            )
             self.host_name = host_name if host_name else address.host_name
             self.host_address = host_address if host_address else str(address.address)
             self.address = address
@@ -41,7 +48,9 @@ class DiscoveryNode():
         self.roles = set()
         roles_size = input.read_v_int()
         for i in range(roles_size):
-            self.roles.add((input.read_string(), input.read_string(), input.read_boolean()))
+            self.roles.add(
+                (input.read_string(), input.read_string(), input.read_boolean())
+            )
         self.version = input.read_version()
         return self
 

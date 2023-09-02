@@ -3,14 +3,14 @@ class Version:
     CURRENT = 3000099
     CURRENT_ID = CURRENT ^ MASK
 
-    def __init__(self, id: int=0):
+    def __init__(self, id: int = 0):
         # OpenSearch flips 25th bit to sort higher than legacy versions
         self.id = id ^ Version.MASK
         self.__build_string()
 
     def from_bytes(self, data: bytes):
         # If we have data bytes use directly for id without bit-flip
-        self.id = int.from_bytes(data, "big")             
+        self.id = int.from_bytes(data, "big")
         self.__build_string()
 
     def __build_string(self):
@@ -23,6 +23,6 @@ class Version:
 
     def __str__(self):
         return f"{self.major}.{self.minor}.{self.revision}.{self.build}"
-            
+
     def __bytes__(self):
-        return self.id.to_bytes(4, byteorder='big')
+        return self.id.to_bytes(4, byteorder="big")

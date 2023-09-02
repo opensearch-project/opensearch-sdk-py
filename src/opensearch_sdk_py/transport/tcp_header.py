@@ -2,8 +2,9 @@
 
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
-from opensearch_sdk_py.transport.version import Version
 from opensearch_sdk_py.transport.transport_status import TransportStatus
+from opensearch_sdk_py.transport.version import Version
+
 
 class TcpHeader:
     MARKER_BYTES_SIZE = 2
@@ -13,14 +14,24 @@ class TcpHeader:
     VERSION_ID_SIZE = 4
     VARIABLE_HEADER_SIZE = 4
     BYTES_REQUIRED_FOR_MESSAGE_SIZE = MARKER_BYTES_SIZE + MESSAGE_LENGTH_SIZE
-    VERSION_POSITION = MARKER_BYTES_SIZE + MESSAGE_LENGTH_SIZE + REQUEST_ID_SIZE + STATUS_SIZE
+    VERSION_POSITION = (
+        MARKER_BYTES_SIZE + MESSAGE_LENGTH_SIZE + REQUEST_ID_SIZE + STATUS_SIZE
+    )
     VARIABLE_HEADER_SIZE_POSITION = VERSION_POSITION + VERSION_ID_SIZE
     PRE_76_HEADER_SIZE = VERSION_POSITION + VERSION_ID_SIZE
     BYTES_REQUIRED_FOR_VERSION = PRE_76_HEADER_SIZE
     HEADER_SIZE = PRE_76_HEADER_SIZE + VARIABLE_HEADER_SIZE
     MESSAGE_SIZE = HEADER_SIZE - BYTES_REQUIRED_FOR_MESSAGE_SIZE
 
-    def __init__(self, prefix=b'ES', request_id=1, status=0, version=None, size=MESSAGE_SIZE, variable_header_size=0):
+    def __init__(
+        self,
+        prefix=b"ES",
+        request_id=1,
+        status=0,
+        version=None,
+        size=MESSAGE_SIZE,
+        variable_header_size=0,
+    ):
         self.prefix = prefix
         self.request_id = request_id
         self.status = status
@@ -35,7 +46,7 @@ class TcpHeader:
         self.request_id = input.read_long()
         self.status = input.read_byte()
         self.version = Version()
-        self.version.from_bytes(input.read_bytes(4)) # always 4 bytes big-endian
+        self.version.from_bytes(input.read_bytes(4))  # always 4 bytes big-endian
         self.variable_header_size = input.read_int()
 
     def write_to(self, output: StreamOutput):
@@ -43,7 +54,7 @@ class TcpHeader:
         output.write_int(self.size)
         output.write_long(self.request_id)
         output.write_byte(self.status)
-        output.write(bytes(self.version)) # always 4 bytes big-endian
+        output.write(bytes(self.version))  # always 4 bytes big-endian
         output.write_int(self.variable_header_size)
 
     def __str__(self):
@@ -54,7 +65,7 @@ class TcpHeader:
 
     def is_request(self) -> bool:
         return (self.status & TransportStatus.STATUS_REQRES) == 0
-    
+
     def set_request(self):
         self.status &= ~TransportStatus.STATUS_REQRES
 
