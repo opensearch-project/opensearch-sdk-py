@@ -19,7 +19,5 @@ class TransportHandshakerHandshakeResponse(TransportResponse):
         return self
 
     def write_to(self, output: StreamOutput):
-        response_bytes = StreamOutput()
-        if self.version:
-            response_bytes.write_version(self.version)
-        super().write_to(output, response_bytes)
+        super().write_to(output)
+        output.write_version(self.version)

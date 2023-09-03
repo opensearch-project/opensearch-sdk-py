@@ -18,7 +18,6 @@ class InitializeExtensionResponse(TransportResponse):
         return self
 
     def write_to(self, output: StreamOutput):
-        response_bytes = StreamOutput()
-        response_bytes.write_string(self.name)
-        response_bytes.write_string_array(self.implemented_interfaces)
-        super().write_to(output, response_bytes)
+        super().write_to(output)
+        output.write_string(self.name)
+        output.write_string_array(self.implemented_interfaces)

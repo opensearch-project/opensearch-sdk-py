@@ -75,6 +75,5 @@ class FakeTransportResponse(TransportResponse):
         super().__init__()
 
     def write_to(self, output: StreamOutput):
-        fake_out = StreamOutput()
-        fake_out.write_string("test")
-        super().write_to(output, fake_out)
+        super().write_to(output)
+        output.write_string("test")
