@@ -11,3 +11,8 @@ class TransportMessage:
 
     def write_to(self, output: StreamOutput):
         pass  # NO-OP, subclasses implement this
+
+    def __bytes__(self):
+        output = StreamOutput()
+        self.write_to(output)
+        return output.getvalue()

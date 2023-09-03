@@ -11,10 +11,12 @@ class TransportRequest(TransportMessage):
 
     # subclasses call super.read_from first
     def read_from(self, input: StreamInput):
+        super().read_from(input)
         self.parent_task_id = TaskId().read_from(input)
 
     # subclasses pass their writeable bytes as stream
     def write_to(self, output: StreamOutput, request_output: StreamOutput = None):
+        super().write_to(input)
         self.parent_task_id.write_to(output)
         if request_output:
             output.write(request_output.getvalue())

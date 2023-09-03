@@ -27,8 +27,9 @@ class TestOutboundMessage(unittest.TestCase):
             status=TransportStatus.STATUS_HANDSHAKE,
         )
         out = StreamOutput()
-        subclass_out = StreamOutput(b"\x01\x02\x03")
-        om.write_to(out, subclass_out)
+        om.variable_bytes = b"\x01\x02\x03"
+        om.write_to(out)
+
         self.assertEqual(
             len(out.getvalue()),
             om.tcp_header.size + TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE,

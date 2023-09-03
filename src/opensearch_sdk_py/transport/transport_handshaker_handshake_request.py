@@ -17,7 +17,6 @@ class TransportHandshakerHandshakeRequest(TransportRequest):
         super().read_from(input)
         input.read_v_int()
         self.version = input.read_version()
-        return self
 
     def write_to(self, output: StreamOutput):
         request_bytes = StreamOutput()

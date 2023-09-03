@@ -17,5 +17,15 @@ class ThreadContextStruct:
         output.write_string_to_string_dict(self.request_headers)
         output.write_string_to_string_array_dict(self.response_headers)
 
+    @property
+    def size(self):
+        if len(self.request_headers) == 0 and len(self.response_headers) == 0:
+            return 2
+        else:
+            # TODO: math instead of writing to a stream
+            out = StreamOutput()
+            self.write_to(out)
+            return len(out.getvalue())
+
     def __str__(self):
         return f"request_headers: {self.request_headers} , response_headers: {self.response_headers}"

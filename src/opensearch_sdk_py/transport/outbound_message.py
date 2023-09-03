@@ -18,29 +18,46 @@ class OutboundMessage(NetworkMessage):
         message: TransportMessage = None,
     ):
         super().__init__(thread_context, version, status, request_id)
-        self.message = message
+        self._variable_bytes = None
+        self._message = message
+        if self._message:
+            self.tcp_header.size += len(self._message)
+        self.tcp_header.variable_header_size = 2  # context
 
     # subclasses call super().read_from first then read their own attributes
     def read_from(self, input: StreamInput):
         self.tcp_header.read_from(input)
         self.thread_context_struct.read_from(input)
-        return self
+
+    @property
+    def variable_bytes(self):
+        return self._variable_bytes
+
+    @variable_bytes.setter
+    def variable_bytes(self, variable_bytes: bytes):
+        if self._variable_bytes:
+            self.tcp_header.size -= len(self._variable_bytes)
+            self.tcp_header.variable_header_size -= len(self._variable_bytes)
+        self.tcp_header.size += len(variable_bytes)
+        self.tcp_header.variable_header_size += len(variable_bytes)
+        self._variable_bytes = variable_bytes
+
+    @property
+    def message(self):
+        return self._message
+
+    @message.setter
+    def message(self, message: bytes):
+        if self._message:
+            self.tcp_header.size -= len(self._message)
+        self.tcp_header.size += len(message)
+        self._message = message
 
     # subclasses create stream of variable attributes and pass here
-    def write_to(self, output: StreamOutput, variable_bytes: StreamOutput):
-        variable_header = StreamOutput()
-        self.thread_context_struct.write_to(variable_header)
-        variable_header.write(variable_bytes.getvalue())
-        variable_len = len(variable_header.getvalue())
-        self.tcp_header.size += variable_len
-        self.tcp_header.variable_header_size += variable_len
-
-        message_out = StreamOutput()
-        if self.message:
-            self.message.write_to(message_out)
-        message_len = len(message_out.getvalue())
-        self.tcp_header.size += message_len
-
+    def write_to(self, output: StreamOutput):
         self.tcp_header.write_to(output)
-        output.write(variable_header.getvalue())
-        output.write(message_out.getvalue())
+        self.thread_context_struct.write_to(output)
+        if self._variable_bytes:
+            output.write(self._variable_bytes)
+        if self._message:
+            output.write(self._message)

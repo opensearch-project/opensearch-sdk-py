@@ -30,5 +30,4 @@ class OutboundMessageResponse(OutboundMessage):
         super().read_from(input)
 
     def write_to(self, output: StreamOutput):
-        variable_bytes = StreamOutput()
-        super().write_to(output, variable_bytes)
+        super().write_to(output)

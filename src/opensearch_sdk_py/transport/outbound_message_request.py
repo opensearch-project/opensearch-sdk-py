@@ -27,6 +27,10 @@ class OutboundMessageRequest(OutboundMessage):
             self.tcp_header.set_handshake()
         if is_compress:
             self.tcp_header.set_compress()
+        variable_bytes = StreamOutput()
+        variable_bytes.write_string_array(self.features)
+        variable_bytes.write_string(self.action)
+        self.variable_bytes = variable_bytes.getvalue()
 
     def read_from(self, input: StreamInput, header: OutboundMessage = None):
         if header:
@@ -39,7 +43,4 @@ class OutboundMessageRequest(OutboundMessage):
         return self
 
     def write_to(self, output: StreamOutput):
-        variable_bytes = StreamOutput()
-        variable_bytes.write_string_array(self.features)
-        variable_bytes.write_string(self.action)
-        super().write_to(output, variable_bytes)
+        super().write_to(output)

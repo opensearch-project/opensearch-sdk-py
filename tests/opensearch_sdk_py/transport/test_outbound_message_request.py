@@ -38,7 +38,7 @@ class TestOutboundMessageRequest(unittest.TestCase):
     def test_outbound_message_request_stream(self):
         omr = OutboundMessageRequest(
             features=["foo", "bar"],
-            message=FakeTransportRequest(),
+            message=bytes(FakeTransportRequest()),
             action="internal:test/handshake",
             request_id=2,
             version=Version(3000099),
