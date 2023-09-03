@@ -9,11 +9,12 @@ class TransportRequest(TransportMessage):
         super().__init__()
         self.parent_task_id = task_id
 
-    # subclasses call super.read_from first
     def read_from(self, input: StreamInput):
         super().read_from(input)
         self.parent_task_id = TaskId().read_from(input)
+        return self
 
     def write_to(self, output: StreamOutput):
         super().write_to(input)
         self.parent_task_id.write_to(output)
+        return self

@@ -7,10 +7,10 @@ class TransportMessage:
         pass
 
     def read_from(self, input: StreamInput):
-        pass  # NO-OP, subclasses implement this
+        return self
 
     def write_to(self, output: StreamOutput):
-        pass  # NO-OP, subclasses implement this
+        return self
 
     def __bytes__(self):
         output = StreamOutput()

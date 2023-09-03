@@ -21,3 +21,4 @@ class InitializeExtensionResponse(TransportResponse):
         super().write_to(output)
         output.write_string(self.name)
         output.write_string_array(self.implemented_interfaces)
+        return self

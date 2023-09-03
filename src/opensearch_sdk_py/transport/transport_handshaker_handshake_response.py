@@ -21,3 +21,4 @@ class TransportHandshakerHandshakeResponse(TransportResponse):
     def write_to(self, output: StreamOutput):
         super().write_to(output)
         output.write_version(self.version)
+        return self

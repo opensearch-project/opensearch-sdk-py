@@ -12,10 +12,12 @@ class ThreadContextStruct:
     def read_from(self, input: StreamInput):
         self.request_headers = input.read_string_to_string_dict()
         self.response_headers = input.read_string_to_string_set_dict()
+        return self
 
     def write_to(self, output: StreamOutput):
         output.write_string_to_string_dict(self.request_headers)
         output.write_string_to_string_array_dict(self.response_headers)
+        return self
 
     @property
     def size(self):

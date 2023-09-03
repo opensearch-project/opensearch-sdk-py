@@ -21,8 +21,10 @@ class InitializeExtensionRequest(TransportRequest):
         super().read_from(input)
         self.source_node = DiscoveryNode().read_from(input)
         self.extension = DiscoveryExtensionNode().read_from(input)
+        return self
 
     def write_to(self, output: StreamOutput):
         super().write_to(output)
         self.source_node.write_to(output)
         self.extension.write_to(output)
+        return self

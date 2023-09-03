@@ -39,3 +39,4 @@ class TransportServiceHandshakeResponse(TransportResponse):
             output.write_boolean(False)
         output.write_string(self.cluster_name)
         output.write_version(self.version)
+        return self

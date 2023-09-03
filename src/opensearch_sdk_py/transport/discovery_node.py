@@ -68,3 +68,4 @@ class DiscoveryNode:
             output.write_string(role[1])
             output.write_boolean(role[2])
         output.write_version(self.version)
+        return self

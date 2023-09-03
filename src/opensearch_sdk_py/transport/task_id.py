@@ -21,6 +21,7 @@ class TaskId:
         output.write_string(self.node_id)
         if self.node_id:
             output.write_long(self.id)
+        return self
 
     def __str__(self):
         return f"{self.node_id}, id={self.id}"

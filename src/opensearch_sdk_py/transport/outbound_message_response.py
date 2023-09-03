@@ -28,6 +28,8 @@ class OutboundMessageResponse(OutboundMessage):
 
     def read_from(self, input: StreamInput):
         super().read_from(input)
+        return self
 
     def write_to(self, output: StreamOutput):
         super().write_to(output)
+        return self

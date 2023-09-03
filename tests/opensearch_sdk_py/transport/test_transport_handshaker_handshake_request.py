@@ -28,6 +28,7 @@ class TestTransportHandshakerHandshakeRequest(unittest.TestCase):
         data = NettyTraceData.load(
             "tests/opensearch_sdk_py/transport/data/tcp_handshake.txt"
         ).data
+
         input = StreamInput(data)
         request = OutboundMessageRequest()
         request.read_from(input)

@@ -24,3 +24,4 @@ class TransportAddress(ipaddress.IPv4Address):
         output.write_int(int(self.address))
         output.write_string(self.host_name)
         output.write_int(self.port)
+        return self

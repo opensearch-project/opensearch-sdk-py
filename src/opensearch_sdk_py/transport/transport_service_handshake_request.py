@@ -17,3 +17,4 @@ class TransportServiceHandshakeRequest(TransportRequest):
 
     def write_to(self, output: StreamOutput):
         super().write_to(output)
+        return self
