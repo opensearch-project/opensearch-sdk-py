@@ -34,14 +34,13 @@ class TestOutboundMessageResponse(unittest.TestCase):
     def test_outbound_message_response_stream(self):
         omr = OutboundMessageResponse(
             features=["foo", "bar"],
-            message=FakeTransportResponse(),
+            message=bytes(FakeTransportResponse()),
             request_id=2,
             version=Version(3000099),
             is_handshake=True,
         )
         out = StreamOutput()
         omr.write_to(out)
-        print(out.getvalue())
         self.assertEqual(
             out.getvalue(),
             b"ES\x00\x00\x00\x18\x00\x00\x00\x00\x00\x00\x00\x02\x09\x08\x2d\xc7\x23\x00\x00\x00\x02"  # tcp header
@@ -76,6 +75,5 @@ class FakeTransportResponse(TransportResponse):
         super().__init__()
 
     def write_to(self, output: StreamOutput):
-        fake_out = StreamOutput()
-        fake_out.write_string("test")
-        super().write_to(output, fake_out)
+        super().write_to(output)
+        output.write_string("test")

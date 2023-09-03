@@ -40,7 +40,6 @@ class TcpHeader:
         self.variable_header_size = variable_header_size
 
     def read_from(self, input: StreamInput):
-        self.raw = input.raw
         self.prefix = input.read_bytes(2)
         self.size = input.read_int()
         self.request_id = input.read_long()
@@ -48,6 +47,7 @@ class TcpHeader:
         self.version = Version()
         self.version.from_bytes(input.read_bytes(4))  # always 4 bytes big-endian
         self.variable_header_size = input.read_int()
+        return self
 
     def write_to(self, output: StreamOutput):
         output.write(self.prefix)
@@ -56,12 +56,10 @@ class TcpHeader:
         output.write_byte(self.status)
         output.write(bytes(self.version))  # always 4 bytes big-endian
         output.write_int(self.variable_header_size)
+        return self
 
     def __str__(self):
         return f"{self.statuses} {self.prefix}, message={self.size} byte(s), request_id={self.request_id}, status={self.status}, version={self.version}"
-
-    def __bytes__(self):
-        return self.raw
 
     def is_request(self) -> bool:
         return (self.status & TransportStatus.STATUS_REQRES) == 0

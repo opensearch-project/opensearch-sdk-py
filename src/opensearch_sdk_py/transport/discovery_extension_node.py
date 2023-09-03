@@ -42,3 +42,4 @@ class DiscoveryExtensionNode(DiscoveryNode):
         output.write_v_int(len(self.dependencies))
         for d in self.dependencies:
             d.write_to(output)
+        return self

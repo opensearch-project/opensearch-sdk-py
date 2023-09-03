@@ -19,6 +19,7 @@ class NetworkMessage:
         self.tcp_header = TcpHeader(
             version=version, status=status, request_id=request_id
         )
+        self.tcp_header.size += self.thread_context_struct.size
 
     def get_version(self) -> Version:
         return self.tcp_header.version

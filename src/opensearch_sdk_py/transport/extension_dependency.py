@@ -18,3 +18,4 @@ class ExtensionDependency:
     def write_to(self, output: StreamOutput):
         output.write_string(self.unique_id)
         output.write_version(self.version)
+        return self

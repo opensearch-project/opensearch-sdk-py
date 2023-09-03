@@ -24,7 +24,7 @@ class InitializeExtensionRequest(TransportRequest):
         return self
 
     def write_to(self, output: StreamOutput):
-        request_bytes = StreamOutput()
-        self.source_node.write_to(request_bytes)
-        self.extension.write_to(request_bytes)
-        super().write_to(output, request_bytes)
+        super().write_to(output)
+        self.source_node.write_to(output)
+        self.extension.write_to(output)
+        return self

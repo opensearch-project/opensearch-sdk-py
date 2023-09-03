@@ -31,12 +31,12 @@ class TransportServiceHandshakeResponse(TransportResponse):
         return self
 
     def write_to(self, output: StreamOutput):
-        response_bytes = StreamOutput()
+        super().write_to(output)
         if self.discovery_node:
-            response_bytes.write_boolean(True)
-            self.discovery_node.write_to(response_bytes)
+            output.write_boolean(True)
+            self.discovery_node.write_to(output)
         else:
-            response_bytes.write_boolean(False)
-        response_bytes.write_string(self.cluster_name)
-        response_bytes.write_version(self.version)
-        super().write_to(output, response_bytes)
+            output.write_boolean(False)
+        output.write_string(self.cluster_name)
+        output.write_version(self.version)
+        return self

@@ -8,8 +8,7 @@ class TransportResponse(TransportMessage):
         super().__init__()
 
     def read_from(self, input: StreamInput):
-        pass  # NO-OP
+        return self
 
-    def write_to(self, output: StreamOutput, response_output: StreamOutput = None):
-        if response_output:
-            output.write(response_output.getvalue())
+    def write_to(self, output: StreamOutput):
+        return self

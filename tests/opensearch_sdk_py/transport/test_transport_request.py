@@ -12,9 +12,9 @@ class TestTransportRequest(unittest.TestCase):
         self.assertEqual(tr.parent_task_id.node_id, "test")
         self.assertEqual(tr.parent_task_id.id, 42)
 
-        request_out = StreamOutput(b"\x01\x02\x03")
         out = StreamOutput()
-        tr.write_to(out, request_out)
+        tr.write_to(out)
+        out.write(b"\x01\x02\x03")
         self.assertEqual(
             out.getvalue(), b"\x04test\x00\x00\x00\x00\x00\x00\x00\x2a\x01\x02\x03"
         )
