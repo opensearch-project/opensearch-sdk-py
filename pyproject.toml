@@ -26,10 +26,6 @@ skip = ["protobuf"]
 exclude = ["protobuf"]
 
 [tool.autoflake]
-recursive = true
-in-place = true
-remove-unused-variables = true
-remove-all-unused-imports = true
 exclude = ["protobuf"]
 
 [build-system]
