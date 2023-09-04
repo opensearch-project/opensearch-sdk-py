@@ -18,7 +18,7 @@ from opensearch_sdk_py.transport.stream_input import StreamInput
 async def handle_connection(conn, loop):
     try:
         conn.setblocking(False)
-        # out = StreamOutput(loop, conn)
+
         while raw := await loop.sock_recv(conn, 1024 * 10):
             input = StreamInput(raw)
             print(f"\nreceived {input}, {len(raw)} byte(s)\n\t#{str(raw)}")
@@ -39,29 +39,36 @@ async def handle_connection(conn, loop):
                     print(f"\taction: {request.action}")
 
                 # TODO: Need a better way of matching these action names to their handlers
+                # Ideas: getattr(), locals(), globals()
                 if request.action == "internal:tcp/handshake":
                     output = HandshakeHandler.handle_tcp_handshake(request, input)
-                    await loop.sock_sendall(conn, output.getvalue())
                 elif request.action == "internal:transport/handshake":
                     output = HandshakeHandler.handle_transport_handshake(request, input)
-                    await loop.sock_sendall(conn, output.getvalue())
                 elif request.action == "internal:discovery/extensions":
                     output = ExtensionInitHandler.handle_init_request(request, input)
-                    await loop.sock_sendall(conn, output.getvalue())
                 else:
+                    output = None
                     print(
                         f"\tparsed action {header.tcp_header}, haven't yet written what to do with it"
                     )
             else:
                 response = OutboundMessageResponse().read_from(input, header)
+                # TODO: Error handling
+                if response.is_error():
+                    output = None
+                    print(
+                        f"\tparsed {header.tcp_header}, this is an ERROR response"
+                    )
                 # TODO: Need to track pending request id's and their handlers
-                if header.get_request_id() == TransportHandler.register_rest_request_id:
+                elif response.get_request_id() == TransportHandler.register_rest_request_id:
                     output = ExtensionInitHandler.handle_register_rest_response(response, input)
-                    await loop.sock_sendall(conn, output.getvalue())
                 else:
+                    output = None
                     print(
                         f"\tparsed {header.tcp_header}, this is a response to something I haven't sent"
                     )
+            if output:
+                await loop.sock_sendall(conn, output.getvalue())
 
     except Exception as ex:
         logging.exception(ex)
