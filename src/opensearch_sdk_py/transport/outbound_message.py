@@ -19,15 +19,18 @@ class OutboundMessage(NetworkMessage):
     ):
         super().__init__(thread_context, version, status, request_id)
         self._variable_bytes = None
-        self._message = message
-        if self._message:
+        if message:
+            self._message = bytes(message)
             self.tcp_header.size += len(self._message)
-        self.tcp_header.variable_header_size = 2  # context
+        else:
+            self._message = None
+        self.tcp_header.variable_header_size = self.thread_context_struct.size
 
     # subclasses call super().read_from first then read their own attributes
     def read_from(self, input: StreamInput):
         self.tcp_header.read_from(input)
         self.thread_context_struct.read_from(input)
+        return self
 
     @property
     def variable_bytes(self):
