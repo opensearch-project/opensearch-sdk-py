@@ -1,4 +1,5 @@
 import io
+from enum import Enum
 
 from opensearch_sdk_py.transport.version import Version
 
@@ -223,3 +224,6 @@ class StreamInput:
             result[key] = value
 
         return result
+
+    def read_enum(self, enum: Enum) -> Enum:
+        return enum(self.read_v_int())

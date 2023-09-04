@@ -1,3 +1,4 @@
+from enum import Enum
 from io import BytesIO
 
 from opensearch_sdk_py.transport.version import Version
@@ -1001,12 +1002,9 @@ class StreamOutput(BytesIO):
     #     }
     # }
 
-    # /**
-    #  Writes an enum with type E based on its ordinal value
-    #
-    # public <E extends Enum<E>> void writeEnum(E enumValue) throws IOException {
-    #     writeVInt(enumValue.ordinal());
-    # }
+    # Writes an enum based on its value
+    def write_enum(self, e: Enum):
+        self.write_v_int(e.value)
 
     # /**
     #  Writes an EnumSet with type E that by serialized it based on it's ordinal value
