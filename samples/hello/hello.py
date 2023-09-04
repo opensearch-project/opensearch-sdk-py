@@ -4,6 +4,7 @@ import logging
 import socket
 
 from handlers.extension_init_handler import ExtensionInitHandler
+from handlers.extension_rest_request_handler import ExtensionRestRequestHandler
 from handlers.handshake_handler import HandshakeHandler
 from handlers.transport_handler import TransportHandler
 
@@ -46,6 +47,8 @@ async def handle_connection(conn, loop):
                     output = HandshakeHandler.handle_transport_handshake(request, input)
                 elif request.action == "internal:discovery/extensions":
                     output = ExtensionInitHandler.handle_init_request(request, input)
+                elif request.action == "internal:extensions/restexecuteonextensiontaction":
+                    output = ExtensionRestRequestHandler.handle_rest_request(request, input)
                 else:
                     output = None
                     print(
