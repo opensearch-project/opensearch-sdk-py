@@ -1,5 +1,6 @@
 # https://github.com/opensearch-project/OpenSearch/blob/main/server/src/main/java/org/opensearch/transport/OutboundMessage.java
 
+
 from opensearch_sdk_py.transport.network_message import NetworkMessage
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
@@ -18,19 +19,13 @@ class OutboundMessage(NetworkMessage):
         message: TransportMessage = None,
     ):
         super().__init__(thread_context, version, status, request_id)
-        self._variable_bytes = None
         if message:
             self._message = bytes(message)
             self.tcp_header.size += len(self._message)
         else:
             self._message = None
         self.tcp_header.variable_header_size = self.thread_context_struct.size
-
-    # subclasses call super().read_from first then read their own attributes
-    def read_from(self, input: StreamInput):
-        self.tcp_header.read_from(input)
-        self.thread_context_struct.read_from(input)
-        return self
+        self._variable_bytes = None
 
     @property
     def variable_bytes(self):
@@ -56,7 +51,14 @@ class OutboundMessage(NetworkMessage):
         self.tcp_header.size += len(message)
         self._message = message
 
-    # subclasses create stream of variable attributes and pass here
+    def read_from(self, input: StreamInput):
+        self.tcp_header.read_from(input)
+        self.thread_context_struct.read_from(input)
+        if self.tcp_header.variable_header_size > 0:
+            self._variable_bytes = input.read_bytes(self.tcp_header.variable_header_size - self.thread_context_struct.size)
+        # TODO: read message
+        return self
+
     def write_to(self, output: StreamOutput):
         self.tcp_header.write_to(output)
         self.thread_context_struct.write_to(output)
@@ -64,3 +66,4 @@ class OutboundMessage(NetworkMessage):
             output.write(self._variable_bytes)
         if self._message:
             output.write(self._message)
+        return self
