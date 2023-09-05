@@ -5,12 +5,12 @@ import socket
 
 from handlers.action_registry import ActionRegistry
 
-from opensearch_sdk_py.transport.outbound_message import OutboundMessage
 from opensearch_sdk_py.transport.outbound_message_request import OutboundMessageRequest
 from opensearch_sdk_py.transport.outbound_message_response import (
     OutboundMessageResponse,
 )
 from opensearch_sdk_py.transport.stream_input import StreamInput
+from opensearch_sdk_py.transport.tcp_header import TcpHeader
 
 
 async def handle_connection(conn, loop):
@@ -21,16 +21,13 @@ async def handle_connection(conn, loop):
             input = StreamInput(raw)
             print(f"\nreceived {input}, {len(raw)} byte(s)\n\t#{str(raw)}")
 
-            header = OutboundMessage().read_from(input)
-            print(f"\t{header.tcp_header}")
-            if (
-                header.thread_context_struct.request_headers
-                or header.thread_context_struct.response_headers
-            ):
-                print(f"\t{header.thread_context_struct}")
+            header = TcpHeader().read_from(input)
+            print(f"\t{header}")
 
             if header.is_request():
                 request = OutboundMessageRequest().continue_reading_from(input, header)
+                if request.thread_context_struct and request.thread_context_struct.request_headers:
+                    print(f"\t{request.thread_context_struct}")
                 if request.features:
                     print(f"\tfeatures: {request.features}")
                 if request.action:
@@ -39,7 +36,7 @@ async def handle_connection(conn, loop):
                 output = ActionRegistry.handle_request(request, input)
                 if output is None:
                     print(
-                        f"\tparsed action {header.tcp_header}, haven't yet written what to do with it"
+                        f"\tparsed action {header}, haven't yet written what to do with it"
                     )
             else:
                 response = OutboundMessageResponse().continue_reading_from(input, header)
@@ -47,13 +44,13 @@ async def handle_connection(conn, loop):
                 if response.is_error():
                     output = None
                     print(
-                        f"\tparsed {header.tcp_header}, this is an ERROR response"
+                        f"\tparsed {header}, this is an ERROR response"
                     )
                 else:
                     output = ActionRegistry.handle_response(response, input)
                     if output is None:
                         print(
-                            f"\tparsed {header.tcp_header}, this is a response to something I haven't sent"
+                            f"\tparsed {header}, this is a response to something I haven't sent"
                         )
             if output:
                 await loop.sock_sendall(conn, output.getvalue())

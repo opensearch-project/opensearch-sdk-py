@@ -1,9 +1,9 @@
 # https://github.com/opensearch-project/OpenSearch/blob/main/server/src/main/java/org/opensearch/transport/OutboundMessage.java
 
-
 from opensearch_sdk_py.transport.network_message import NetworkMessage
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
+from opensearch_sdk_py.transport.tcp_header import TcpHeader
 from opensearch_sdk_py.transport.thread_context_struct import ThreadContextStruct
 from opensearch_sdk_py.transport.transport_message import TransportMessage
 from opensearch_sdk_py.transport.version import Version
@@ -26,6 +26,7 @@ class OutboundMessage(NetworkMessage):
             self._message = None
         self.tcp_header.variable_header_size = self.thread_context_struct.size
         self._variable_bytes = None
+        self._write_variable_bytes()
 
     @property
     def variable_bytes(self):
@@ -53,11 +54,23 @@ class OutboundMessage(NetworkMessage):
 
     def read_from(self, input: StreamInput):
         self.tcp_header.read_from(input)
+        self.continue_reading_from(input)
+
+    def continue_reading_from(self, input: StreamInput, header: TcpHeader = None):
+        if header:
+            self.tcp_header = header
         self.thread_context_struct.read_from(input)
         if self.tcp_header.variable_header_size > 0:
             self._variable_bytes = input.read_bytes(self.tcp_header.variable_header_size - self.thread_context_struct.size)
+            self._read_variable_bytes()
         # TODO: read message
         return self
+
+    def _read_variable_bytes(self):
+        pass
+
+    def _write_variable_bytes(self):
+        pass
 
     def write_to(self, output: StreamOutput):
         self.tcp_header.write_to(output)

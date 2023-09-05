@@ -21,37 +21,20 @@ class OutboundMessageRequest(OutboundMessage):
         is_handshake: bool = False,
         is_compress: bool = False,
     ):
-        super().__init__(thread_context, version, 0, request_id, message)
         self.features = features
         self.action = action
+        super().__init__(thread_context, version, 0, request_id, message)
         if is_handshake:
             self.tcp_header.set_handshake()
         if is_compress:
             self.tcp_header.set_compress()
-        self.__write_variable_bytes()
 
-    def read_from(self, input: StreamInput):
-        super().read_from(input)
-        self.__read_variable_bytes()
-        return self
+    def _read_variable_bytes(self):
+        variable_stream = StreamInput(self.variable_bytes)
+        self.features = variable_stream.read_string_array()
+        self.action = variable_stream.read_string()
 
-    def continue_reading_from(self, input: StreamInput, om: OutboundMessage = None):
-        self.tcp_header = om.tcp_header
-        self.thread_context_struct = om.thread_context_struct
-        self._variable_bytes = om.variable_bytes
-        self.__read_variable_bytes()
-        return self
-
-    def write_to(self, output: StreamOutput):
-        return super().write_to(output)
-
-    def __read_variable_bytes(self):
-        if self.variable_bytes:
-            variable_stream = StreamInput(self.variable_bytes)
-            self.features = variable_stream.read_string_array()
-            self.action = variable_stream.read_string()
-
-    def __write_variable_bytes(self):
+    def _write_variable_bytes(self):
         output = StreamOutput()
         output.write_string_array(self.features)
         output.write_string(self.action)
