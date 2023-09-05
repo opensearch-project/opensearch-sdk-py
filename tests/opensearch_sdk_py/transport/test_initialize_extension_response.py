@@ -1,8 +1,6 @@
 import unittest
 
-from opensearch_sdk_py.transport.initialize_extension_response import (
-    InitializeExtensionResponse,
-)
+from opensearch_sdk_py.transport.initialize_extension_response import InitializeExtensionResponse
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
 

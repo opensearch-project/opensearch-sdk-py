@@ -1,8 +1,6 @@
 import unittest
 
-from opensearch_sdk_py.transport.register_rest_actions_request import (
-    RegisterRestActionsRequest,
-)
+from opensearch_sdk_py.transport.register_rest_actions_request import RegisterRestActionsRequest
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
 

@@ -2,9 +2,7 @@ import unittest
 
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
-from opensearch_sdk_py.transport.transport_handshaker_handshake_response import (
-    TransportHandshakerHandshakeResponse,
-)
+from opensearch_sdk_py.transport.transport_handshaker_handshake_response import TransportHandshakerHandshakeResponse
 from opensearch_sdk_py.transport.version import Version
 
 
