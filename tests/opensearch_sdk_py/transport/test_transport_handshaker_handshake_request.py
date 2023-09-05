@@ -36,9 +36,7 @@ class TestTransportHandshakerHandshakeRequest(unittest.TestCase):
         thhr.read_from(input)
         self.assertEqual(str(thhr.version), "3.0.0.99")
 
-        # out = StreamOutput()
-        # request.write_to(out)
-        # thhr.write_to(out)
-        # logging.getLogger().info(bytearray(out.getvalue()))
-        # logging.getLogger().info(data)
-        # self.assertEqual(out.getvalue(), data)
+        out = StreamOutput()
+        request.write_to(out)
+        thhr.write_to(out)
+        self.assertEqual(out.getvalue(), data)

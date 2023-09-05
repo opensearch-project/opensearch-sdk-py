@@ -57,6 +57,6 @@ class TestDiscoveryNode(unittest.TestCase):
         self.assertEqual(dn.address.port, 1234)
         self.assertDictEqual(dn.attributes, {"foo": "bar", "baz": "qux"})
         self.assertSetEqual(
-            dn.roles, {DiscoveryNodeRole.DATA_ROLE, DiscoveryNodeRole.INGEST_ROLE}
+            set(dn.roles), {DiscoveryNodeRole.DATA_ROLE, DiscoveryNodeRole.INGEST_ROLE}
         )
         self.assertEqual(dn.version.id, Version.CURRENT_ID)

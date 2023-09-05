@@ -11,11 +11,12 @@ python = "^3.7"
 aiohttp = "*"
 pytest = "*"
 isort = "*"
-flake8 = "*"
+flake8 = "^5"
 black = "*"
 autoflake = "*"
 protobuf = "^3"
 2to3 = "*"
+sortedcollections = "*"
 
 [tool.isort]
 profile = "black"

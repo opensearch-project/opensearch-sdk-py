@@ -30,7 +30,7 @@ async def handle_connection(conn, loop):
                 print(f"\t{header.thread_context_struct}")
 
             if header.is_request():
-                request = OutboundMessageRequest().read_from(input, header)
+                request = OutboundMessageRequest().continue_reading_from(input, header)
                 if request.features:
                     print(f"\tfeatures: {request.features}")
                 if request.action:
@@ -42,7 +42,7 @@ async def handle_connection(conn, loop):
                         f"\tparsed action {header.tcp_header}, haven't yet written what to do with it"
                     )
             else:
-                response = OutboundMessageResponse().read_from(input, header)
+                response = OutboundMessageResponse().continue_reading_from(input, header)
                 # TODO: Error handling
                 if response.is_error():
                     output = None

@@ -26,12 +26,13 @@ class OutboundMessageResponse(OutboundMessage):
         if is_compress:
             self.tcp_header.set_compress()
 
-    def read_from(self, input: StreamInput, header: OutboundMessage = None):
-        if header:
-            self.tcp_header = header.tcp_header
-            self.thread_context_struct = header.thread_context_struct
-        else:
-            super().read_from(input)
+    def continue_reading_from(self, input: StreamInput, om: OutboundMessage = None):
+        self.tcp_header = om.tcp_header
+        self.thread_context_struct = om.thread_context_struct
+        return self
+
+    def read_from(self, input: StreamInput):
+        super().read_from(input)
         return self
 
     def write_to(self, output: StreamOutput):
