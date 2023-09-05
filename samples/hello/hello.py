@@ -3,10 +3,7 @@ import asyncio
 import logging
 import socket
 
-from handlers.extension_init_handler import ExtensionInitHandler
-from handlers.extension_rest_request_handler import ExtensionRestRequestHandler
-from handlers.handshake_handler import HandshakeHandler
-from handlers.transport_handler import TransportHandler
+from handlers.action_registry import ActionRegistry
 
 from opensearch_sdk_py.transport.outbound_message import OutboundMessage
 from opensearch_sdk_py.transport.outbound_message_request import OutboundMessageRequest
@@ -39,18 +36,8 @@ async def handle_connection(conn, loop):
                 if request.action:
                     print(f"\taction: {request.action}")
 
-                # TODO: Need a better way of matching these action names to their handlers
-                # Ideas: getattr(), locals(), globals()
-                if request.action == "internal:tcp/handshake":
-                    output = HandshakeHandler.handle_tcp_handshake(request, input)
-                elif request.action == "internal:transport/handshake":
-                    output = HandshakeHandler.handle_transport_handshake(request, input)
-                elif request.action == "internal:discovery/extensions":
-                    output = ExtensionInitHandler.handle_init_request(request, input)
-                elif request.action == "internal:extensions/restexecuteonextensiontaction":
-                    output = ExtensionRestRequestHandler.handle_rest_request(request, input)
-                else:
-                    output = None
+                output = ActionRegistry.handle_request(request, input)
+                if output is None:
                     print(
                         f"\tparsed action {header.tcp_header}, haven't yet written what to do with it"
                     )
@@ -62,14 +49,12 @@ async def handle_connection(conn, loop):
                     print(
                         f"\tparsed {header.tcp_header}, this is an ERROR response"
                     )
-                # TODO: Need to track pending request id's and their handlers
-                elif response.get_request_id() == TransportHandler.register_rest_request_id:
-                    output = ExtensionInitHandler.handle_register_rest_response(response, input)
                 else:
-                    output = None
-                    print(
-                        f"\tparsed {header.tcp_header}, this is a response to something I haven't sent"
-                    )
+                    output = ActionRegistry.handle_response(response, input)
+                    if output is None:
+                        print(
+                            f"\tparsed {header.tcp_header}, this is a response to something I haven't sent"
+                        )
             if output:
                 await loop.sock_sendall(conn, output.getvalue())
 

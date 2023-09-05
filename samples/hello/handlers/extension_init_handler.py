@@ -21,9 +21,10 @@ from opensearch_sdk_py.transport.stream_output import StreamOutput
 
 class ExtensionInitHandler():
 
-    # TODO: set up a class to track pending request_ids. For now just hard-coding this.
-    register_rest_request_id = 101  # TODO: auto-increment and store in a dict somewhere
-    init_response_request_id = -1  # TODO: store in a dict somewhere
+    # TODO: replace this constant with auto-incremented value
+    REGISTER_REST_REQUEST_ID = 101
+    # TODO: make this private to this class
+    init_response_request_id = -1
 
     @staticmethod
     def handle_init_request(request: OutboundMessageRequest, input: StreamInput) -> StreamOutput:
@@ -46,7 +47,6 @@ class ExtensionInitHandler():
 
         # TODO: Other initialization, ideally async
 
-        # TODO: Do this better than static variable in this class
         ExtensionInitHandler.init_response_request_id = request.get_request_id()
 
         return TransportHandler.send_request(OutboundMessageRequest(
@@ -57,7 +57,7 @@ class ExtensionInitHandler():
             ),
             request.get_version(),
             "internal:discovery/registerrestactions",
-            ExtensionInitHandler.register_rest_request_id,
+            ExtensionInitHandler.REGISTER_REST_REQUEST_ID,
             False,
             False,
         ))
