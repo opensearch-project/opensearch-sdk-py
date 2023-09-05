@@ -3,9 +3,7 @@ import unittest
 from opensearch_sdk_py.transport.outbound_message_request import OutboundMessageRequest
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
-from opensearch_sdk_py.transport.transport_service_handshake_request import (
-    TransportServiceHandshakeRequest,
-)
+from opensearch_sdk_py.transport.transport_service_handshake_request import TransportServiceHandshakeRequest
 from tests.opensearch_sdk_py.transport.data.netty_trace_data import NettyTraceData
 
 

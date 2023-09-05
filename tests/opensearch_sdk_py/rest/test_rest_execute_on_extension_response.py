@@ -1,8 +1,6 @@
 import unittest
 
-from opensearch_sdk_py.rest.rest_execute_on_extension_response import (
-    RestExecuteOnExtensionResponse,
-)
+from opensearch_sdk_py.rest.rest_execute_on_extension_response import RestExecuteOnExtensionResponse
 from opensearch_sdk_py.rest.rest_status import RestStatus
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput

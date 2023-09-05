@@ -22,9 +22,12 @@ sortedcollections = "*"
 profile = "black"
 known_first_party = "poetry"
 skip = ["protobuf"]
+line_length = 240
 
 [tool.black]
 exclude = ["protobuf"]
+line-length = 240
+target-version = ['py37']
 
 [tool.autoflake]
 exclude = ["protobuf"]

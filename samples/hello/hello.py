@@ -3,13 +3,14 @@ import asyncio
 import logging
 import socket
 
-from handlers.action_registry import ActionRegistry
-
+from opensearch_sdk_py.actions.internal.discovery_extensions_request_handler import DiscoveryExtensionsRequestHandler
+from opensearch_sdk_py.actions.request_handlers import RequestHandlers
+from opensearch_sdk_py.transport.acknowledged_response import AcknowledgedResponse
+from opensearch_sdk_py.transport.initialize_extension_response import InitializeExtensionResponse
 from opensearch_sdk_py.transport.outbound_message_request import OutboundMessageRequest
-from opensearch_sdk_py.transport.outbound_message_response import (
-    OutboundMessageResponse,
-)
+from opensearch_sdk_py.transport.outbound_message_response import OutboundMessageResponse
 from opensearch_sdk_py.transport.stream_input import StreamInput
+from opensearch_sdk_py.transport.stream_output import StreamOutput
 from opensearch_sdk_py.transport.tcp_header import TcpHeader
 
 
@@ -33,7 +34,7 @@ async def handle_connection(conn, loop):
                 if request.action:
                     print(f"\taction: {request.action}")
 
-                output = ActionRegistry.handle_request(request, input)
+                output = RequestHandlers().handle(request, input)
                 if output is None:
                     print(
                         f"\tparsed action {header}, haven't yet written what to do with it"
@@ -47,11 +48,24 @@ async def handle_connection(conn, loop):
                         f"\tparsed {header}, this is an ERROR response"
                     )
                 else:
-                    output = ActionRegistry.handle_response(response, input)
-                    if output is None:
-                        print(
-                            f"\tparsed {header}, this is a response to something I haven't sent"
-                        )
+                    ack_response = AcknowledgedResponse().read_from(input)
+                    print(f"\trequest {response.get_request_id()} acknowledged: {ack_response.status}")
+                    print("\tparsed Acknowledged response for REST registration, returning init response")
+                    output = StreamOutput()
+                    message = OutboundMessageResponse(
+                        response.thread_context_struct,
+                        response.features,
+                        InitializeExtensionResponse(
+                            "hello-world", ["Extension", "ActionExtension"]
+                        ),
+                        response.get_version(),
+                        DiscoveryExtensionsRequestHandler.init_response_request_id,
+                        response.is_handshake(),
+                        response.is_compress(),
+                    )
+                    message.write_to(output)
+                    print(f"\nsent request id {message.get_request_id()}, {len(output.getvalue())} byte(s):\n\t#{output}\n\t{message.tcp_header}")
+
             if output:
                 await loop.sock_sendall(conn, output.getvalue())
 

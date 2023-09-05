@@ -2,9 +2,7 @@ import unittest
 
 from opensearch_sdk_py.transport.discovery_extension_node import DiscoveryExtensionNode
 from opensearch_sdk_py.transport.discovery_node import DiscoveryNode
-from opensearch_sdk_py.transport.initialize_extension_request import (
-    InitializeExtensionRequest,
-)
+from opensearch_sdk_py.transport.initialize_extension_request import InitializeExtensionRequest
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
 from opensearch_sdk_py.transport.transport_address import TransportAddress
