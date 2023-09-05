@@ -1,8 +1,6 @@
 import unittest
 
-from opensearch_sdk_py.transport.outbound_message_response import (
-    OutboundMessageResponse,
-)
+from opensearch_sdk_py.transport.outbound_message_response import OutboundMessageResponse
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
 from opensearch_sdk_py.transport.tcp_header import TcpHeader
