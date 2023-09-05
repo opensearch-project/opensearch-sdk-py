@@ -1,4 +1,5 @@
 import unittest
+from enum import Enum
 
 from opensearch_sdk_py.transport.stream_output import StreamOutput
 from opensearch_sdk_py.transport.version import Version
@@ -106,3 +107,9 @@ class TestStreamOutput(unittest.TestCase):
                 b"\x02\x03foo\x02\x03baz\x03bar\x03qux\x00",
             ],
         )
+
+    def test_write_enum(self):
+        TestEnum = Enum('TestEnum', ['FOO', 'BAR', 'BAZ'], start=0)
+        out = StreamOutput()
+        out.write_enum(TestEnum.BAZ)
+        self.assertEqual(out.getvalue(), b"\x02")

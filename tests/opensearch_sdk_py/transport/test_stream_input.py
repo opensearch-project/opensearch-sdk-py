@@ -1,4 +1,5 @@
 import unittest
+from enum import Enum
 
 from opensearch_sdk_py.transport.stream_input import StreamInput
 
@@ -156,3 +157,8 @@ class TestStreamInput(unittest.TestCase):
         self.assertEqual(len(dict), 2)
         self.assertSetEqual(dict["foo"], {"bar", "baz"})
         self.assertSetEqual(dict["qux"], set())
+
+    def test_read_enum(self):
+        TestEnum = Enum('TestEnum', ['FOO', 'BAR', 'BAZ'], start=0)
+        input = StreamInput(b'\x01')
+        self.assertEqual(input.read_enum(TestEnum), TestEnum.BAR)

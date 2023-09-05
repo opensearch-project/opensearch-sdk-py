@@ -12,6 +12,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       PYTHON_VERSION: '3.9'
+      SRC_DIR: ./src/opensearch_sdk_py/protobuf
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ env.PYTHON_VERSION }}
@@ -22,7 +23,11 @@ jobs:
         uses: abatilo/actions-poetry@v2
         with:
           poetry-version: '1.5.1'
+      - name: Set up Protobuf
+        uses: arduino/setup-protoc@v2
       - name: Run Tests
         run: |
           poetry install
+          protoc -I=$SRC_DIR --python_out=$SRC_DIR $SRC_DIR/*.proto
+          2to3 --no-diff -n -w $SRC_DIR
           poetry run pytest -v
