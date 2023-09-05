@@ -52,13 +52,11 @@ class OutboundMessage(NetworkMessage):
         self.tcp_header.size += len(message)
         self._message = message
 
-    def read_from(self, input: StreamInput):
-        self.tcp_header.read_from(input)
-        self.continue_reading_from(input)
-
-    def continue_reading_from(self, input: StreamInput, header: TcpHeader = None):
+    def read_from(self, input: StreamInput, header: TcpHeader = None):
         if header:
             self.tcp_header = header
+        else:
+            self.tcp_header.read_from(input)
         self.thread_context_struct.read_from(input)
         if self.tcp_header.variable_header_size > 0:
             self._variable_bytes = input.read_bytes(self.tcp_header.variable_header_size - self.thread_context_struct.size)

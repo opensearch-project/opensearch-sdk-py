@@ -84,7 +84,7 @@ class TestOutboundMessageRequest(unittest.TestCase):
         header.read_from(input)
 
         omr = OutboundMessageRequest()
-        omr.continue_reading_from(input, header)
+        omr.read_from(input, header)
         self.assertEqual(omr.get_request_id(), 2)
         self.assertTrue(omr.is_handshake())
         self.assertListEqual(omr.features, ["foo", "bar"])
