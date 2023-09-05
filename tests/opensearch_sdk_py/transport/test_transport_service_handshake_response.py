@@ -1,7 +1,7 @@
 import unittest
 
 from opensearch_sdk_py.transport.discovery_node import DiscoveryNode
-from opensearch_sdk_py.transport.outbound_message_request import OutboundMessageRequest
+from opensearch_sdk_py.transport.outbound_message import OutboundMessage
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
 from opensearch_sdk_py.transport.transport_address import TransportAddress
@@ -35,7 +35,7 @@ class TestTransportServiceHandshakeResponse(unittest.TestCase):
         ).data
 
         input = StreamInput(data)
-        request = OutboundMessageRequest()
+        request = OutboundMessage()
         request.read_from(input)
         thhr = TransportServiceHandshakeResponse()
         thhr.read_from(input)

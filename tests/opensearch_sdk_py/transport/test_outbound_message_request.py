@@ -1,6 +1,5 @@
 import unittest
 
-from opensearch_sdk_py.transport.outbound_message import OutboundMessage
 from opensearch_sdk_py.transport.outbound_message_request import OutboundMessageRequest
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
@@ -81,11 +80,11 @@ class TestOutboundMessageRequest(unittest.TestCase):
 
         # test two-part reading with optional argument
         input = StreamInput(out.getvalue())
-        om = OutboundMessage()
-        om.read_from(input)
+        header = TcpHeader()
+        header.read_from(input)
 
         omr = OutboundMessageRequest()
-        omr.continue_reading_from(input, om)
+        omr.read_from(input, header)
         self.assertEqual(omr.get_request_id(), 2)
         self.assertTrue(omr.is_handshake())
         self.assertListEqual(omr.features, ["foo", "bar"])
