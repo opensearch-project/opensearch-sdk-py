@@ -26,6 +26,8 @@ class TransportServiceHandshakeResponse(TransportResponse):
         # DiscoveryNode is an optional writeable
         if input.read_boolean():
             self.discovery_node = DiscoveryNode().read_from(input)
+        else:
+            self.discovery_node = None
         self.cluster_name = input.read_string()
         self.version = input.read_version()
         return self

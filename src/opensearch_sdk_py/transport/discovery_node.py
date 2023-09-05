@@ -1,6 +1,8 @@
 import base64
 import uuid
 
+from sortedcollections import OrderedSet
+
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
 from opensearch_sdk_py.transport.transport_address import TransportAddress
@@ -45,7 +47,7 @@ class DiscoveryNode:
         self.host_address = input.read_string()
         self.address = TransportAddress().read_from(input)
         self.attributes = input.read_string_to_string_dict()
-        self.roles = set()
+        self.roles = OrderedSet()
         roles_size = input.read_v_int()
         for i in range(roles_size):
             self.roles.add(

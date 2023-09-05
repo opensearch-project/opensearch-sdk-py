@@ -1,5 +1,6 @@
 # https://github.com/opensearch-project/OpenSearch/blob/main/server/src/main/java/org/opensearch/transport/OutboundMessage.java#L122
 
+
 from opensearch_sdk_py.transport.outbound_message import OutboundMessage
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
@@ -42,13 +43,13 @@ class OutboundMessageRequest(OutboundMessage):
         return self
 
     def write_to(self, output: StreamOutput):
-        super().write_to(output)
-        return self
+        return super().write_to(output)
 
     def __read_variable_bytes(self):
-        variable_stream = StreamInput(self.variable_bytes)
-        self.features = variable_stream.read_string_array()
-        self.action = variable_stream.read_string()
+        if self.variable_bytes:
+            variable_stream = StreamInput(self.variable_bytes)
+            self.features = variable_stream.read_string_array()
+            self.action = variable_stream.read_string()
 
     def __write_variable_bytes(self):
         output = StreamOutput()
