@@ -15,6 +15,6 @@ class TransportRequest(TransportMessage):
         return self
 
     def write_to(self, output: StreamOutput):
-        super().write_to(input)
+        super().write_to(output)
         self.parent_task_id.write_to(output)
         return self
