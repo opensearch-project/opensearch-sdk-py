@@ -1,3 +1,5 @@
+import logging
+
 from opensearch_sdk_py.actions.request_handler import RequestHandler
 from opensearch_sdk_py.transport.discovery_node import DiscoveryNode
 from opensearch_sdk_py.transport.discovery_node_role import DiscoveryNodeRole
@@ -15,8 +17,8 @@ class TransportHandshakeRequestHandler(RequestHandler):
 
     def handle(self, request: OutboundMessageRequest, input: StreamInput):
         transport_handshake = TransportServiceHandshakeRequest().read_from(input)
-        print(f"\ttask_id: {transport_handshake.parent_task_id}")
-        print("\tparsed Transport handshake, returning a response")
+        logging.info(f"\ttask_id: {transport_handshake.parent_task_id}")
+        logging.info("\tparsed Transport handshake, returning a response")
 
         return self.send(OutboundMessageResponse(
             request.thread_context_struct,

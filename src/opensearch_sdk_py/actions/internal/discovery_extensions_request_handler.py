@@ -1,3 +1,5 @@
+import logging
+
 from opensearch_sdk_py.actions.request_handler import RequestHandler
 from opensearch_sdk_py.transport.initialize_extension_request import InitializeExtensionRequest
 from opensearch_sdk_py.transport.outbound_message_request import OutboundMessageRequest
@@ -20,13 +22,13 @@ class DiscoveryExtensionsRequestHandler(RequestHandler):
         initialize_extension_request = (
             InitializeExtensionRequest().read_from(input)
         )
-        print(
+        logging.info(
             f"\tsource node: {initialize_extension_request.source_node.address.host_name}"
             + f":{initialize_extension_request.source_node.address.port}"
             + f", extension {initialize_extension_request.extension.address.host_name}"
             + f":{initialize_extension_request.extension.address.port}"
         )
-        print("\tparsed Init Request, returning REST registration request")
+        logging.info("\tparsed Init Request, returning REST registration request")
 
         # Sometime between tcp and transport handshakes and the eventual response,
         # the uniqueId gets added to the thread context.

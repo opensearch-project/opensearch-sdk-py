@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import logging
 from opensearch_sdk_py.transport.version import Version
 
-print(Version(2100099))
+logging.basicConfig(encoding='utf-8', level=logging.DEBUG)
+logging.info(Version(2100099))

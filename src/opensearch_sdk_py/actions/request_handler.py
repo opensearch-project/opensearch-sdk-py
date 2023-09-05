@@ -1,3 +1,4 @@
+import logging
 from abc import ABC, abstractmethod
 
 from opensearch_sdk_py.transport.outbound_message import OutboundMessage
@@ -18,5 +19,5 @@ class RequestHandler(ABC):
         output = StreamOutput()
         message.write_to(output)
         raw_out = output.getvalue()
-        print(f"\nsent request id {message.get_request_id()}, {len(raw_out)} byte(s):\n\t#{raw_out}\n\t{message.tcp_header}")
+        logging.info(f"\nsent request id {message.get_request_id()}, {len(raw_out)} byte(s):\n\t#{raw_out}\n\t{message.tcp_header}")
         return output

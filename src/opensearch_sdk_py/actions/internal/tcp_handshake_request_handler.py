@@ -1,3 +1,5 @@
+import logging
+
 from opensearch_sdk_py.actions.request_handler import RequestHandler
 from opensearch_sdk_py.transport.outbound_message_request import OutboundMessageRequest
 from opensearch_sdk_py.transport.outbound_message_response import OutboundMessageResponse
@@ -13,8 +15,8 @@ class TcpHandshakeRequestHandler(RequestHandler):
 
     def handle(self, request: OutboundMessageRequest, input: StreamInput) -> StreamOutput:
         tcp_handshake = TransportHandshakerHandshakeRequest().read_from(input)
-        print(f"\topensearch_version: {tcp_handshake.version}")
-        print("\tparsed TCP handshake, returning a response")
+        logging.info(f"\topensearch_version: {tcp_handshake.version}")
+        logging.info("\tparsed TCP handshake, returning a response")
         return self.send(OutboundMessageResponse(
             request.thread_context_struct,
             request.features,
