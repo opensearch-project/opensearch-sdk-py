@@ -14,6 +14,7 @@ from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
 from opensearch_sdk_py.transport.thread_context_struct import ThreadContextStruct
 from opensearch_sdk_py.transport.transport_message import TransportMessage
+from opensearch_sdk_py.transport.transport_status import TransportStatus
 from opensearch_sdk_py.transport.version import Version
 
 
@@ -31,11 +32,11 @@ class OutboundMessageRequest(OutboundMessage):
     ) -> None:
         self.features = features
         self.action = action
-        super().__init__(thread_context, version, 0, request_id, message)
+        super().__init__(thread_context=thread_context, version=version, status=TransportStatus.STATUS_REQRES, request_id=request_id, message=message)
         if is_handshake:
-            self.tcp_header.set_handshake()
+            self.tcp_header.is_handshake = True
         if is_compress:
-            self.tcp_header.set_compress()
+            self.tcp_header.is_compress = True
 
     def _read_variable_bytes(self) -> None:
         variable_stream = StreamInput(self.variable_bytes)

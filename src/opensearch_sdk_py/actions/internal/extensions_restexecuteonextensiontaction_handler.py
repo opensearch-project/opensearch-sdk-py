@@ -35,9 +35,9 @@ class ExtensionRestRequestHandler(RequestHandler):
                 request.thread_context_struct,
                 request.features,
                 RestExecuteOnExtensionResponse(RestStatus.OK, "text/html; charset=utf-8", response_bytes),
-                request.get_version(),
-                request.get_request_id(),
-                request.is_handshake(),
-                request.is_compress(),
+                request.version,
+                request.request_id,
+                request.is_handshake,
+                request.is_compress,
             )
         )

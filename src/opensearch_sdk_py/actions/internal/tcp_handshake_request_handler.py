@@ -29,10 +29,10 @@ class TcpHandshakeRequestHandler(RequestHandler):
             OutboundMessageResponse(
                 request.thread_context_struct,
                 request.features,
-                TransportHandshakerHandshakeResponse(request.get_version()),
-                request.get_version(),
-                request.get_request_id(),
-                request.is_handshake(),
-                request.is_compress(),
+                TransportHandshakerHandshakeResponse(request.version),
+                request.version,
+                request.request_id,
+                request.is_handshake,
+                request.is_compress,
             )
         )

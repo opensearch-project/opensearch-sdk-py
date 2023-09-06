@@ -35,7 +35,7 @@ async def handle_connection(conn: Any, loop: asyncio.AbstractEventLoop) -> None:
             header = TcpHeader().read_from(input)
             logging.debug(f"< {header}")
 
-            if header.is_request():
+            if header.is_request:
                 request = OutboundMessageRequest().read_from(input, header)
                 logging.info(f"< {request}")
                 output = RequestHandlers().handle(request, input)
@@ -44,7 +44,7 @@ async def handle_connection(conn: Any, loop: asyncio.AbstractEventLoop) -> None:
             else:
                 response = OutboundMessageResponse().read_from(input, header)
                 # TODO: Error handling
-                if response.is_error():
+                if response.is_error:
                     output = None
                     logging.warn(f"< error {header}")
                 else:
@@ -55,10 +55,10 @@ async def handle_connection(conn: Any, loop: asyncio.AbstractEventLoop) -> None:
                         response.thread_context_struct,
                         response.features,
                         InitializeExtensionResponse("hello-world", ["Extension", "ActionExtension"]),
-                        response.get_version(),
+                        response.version,
                         DiscoveryExtensionsRequestHandler.init_response_request_id,
-                        response.is_handshake(),
-                        response.is_compress(),
+                        response.is_handshake,
+                        response.is_compress,
                     )
                     response.write_to(output)
                     logging.info(f"> {response}")

@@ -19,17 +19,18 @@ from opensearch_sdk_py.transport.version import Version
 
 class TestOutboundMessageRequest(unittest.TestCase):
     def test_outbound_message_request(self) -> None:
-        omr = OutboundMessageRequest(version=Version(2100099))
+        omr = OutboundMessageRequest(version=Version(2100099), request_id=42)
         self.assertEqual(len(omr.thread_context_struct.request_headers), 0)
         self.assertEqual(len(omr.thread_context_struct.response_headers), 0)
         self.assertListEqual(omr.features, [])
         self.assertEqual(omr.action, "")
-        self.assertEqual(omr.get_request_id(), 1)
-        self.assertEqual(omr.get_version().id, 136317827)
-        self.assertTrue(omr.is_request())
-        self.assertFalse(omr.is_error())
-        self.assertFalse(omr.is_compress())
-        self.assertFalse(omr.is_handshake())
+        self.assertEqual(omr.request_id, 42)
+        self.assertEqual(omr.version.id, 136317827)
+        self.assertFalse(omr.is_request)
+        self.assertTrue(omr.is_response)
+        self.assertFalse(omr.is_error)
+        self.assertFalse(omr.is_compress)
+        self.assertFalse(omr.is_handshake)
 
     def test_custom_outbound_message_request(self) -> None:
         omr = OutboundMessageRequest(
@@ -40,8 +41,8 @@ class TestOutboundMessageRequest(unittest.TestCase):
         )
         self.assertListEqual(omr.features, ["foo", "bar"])
         self.assertEqual(omr.action, "internal:test")
-        self.assertTrue(omr.is_compress())
-        self.assertTrue(omr.is_handshake())
+        self.assertTrue(omr.is_compress)
+        self.assertTrue(omr.is_handshake)
 
     def test_outbound_message_request_stream(self) -> None:
         omr = OutboundMessageRequest(
@@ -54,9 +55,10 @@ class TestOutboundMessageRequest(unittest.TestCase):
         )
         out = StreamOutput()
         omr.write_to(out)
+
         self.assertEqual(
             out.getvalue(),
-            b"ES\x00\x00\x00\x3a\x00\x00\x00\x00\x00\x00\x00\x02\x08\x08\x2d\xc7\x23\x00\x00\x00\x23"  # tcp header
+            b"ES\x00\x00\x00\x3a\x00\x00\x00\x00\x00\x00\x00\x02\t\x08\x2d\xc7\x23\x00\x00\x00\x23"  # tcp header
             + b"\x00\x00"  # context
             + b"\x02\x03foo\x03bar"  # features
             + b"\x17internal:test/handshake"  # action
@@ -70,8 +72,8 @@ class TestOutboundMessageRequest(unittest.TestCase):
 
         omr = OutboundMessageRequest()
         omr.read_from(StreamInput(out.getvalue()))
-        self.assertEqual(omr.get_request_id(), 2)
-        self.assertTrue(omr.is_handshake())
+        self.assertEqual(omr.request_id, 2)
+        self.assertTrue(omr.is_handshake)
         self.assertEqual(
             omr.tcp_header.size,
             len(out.getvalue()) - TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE,
@@ -89,8 +91,8 @@ class TestOutboundMessageRequest(unittest.TestCase):
 
         omr = OutboundMessageRequest()
         omr.read_from(input, header)
-        self.assertEqual(omr.get_request_id(), 2)
-        self.assertTrue(omr.is_handshake())
+        self.assertEqual(omr.request_id, 2)
+        self.assertTrue(omr.is_handshake)
         self.assertListEqual(omr.features, ["foo", "bar"])
         self.assertEqual(omr.action, "internal:test/handshake")
         self.assertEqual(

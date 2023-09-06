@@ -9,7 +9,6 @@
 
 # https://github.com/opensearch-project/OpenSearch/blob/main/server/src/main/java/org/opensearch/transport/TcpHeader.java
 
-
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
 from opensearch_sdk_py.transport.transport_status import TransportStatus
@@ -69,44 +68,66 @@ class TcpHeader:
     def __str__(self) -> str:
         return f"prefix={self.prefix!r}, version={self.version}, type={self.statuses}, message={self.size} byte(s), id={self.request_id}"
 
+    @property
+    def is_response(self) -> bool:
+        return self.__is_status(TransportStatus.STATUS_REQRES)
+
+    @is_response.setter
+    def is_response(self, value: bool) -> None:
+        self.__set_status(TransportStatus.STATUS_REQRES, value)
+
+    @property
     def is_request(self) -> bool:
-        return bool((self.status & TransportStatus.STATUS_REQRES) == 0)
+        return not self.is_response
 
-    def set_request(self) -> None:
-        self.status &= ~TransportStatus.STATUS_REQRES
+    @is_request.setter
+    def is_request(self, value: bool) -> None:
+        self.__set_status(TransportStatus.STATUS_REQRES, not value)
 
-    def set_response(self) -> None:
-        self.status |= TransportStatus.STATUS_REQRES
-
+    @property
     def is_error(self) -> bool:
-        return bool((self.status & TransportStatus.STATUS_ERROR) != 0)
+        return self.__is_status(TransportStatus.STATUS_ERROR)
 
-    def set_error(self) -> None:
-        self.status |= TransportStatus.STATUS_ERROR
+    @is_error.setter
+    def is_error(self, value: bool) -> None:
+        self.__set_status(TransportStatus.STATUS_ERROR, value)
 
+    @property
     def is_compress(self) -> bool:
-        return bool((self.status & TransportStatus.STATUS_COMPRESS) != 0)
+        return self.__is_status(TransportStatus.STATUS_COMPRESS)
 
-    def set_compress(self) -> None:
-        self.status |= TransportStatus.STATUS_COMPRESS
+    @is_compress.setter
+    def is_compress(self, value: bool) -> None:
+        self.__set_status(TransportStatus.STATUS_COMPRESS, value)
 
+    @property
     def is_handshake(self) -> bool:
-        return bool((self.status & TransportStatus.STATUS_HANDSHAKE) != 0)
+        return self.__is_status(TransportStatus.STATUS_HANDSHAKE)
 
-    def set_handshake(self) -> None:
-        self.status |= TransportStatus.STATUS_HANDSHAKE
+    @is_handshake.setter
+    def is_handshake(self, value: bool) -> None:
+        self.__set_status(TransportStatus.STATUS_HANDSHAKE, value)
 
     @property
     def statuses(self) -> list[str]:
         result = []
-        if self.is_request():
+        if self.is_request:
             result.append("request")
         else:
             result.append("response")
-        if self.is_error():
+        if self.is_error:
             result.append("error")
-        if self.is_compress():
+        if self.is_compress:
             result.append("compressed")
-        if self.is_handshake():
+        if self.is_handshake:
             result.append("handshake")
         return result
+
+    def __is_status(self, flag: int) -> bool:
+        return bool((self.status & flag) != 0)
+
+    def __set_status(self, flag: int, value: bool) -> None:
+        if value:
+            self.status |= flag
+        else:
+            self.status &= ~flag
