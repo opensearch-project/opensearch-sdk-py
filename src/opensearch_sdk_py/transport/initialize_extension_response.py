@@ -31,3 +31,6 @@ class InitializeExtensionResponse(TransportResponse):
         output.write_string(self.name)
         output.write_string_array(self.implemented_interfaces)
         return self
+
+    def __str__(self) -> str:
+        return f"name={self.name}, interfaces={self.implemented_interfaces}"

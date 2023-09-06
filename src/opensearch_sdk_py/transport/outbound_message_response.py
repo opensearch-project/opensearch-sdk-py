@@ -32,3 +32,6 @@ class OutboundMessageResponse(OutboundMessage):
             self.tcp_header.set_handshake()
         if is_compress:
             self.tcp_header.set_compress()
+
+    def __str__(self) -> str:
+        return f"{super().__str__()}, features={self.features}"

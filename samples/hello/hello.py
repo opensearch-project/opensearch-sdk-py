@@ -30,36 +30,28 @@ async def handle_connection(conn: Any, loop: asyncio.AbstractEventLoop) -> None:
 
         while raw := await loop.sock_recv(conn, 1024 * 10):
             input = StreamInput(raw)
-            logging.info("")
-            logging.info(f"received {input}, {len(raw)} byte(s)\n  #{str(raw)}")
+            logging.debug(f"< #{str(raw)}, size={len(raw)} byte(s)")
 
             header = TcpHeader().read_from(input)
-            logging.info(f"\t{header}")
+            logging.debug(f"< {header}")
 
             if header.is_request():
                 request = OutboundMessageRequest().read_from(input, header)
-                if request.thread_context_struct and request.thread_context_struct.request_headers:
-                    logging.info(f"\t{request.thread_context_struct}")
-                if request.features:
-                    logging.info(f"\tfeatures: {request.features}")
-                if request.action:
-                    logging.info(f"\taction: {request.action}")
-
+                logging.info(f"< {request}")
                 output = RequestHandlers().handle(request, input)
                 if output is None:
-                    logging.info(f"\tparsed action {header}, haven't yet written what to do with it")
+                    logging.warn(f"< unhandled {header}")
             else:
                 response = OutboundMessageResponse().read_from(input, header)
                 # TODO: Error handling
                 if response.is_error():
                     output = None
-                    logging.info(f"\tparsed {header}, this is an ERROR response")
+                    logging.warn(f"< error {header}")
                 else:
                     ack_response = AcknowledgedResponse().read_from(input)
-                    logging.info(f"\trequest {response.get_request_id()} acknowledged: {ack_response.status}")
-                    logging.info("\tparsed Acknowledged response for REST registration, returning init response")
+                    logging.debug(f"< response {response}, {ack_response}")
                     output = StreamOutput()
-                    message = OutboundMessageResponse(
+                    response = OutboundMessageResponse(
                         response.thread_context_struct,
                         response.features,
                         InitializeExtensionResponse("hello-world", ["Extension", "ActionExtension"]),
@@ -68,8 +60,8 @@ async def handle_connection(conn: Any, loop: asyncio.AbstractEventLoop) -> None:
                         response.is_handshake(),
                         response.is_compress(),
                     )
-                    message.write_to(output)
-                    logging.info(f"sent request id {message.get_request_id()}, {len(output.getvalue())} byte(s):\n  #{output}\n  {message.tcp_header}")
+                    response.write_to(output)
+                    logging.info(f"> {response}")
 
             if output:
                 await loop.sock_sendall(conn, output.getvalue())
@@ -88,10 +80,10 @@ async def run_server() -> None:
 
     loop = asyncio.get_event_loop()
 
-    logging.info(f"listening, {server}")
+    logging.info(f"< server={server}")
     while True:
         conn, _ = await loop.sock_accept(server)
-        logging.info(f"got a connection, {conn}")
+        logging.debug(f"< connection={conn}")
         loop.create_task(handle_connection(conn, loop))
 
 

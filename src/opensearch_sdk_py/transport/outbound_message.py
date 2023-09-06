@@ -31,6 +31,7 @@ class OutboundMessage(NetworkMessage):
     ):
         self._message_bytes: Optional[bytes]
         self._variable_bytes: Optional[bytes]
+        self.message = message
         super().__init__(thread_context, version, status, request_id)
         if message:
             self._message_bytes = bytes(message)
@@ -91,3 +92,6 @@ class OutboundMessage(NetworkMessage):
         if self._message_bytes:
             output.write(self._message_bytes)
         return self
+
+    def __str__(self) -> str:
+        return f"{super().__str__()}, {self.message.__str__()}"

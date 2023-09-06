@@ -47,3 +47,6 @@ class OutboundMessageRequest(OutboundMessage):
         output.write_string_array(self.features)
         output.write_string(self.action)
         self.variable_bytes = output.getvalue()
+
+    def __str__(self) -> str:
+        return f"{super().__str__()}, features={self.features}, action={self.action}"

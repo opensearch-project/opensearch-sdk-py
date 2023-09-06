@@ -75,3 +75,6 @@ class DiscoveryNode:
             output.write_boolean(role[2])
         output.write_version(self.version)
         return self
+
+    def __str__(self) -> str:
+        return f"id={self.node_id}, version={self.version}, name={self.node_name}, host={self.host_name}, addr={self.host_address}, attr={self.attributes}, roles={self.roles}"

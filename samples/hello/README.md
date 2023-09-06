@@ -73,15 +73,12 @@ curl -XPOST "localhost:9200/_extensions/initialize" -H "Content-Type:application
 You should see some output on the extension.
 
 ```
-received <opensearch_sdk_py.transport.stream_input.StreamInput object at 0x104e02450>, 55 byte(s)
-	#b'ES\x00\x00\x001\x00\x00\x00\x00\x00\x00\x00\n\x08\x08 \x0b\x83\x00\x00\x00\x1a\x00\x00\x00\x16internal:tcp/handshake\x00\x04\xa3\x8e\xb7A'
-	handshake b'ES', message=49 byte(s), request_id=10, status=8, version=2.10.0.99
-
-received <opensearch_sdk_py.transport.stream_input.StreamInput object at 0x10442a050>, 29 byte(s)
-	#b'ES\x00\x00\x00\x17\x00\x00\x00\x00\x00\x00\x00\n\t\x08 \x0b\x83\x00\x00\x00\x02\x00\x00\xa3\x8e\xb7A'
-	handshake b'ES', message=23 byte(s), request_id=10, status=9, version=2.10.0.99
-
-received <opensearch_sdk_py.transport.stream_input.StreamInput object at 0x104e01d90>, 56 byte(s)
-	#b'ES\x00\x00\x002\x00\x00\x00\x00\x00\x00\x00\x0b\x00\x08-\xc7#\x00\x00\x00 \x00\x00\x00\x1cinternal:transport/handshake\x00'
-	request b'ES', message=50 byte(s), request_id=11, status=0, version=3.0.0.99
+INFO:root:< server=<socket.socket fd=7, family=2, type=1, proto=0, laddr=('127.0.0.1', 1234)>
+INFO:root:< prefix=b'ES', version=2.10.0.99, type=['request', 'handshake'], message=49 byte(s), id=8, ctx=req={}, res={}, None
+INFO:root:> prefix=b'ES', version=2.10.0.99, type=['response', 'handshake'], message=23 byte(s), id=8, ctx=req={}, res={}, version=2.10.0.99, features=[], size=29 byte(s)
+INFO:root:< prefix=b'ES', version=2.10.0.99, type=['request'], message=50 byte(s), id=9, ctx=req={}, res={}, None
+INFO:root:> prefix=b'ES', version=2.10.0.99, type=['response'], message=179 byte(s), id=9, ctx=req={}, res={}, id=hello-world, version=3.0.0.99, name=hello-world, host=127.0.0.1, addr=127.0.0.1, attr={}, roles={('ingest', 'i', False), ('remote_cluster_client', 'r', False), ('data', 'd', True), ('cluster_manager', 'm', False)}, cluster name=, version=3.0.0.99, features=[], size=185 byte(s)
+INFO:root:< prefix=b'ES', version=2.10.0.99, type=['request'], message=469 byte(s), id=10, ctx=req={'_system_index_access_allowed': 'false'}, res={}, None
+INFO:root:> prefix=b'ES', version=2.10.0.99, type=['request'], message=167 byte(s), id=101, ctx=req={'_system_index_access_allowed': 'false', 'extension_unique_id': 'hello-world'}, res={}, node=, id=-1, size=173 byte(s)
+INFO:root:> prefix=b'ES', version=2.10.0.99, type=['response'], message=125 byte(s), id=10, ctx=req={'extension_unique_id': 'hello-world', '_system_index_access_allowed': 'false'}, res={}, name=hello-world, interfaces=['Extension', 'ActionExtension'], features=[]
 ```

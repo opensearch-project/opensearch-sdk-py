@@ -25,8 +25,7 @@ class ExtensionRestRequestHandler(RequestHandler):
 
     def handle(self, request: OutboundMessageRequest, input: StreamInput) -> StreamOutput:
         extension_rest_request = ExtensionRestRequest().read_from(input)
-        logging.info(f"\tmethod: {extension_rest_request.method}, path: {extension_rest_request.path}")
-        logging.info("\tparsed REST Request, returning REST response")
+        logging.debug(f"< {extension_rest_request}")
 
         response_bytes = bytes("Hello from Python!", "utf-8")
         response_bytes += b"\x20\xf0\x9f\x91\x8b"

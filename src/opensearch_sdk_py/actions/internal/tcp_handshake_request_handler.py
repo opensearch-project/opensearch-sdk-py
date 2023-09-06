@@ -24,8 +24,7 @@ class TcpHandshakeRequestHandler(RequestHandler):
 
     def handle(self, request: OutboundMessageRequest, input: StreamInput) -> StreamOutput:
         tcp_handshake = TransportHandshakerHandshakeRequest().read_from(input)
-        logging.info(f"\topensearch_version: {tcp_handshake.version}")
-        logging.info("\tparsed TCP handshake, returning a response")
+        logging.debug(f"< {tcp_handshake}")
         return self.send(
             OutboundMessageResponse(
                 request.thread_context_struct,

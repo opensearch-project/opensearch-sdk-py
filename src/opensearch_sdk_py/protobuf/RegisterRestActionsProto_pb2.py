@@ -15,6 +15,7 @@ from google.protobuf import descriptor as _descriptor
 from google.protobuf import descriptor_pool as _descriptor_pool
 from google.protobuf import symbol_database as _symbol_database
 from google.protobuf.internal import builder as _builder
+
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
@@ -23,14 +24,16 @@ _sym_db = _symbol_database.Default()
 from . import ExtensionIdentityProto_pb2 as ExtensionIdentityProto__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1eRegisterRestActionsProto.proto\x12\x1forg.opensearch.extensions.proto\x1a\x1c\x45xtensionIdentityProto.proto\"\x8f\x01\n\x13RegisterRestActions\x12\x44\n\x08identity\x18\x01 \x01(\x0b\x32\x32.org.opensearch.extensions.proto.ExtensionIdentity\x12\x13\n\x0brestActions\x18\x02 \x03(\t\x12\x1d\n\x15\x64\x65precatedRestActions\x18\x03 \x03(\tB\x1a\x42\x18RegisterRestActionsProtob\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(
+    b'\n\x1eRegisterRestActionsProto.proto\x12\x1forg.opensearch.extensions.proto\x1a\x1c\x45xtensionIdentityProto.proto"\x8f\x01\n\x13RegisterRestActions\x12\x44\n\x08identity\x18\x01 \x01(\x0b\x32\x32.org.opensearch.extensions.proto.ExtensionIdentity\x12\x13\n\x0brestActions\x18\x02 \x03(\t\x12\x1d\n\x15\x64\x65precatedRestActions\x18\x03 \x03(\tB\x1a\x42\x18RegisterRestActionsProtob\x06proto3'
+)
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
-_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'RegisterRestActionsProto_pb2', _globals)
+_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, "RegisterRestActionsProto_pb2", _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
-  DESCRIPTOR._options = None
-  DESCRIPTOR._serialized_options = b'B\030RegisterRestActionsProto'
-  _globals['_REGISTERRESTACTIONS']._serialized_start=98
-  _globals['_REGISTERRESTACTIONS']._serialized_end=241
+    DESCRIPTOR._options = None
+    DESCRIPTOR._serialized_options = b"B\030RegisterRestActionsProto"
+    _globals["_REGISTERRESTACTIONS"]._serialized_start = 98
+    _globals["_REGISTERRESTACTIONS"]._serialized_end = 241
 # @@protoc_insertion_point(module_scope)

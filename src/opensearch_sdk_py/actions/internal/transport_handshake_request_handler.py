@@ -27,8 +27,7 @@ class TransportHandshakeRequestHandler(RequestHandler):
 
     def handle(self, request: OutboundMessageRequest, input: StreamInput) -> StreamOutput:
         transport_handshake = TransportServiceHandshakeRequest().read_from(input)
-        logging.info(f"\ttask_id: {transport_handshake.parent_task_id}")
-        logging.info("\tparsed Transport handshake, returning a response")
+        logging.debug(f"< {transport_handshake}")
 
         return self.send(
             OutboundMessageResponse(

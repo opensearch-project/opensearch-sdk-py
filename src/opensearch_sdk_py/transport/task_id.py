@@ -33,4 +33,4 @@ class TaskId:
         return self
 
     def __str__(self) -> str:
-        return f"{self.node_id}, id={self.id}"
+        return f"node={self.node_id}, id={self.id}"

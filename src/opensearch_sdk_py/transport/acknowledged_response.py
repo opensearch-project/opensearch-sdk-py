@@ -28,3 +28,6 @@ class AcknowledgedResponse(TransportResponse):
         super().write_to(output)
         output.write_boolean(self.status)
         return self
+
+    def __str__(self) -> str:
+        return f"status={self.status}"

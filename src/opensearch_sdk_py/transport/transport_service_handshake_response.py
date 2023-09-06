@@ -52,3 +52,6 @@ class TransportServiceHandshakeResponse(TransportResponse):
         output.write_string(self.cluster_name)
         output.write_version(self.version)
         return self
+
+    def __str__(self) -> str:
+        return f"{self.discovery_node.__str__()}, cluster name={self.cluster_name}, version={self.version.__str__()}"

@@ -36,3 +36,6 @@ class TransportHandshakerHandshakeRequest(TransportRequest):
             output.write_v_int(len(version_bytes.getvalue()))
             output.write(version_bytes.getvalue())
         return self
+
+    def __str__(self) -> str:
+        return f"version={self.version.__str__()}"

@@ -27,3 +27,6 @@ class TransportRequest(TransportMessage):
         super().write_to(output)
         self.parent_task_id.write_to(output)
         return self
+
+    def __str__(self) -> str:
+        return f"{self.parent_task_id.__str__()}"

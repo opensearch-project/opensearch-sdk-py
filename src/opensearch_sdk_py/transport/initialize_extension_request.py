@@ -37,3 +37,6 @@ class InitializeExtensionRequest(TransportRequest):
         self.source_node.write_to(output)
         self.extension.write_to(output)
         return self
+
+    def __str__(self) -> str:
+        return f"{self.source_node.__str__()}, {self.extension.__str__()}"

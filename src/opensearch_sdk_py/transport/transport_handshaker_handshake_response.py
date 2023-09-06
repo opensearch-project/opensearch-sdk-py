@@ -31,3 +31,6 @@ class TransportHandshakerHandshakeResponse(TransportResponse):
         super().write_to(output)
         output.write_version(self.version)
         return self
+
+    def __str__(self) -> str:
+        return f"version={self.version.__str__()}"
