@@ -15,6 +15,7 @@ from google.protobuf import descriptor as _descriptor
 from google.protobuf import descriptor_pool as _descriptor_pool
 from google.protobuf import symbol_database as _symbol_database
 from google.protobuf.internal import builder as _builder
+
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
@@ -23,16 +24,18 @@ _sym_db = _symbol_database.Default()
 from . import ExtensionIdentityProto_pb2 as ExtensionIdentityProto__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1b\x45xtensionRequestProto.proto\x12\x1forg.opensearch.extensions.proto\x1a\x1c\x45xtensionIdentityProto.proto\"\x9b\x01\n\x10\x45xtensionRequest\x12\x44\n\x08identity\x18\x01 \x01(\x0b\x32\x32.org.opensearch.extensions.proto.ExtensionIdentity\x12\x41\n\x0brequestType\x18\x02 \x01(\x0e\x32,.org.opensearch.extensions.proto.RequestType*\xc7\x02\n\x0bRequestType\x12#\n\x1fREQUEST_EXTENSION_CLUSTER_STATE\x10\x00\x12&\n\"REQUEST_EXTENSION_CLUSTER_SETTINGS\x10\x01\x12+\n\'REQUEST_EXTENSION_REGISTER_REST_ACTIONS\x10\x02\x12\'\n#REQUEST_EXTENSION_REGISTER_SETTINGS\x10\x03\x12*\n&REQUEST_EXTENSION_ENVIRONMENT_SETTINGS\x10\x04\x12,\n(REQUEST_EXTENSION_DEPENDENCY_INFORMATION\x10\x05\x12\x14\n\x10\x43REATE_COMPONENT\x10\x06\x12\x13\n\x0fON_INDEX_MODULE\x10\x07\x12\x10\n\x0cGET_SETTINGS\x10\x08\x42\x17\x42\x15\x45xtensionRequestProtob\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(
+    b"\n\x1b\x45xtensionRequestProto.proto\x12\x1forg.opensearch.extensions.proto\x1a\x1c\x45xtensionIdentityProto.proto\"\x9b\x01\n\x10\x45xtensionRequest\x12\x44\n\x08identity\x18\x01 \x01(\x0b\x32\x32.org.opensearch.extensions.proto.ExtensionIdentity\x12\x41\n\x0brequestType\x18\x02 \x01(\x0e\x32,.org.opensearch.extensions.proto.RequestType*\xc7\x02\n\x0bRequestType\x12#\n\x1fREQUEST_EXTENSION_CLUSTER_STATE\x10\x00\x12&\n\"REQUEST_EXTENSION_CLUSTER_SETTINGS\x10\x01\x12+\n'REQUEST_EXTENSION_REGISTER_REST_ACTIONS\x10\x02\x12'\n#REQUEST_EXTENSION_REGISTER_SETTINGS\x10\x03\x12*\n&REQUEST_EXTENSION_ENVIRONMENT_SETTINGS\x10\x04\x12,\n(REQUEST_EXTENSION_DEPENDENCY_INFORMATION\x10\x05\x12\x14\n\x10\x43REATE_COMPONENT\x10\x06\x12\x13\n\x0fON_INDEX_MODULE\x10\x07\x12\x10\n\x0cGET_SETTINGS\x10\x08\x42\x17\x42\x15\x45xtensionRequestProtob\x06proto3"
+)
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
-_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'ExtensionRequestProto_pb2', _globals)
+_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, "ExtensionRequestProto_pb2", _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
-  DESCRIPTOR._options = None
-  DESCRIPTOR._serialized_options = b'B\025ExtensionRequestProto'
-  _globals['_REQUESTTYPE']._serialized_start=253
-  _globals['_REQUESTTYPE']._serialized_end=580
-  _globals['_EXTENSIONREQUEST']._serialized_start=95
-  _globals['_EXTENSIONREQUEST']._serialized_end=250
+    DESCRIPTOR._options = None
+    DESCRIPTOR._serialized_options = b"B\025ExtensionRequestProto"
+    _globals["_REQUESTTYPE"]._serialized_start = 253
+    _globals["_REQUESTTYPE"]._serialized_end = 580
+    _globals["_EXTENSIONREQUEST"]._serialized_start = 95
+    _globals["_EXTENSIONREQUEST"]._serialized_end = 250
 # @@protoc_insertion_point(module_scope)

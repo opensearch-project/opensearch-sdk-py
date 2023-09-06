@@ -67,7 +67,7 @@ class TcpHeader:
         return self
 
     def __str__(self) -> str:
-        return f"{self.statuses} {self.prefix!r}, message={self.size} byte(s), request_id={self.request_id}, status={self.status}, version={self.version}"
+        return f"prefix={self.prefix!r}, version={self.version}, type={self.statuses}, message={self.size} byte(s), id={self.request_id}"
 
     def is_request(self) -> bool:
         return bool((self.status & TransportStatus.STATUS_REQRES) == 0)

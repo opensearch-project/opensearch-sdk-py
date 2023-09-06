@@ -30,7 +30,7 @@ class TestTcpHeader(unittest.TestCase):
         self.assertEqual(header.variable_header_size, 0)
         self.assertEqual(
             str(header),
-            "['request'] b'ES', message=17 byte(s), request_id=1, status=0, version=3.0.0.99",
+            "prefix=b'ES', version=3.0.0.99, type=['request'], message=17 byte(s), id=1",
         )
 
         header.set_response()

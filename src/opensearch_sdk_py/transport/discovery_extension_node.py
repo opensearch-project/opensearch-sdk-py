@@ -52,3 +52,6 @@ class DiscoveryExtensionNode(DiscoveryNode):
         for d in self.dependencies:
             d.write_to(output)
         return self
+
+    def __str__(self) -> str:
+        return f"{super().__str__()}, compatible>={self.minimum_compatible_version}, deps={self.dependencies}"

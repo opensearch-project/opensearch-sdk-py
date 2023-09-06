@@ -29,6 +29,6 @@ class RequestHandler(ABC):
         output = StreamOutput()
         message.write_to(output)
         raw_out = output.getvalue()
-        logging.info("")
-        logging.info(f"sent request id {message.get_request_id()}, {len(raw_out)} byte(s):\n  #{raw_out}\n  {message.tcp_header}")
+        logging.info(f"> {message.__str__()}, size={len(raw_out)} byte(s)")
+        logging.debug(f"> #{raw_out}")
         return output

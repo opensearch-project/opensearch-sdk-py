@@ -39,4 +39,4 @@ class ThreadContextStruct:
             return len(out.getvalue())
 
     def __str__(self) -> str:
-        return f"request_headers: {self.request_headers} , response_headers: {self.response_headers}"
+        return f"req={self.request_headers}, res={self.response_headers}"

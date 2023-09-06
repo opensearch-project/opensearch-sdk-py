@@ -47,3 +47,6 @@ class NetworkMessage:
 
     def is_handshake(self) -> bool:
         return bool(self.tcp_header.is_handshake())
+
+    def __str__(self) -> str:
+        return f"{self.tcp_header}, ctx={self.thread_context_struct}"
