@@ -46,9 +46,9 @@ class TransportHandshakeRequestHandler(RequestHandler):
                         },
                     )
                 ),
-                request.get_version(),
-                request.get_request_id(),
-                request.is_handshake(),
-                request.is_compress(),
+                request.version,
+                request.request_id,
+                request.is_handshake,
+                request.is_compress,
             )
         )

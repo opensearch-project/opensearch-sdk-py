@@ -12,6 +12,7 @@
 from opensearch_sdk_py.transport.outbound_message import OutboundMessage
 from opensearch_sdk_py.transport.thread_context_struct import ThreadContextStruct
 from opensearch_sdk_py.transport.transport_message import TransportMessage
+from opensearch_sdk_py.transport.transport_status import TransportStatus
 from opensearch_sdk_py.transport.version import Version
 
 
@@ -27,11 +28,11 @@ class OutboundMessageResponse(OutboundMessage):
         is_compress: bool = False,
     ):
         self.features = features
-        super().__init__(thread_context, version, 1, request_id, message)
+        super().__init__(thread_context=thread_context, version=version, status=TransportStatus.STATUS_REQRES, request_id=request_id, message=message)
         if is_handshake:
-            self.tcp_header.set_handshake()
+            self.tcp_header.is_handshake = True
         if is_compress:
-            self.tcp_header.set_compress()
+            self.tcp_header.is_compress = True
 
     def __str__(self) -> str:
         return f"{super().__str__()}, features={self.features}"

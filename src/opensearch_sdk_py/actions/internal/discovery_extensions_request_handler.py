@@ -36,17 +36,17 @@ class DiscoveryExtensionsRequestHandler(RequestHandler):
         request.thread_context_struct.request_headers["extension_unique_id"] = "hello-world"
 
         # TODO: Other initialization, ideally async
-        DiscoveryExtensionsRequestHandler.init_response_request_id = request.get_request_id()
+        DiscoveryExtensionsRequestHandler.init_response_request_id = request.request_id
 
         return self.send(
             OutboundMessageRequest(
-                request.thread_context_struct,
-                request.features,
-                RegisterRestActionsRequest("hello-world", ["GET /hello hw_greeting"]),
-                request.get_version(),
-                "internal:discovery/registerrestactions",
-                DiscoveryExtensionsRequestHandler.REGISTER_REST_REQUEST_ID,
-                False,
-                False,
+                thread_context=request.thread_context_struct,
+                features=request.features,
+                message=RegisterRestActionsRequest("hello-world", ["GET /hello hw_greeting"]),
+                version=request.version,
+                action="internal:discovery/registerrestactions",
+                request_id=DiscoveryExtensionsRequestHandler.REGISTER_REST_REQUEST_ID,
+                is_handshake=False,
+                is_compress=False,
             )
         )

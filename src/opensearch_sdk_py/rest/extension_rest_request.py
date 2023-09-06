@@ -72,5 +72,7 @@ class ExtensionRestRequest(TransportRequest):
         return self
 
     def __str__(self) -> str:
-        return f"http version={self.http_version}, method={self.method}, uri={self.uri}, path={self.path}, params={self.params}, " \
+        return (
+            f"http version={self.http_version}, method={self.method}, uri={self.uri}, path={self.path}, params={self.params}, "
             "headers={self.headers}, media type={self.media_type}, content={len(self.content)} byte(s), pit={self.principal_identifier_token}"
+        )

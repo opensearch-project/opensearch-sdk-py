@@ -15,12 +15,13 @@ from opensearch_sdk_py.transport.version import Version
 
 class TestNetworkMessage(unittest.TestCase):
     def test_network_message(self) -> None:
-        nm = NetworkMessage(version=Version(2100099))
+        nm = NetworkMessage(version=Version(2100099), request_id=42)
         self.assertEqual(len(nm.thread_context_struct.request_headers), 0)
         self.assertEqual(len(nm.thread_context_struct.response_headers), 0)
-        self.assertEqual(nm.get_request_id(), 1)
-        self.assertEqual(nm.get_version().id, 136317827)
-        self.assertTrue(nm.is_request())
-        self.assertFalse(nm.is_error())
-        self.assertFalse(nm.is_compress())
-        self.assertFalse(nm.is_handshake())
+        self.assertEqual(nm.request_id, 42)
+        self.assertEqual(nm.version.id, 136317827)
+        self.assertFalse(nm.is_request)
+        self.assertTrue(nm.is_response)
+        self.assertFalse(nm.is_error)
+        self.assertFalse(nm.is_compress)
+        self.assertFalse(nm.is_handshake)

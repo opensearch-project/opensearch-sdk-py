@@ -12,6 +12,7 @@
 
 from opensearch_sdk_py.transport.tcp_header import TcpHeader
 from opensearch_sdk_py.transport.thread_context_struct import ThreadContextStruct
+from opensearch_sdk_py.transport.transport_status import TransportStatus
 from opensearch_sdk_py.transport.version import Version
 
 
@@ -20,33 +21,40 @@ class NetworkMessage:
         self,
         thread_context: ThreadContextStruct = None,
         version: Version = None,
-        status: int = 0,
+        status: int = TransportStatus.STATUS_REQRES,
         request_id: int = 1,
     ) -> None:
         self.thread_context_struct = thread_context if thread_context else ThreadContextStruct()
         self.tcp_header = TcpHeader(version=version, status=status, request_id=request_id)
         self.tcp_header.size += self.thread_context_struct.size
 
-    def get_version(self) -> Version:
+    @property
+    def version(self) -> Version:
         return self.tcp_header.version
 
-    def get_request_id(self) -> int:
+    @property
+    def request_id(self) -> int:
         return int(self.tcp_header.request_id)
 
+    @property
     def is_request(self) -> bool:
-        return bool(self.tcp_header.is_request())
+        return bool(self.tcp_header.is_request)
 
+    @property
     def is_response(self) -> bool:
-        return not bool(self.tcp_header.is_request())
+        return not bool(self.tcp_header.is_request)
 
+    @property
     def is_error(self) -> bool:
-        return bool(self.tcp_header.is_error())
+        return bool(self.tcp_header.is_error)
 
+    @property
     def is_compress(self) -> bool:
-        return bool(self.tcp_header.is_compress())
+        return bool(self.tcp_header.is_compress)
 
+    @property
     def is_handshake(self) -> bool:
-        return bool(self.tcp_header.is_handshake())
+        return bool(self.tcp_header.is_handshake)
 
     def __str__(self) -> str:
         return f"{self.tcp_header}, ctx={self.thread_context_struct}"

@@ -17,6 +17,7 @@ from opensearch_sdk_py.transport.stream_output import StreamOutput
 from opensearch_sdk_py.transport.tcp_header import TcpHeader
 from opensearch_sdk_py.transport.thread_context_struct import ThreadContextStruct
 from opensearch_sdk_py.transport.transport_message import TransportMessage
+from opensearch_sdk_py.transport.transport_status import TransportStatus
 from opensearch_sdk_py.transport.version import Version
 
 
@@ -25,7 +26,7 @@ class OutboundMessage(NetworkMessage):
         self,
         thread_context: ThreadContextStruct = None,
         version: Version = None,
-        status: int = 0,
+        status: int = TransportStatus.STATUS_REQRES,
         request_id: int = 1,
         message: TransportMessage = None,
     ):
