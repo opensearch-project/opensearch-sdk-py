@@ -24,5 +24,5 @@ jobs:
       - run: poetry run mypy .
       - run: |
           poetry run licenseheaders -t LICENSE_HEADER.txt -E .py
-          git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }}
-          git diff --quiet --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} || exit -1 
+          git diff --name-only .
+          git diff --quiet --name-only . || exit -1 
