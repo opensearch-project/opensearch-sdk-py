@@ -1,3 +1,12 @@
+#
+# Copyright OpenSearch Contributors
+# SPDX-License-Identifier: Apache-2.0
+#
+# The OpenSearch Contributors require contributions made to
+# this file be licensed under the Apache-2.0 license or a
+# compatible open source license.
+#
+
 import unittest
 from ipaddress import AddressValueError
 
@@ -15,9 +24,7 @@ class TestTransportAddress(unittest.TestCase):
         self.assertEqual(ta.port, 1234)
         out = StreamOutput()
         ta.write_to(out)
-        self.assertEqual(
-            out.getvalue(), b"\x04\x01\x02\x03\x04\x071.2.3.4\x00\x00\x04\xd2"
-        )
+        self.assertEqual(out.getvalue(), b"\x04\x01\x02\x03\x04\x071.2.3.4\x00\x00\x04\xd2")
 
     def test_address_with_host(self) -> None:
         ta = TransportAddress("1.2.3.4", 1234, "host.name")
@@ -27,9 +34,7 @@ class TestTransportAddress(unittest.TestCase):
         self.assertEqual(ta.port, 1234)
         out = StreamOutput()
         ta.write_to(out)
-        self.assertEqual(
-            out.getvalue(), b"\x04\x01\x02\x03\x04\x09host.name\x00\x00\x04\xd2"
-        )
+        self.assertEqual(out.getvalue(), b"\x04\x01\x02\x03\x04\x09host.name\x00\x00\x04\xd2")
 
         ta2 = TransportAddress()
         ta2.read_from(input=StreamInput(out.getvalue()))

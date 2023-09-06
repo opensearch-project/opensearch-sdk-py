@@ -1,3 +1,12 @@
+#
+# Copyright OpenSearch Contributors
+# SPDX-License-Identifier: Apache-2.0
+#
+# The OpenSearch Contributors require contributions made to
+# this file be licensed under the Apache-2.0 license or a
+# compatible open source license.
+#
+
 import unittest
 
 from opensearch_sdk_py.transport.discovery_extension_node import DiscoveryExtensionNode
@@ -10,9 +19,7 @@ from opensearch_sdk_py.transport.version import Version
 
 class TestDiscoveryExtensionNode(unittest.TestCase):
     def test_discovery_extension_node(self) -> None:
-        den = DiscoveryExtensionNode(
-            node_id="id", address=TransportAddress("127.0.0.1")
-        )
+        den = DiscoveryExtensionNode(node_id="id", address=TransportAddress("127.0.0.1"))
         self.assertEqual(den.node_name, "")
         self.assertEqual(den.node_id, "id")
         self.assertEqual(len(den.ephemeral_id), 22)

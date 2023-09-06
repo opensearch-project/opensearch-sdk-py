@@ -1,3 +1,12 @@
+#
+# Copyright OpenSearch Contributors
+# SPDX-License-Identifier: Apache-2.0
+#
+# The OpenSearch Contributors require contributions made to
+# this file be licensed under the Apache-2.0 license or a
+# compatible open source license.
+#
+
 import unittest
 
 from opensearch_sdk_py.transport.stream_input import StreamInput
@@ -15,9 +24,7 @@ class TestTransportRequest(unittest.TestCase):
         out = StreamOutput()
         tr.write_to(out)
         out.write(b"\x01\x02\x03")
-        self.assertEqual(
-            out.getvalue(), b"\x04test\x00\x00\x00\x00\x00\x00\x00\x2a\x01\x02\x03"
-        )
+        self.assertEqual(out.getvalue(), b"\x04test\x00\x00\x00\x00\x00\x00\x00\x2a\x01\x02\x03")
 
         tr = TransportRequest()
         self.assertEqual(tr.parent_task_id.node_id, "")

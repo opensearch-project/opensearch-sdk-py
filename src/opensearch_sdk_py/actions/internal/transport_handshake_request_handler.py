@@ -1,3 +1,12 @@
+#
+# Copyright OpenSearch Contributors
+# SPDX-License-Identifier: Apache-2.0
+#
+# The OpenSearch Contributors require contributions made to
+# this file be licensed under the Apache-2.0 license or a
+# compatible open source license.
+#
+
 import logging
 
 from opensearch_sdk_py.actions.request_handler import RequestHandler
@@ -21,24 +30,26 @@ class TransportHandshakeRequestHandler(RequestHandler):
         logging.info(f"\ttask_id: {transport_handshake.parent_task_id}")
         logging.info("\tparsed Transport handshake, returning a response")
 
-        return self.send(OutboundMessageResponse(
-            request.thread_context_struct,
-            request.features,
-            TransportServiceHandshakeResponse(
-                DiscoveryNode(
-                    node_name="hello-world",
-                    node_id="hello-world",
-                    address=TransportAddress("127.0.0.1", 1234),
-                    roles={
-                        DiscoveryNodeRole.CLUSTER_MANAGER_ROLE,
-                        DiscoveryNodeRole.DATA_ROLE,
-                        DiscoveryNodeRole.INGEST_ROLE,
-                        DiscoveryNodeRole.REMOTE_CLUSTER_CLIENT_ROLE,
-                    },
-                )
-            ),
-            request.get_version(),
-            request.get_request_id(),
-            request.is_handshake(),
-            request.is_compress(),
-        ))
+        return self.send(
+            OutboundMessageResponse(
+                request.thread_context_struct,
+                request.features,
+                TransportServiceHandshakeResponse(
+                    DiscoveryNode(
+                        node_name="hello-world",
+                        node_id="hello-world",
+                        address=TransportAddress("127.0.0.1", 1234),
+                        roles={
+                            DiscoveryNodeRole.CLUSTER_MANAGER_ROLE,
+                            DiscoveryNodeRole.DATA_ROLE,
+                            DiscoveryNodeRole.INGEST_ROLE,
+                            DiscoveryNodeRole.REMOTE_CLUSTER_CLIENT_ROLE,
+                        },
+                    )
+                ),
+                request.get_version(),
+                request.get_request_id(),
+                request.is_handshake(),
+                request.is_compress(),
+            )
+        )

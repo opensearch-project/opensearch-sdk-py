@@ -1,3 +1,12 @@
+#
+# Copyright OpenSearch Contributors
+# SPDX-License-Identifier: Apache-2.0
+#
+# The OpenSearch Contributors require contributions made to
+# this file be licensed under the Apache-2.0 license or a
+# compatible open source license.
+#
+
 import unittest
 
 from opensearch_sdk_py.rest.extension_rest_request import ExtensionRestRequest
@@ -18,7 +27,7 @@ class TestExtensionRestRequest(unittest.TestCase):
             media_type="application/json; charset=utf-8",
             content=bytes("{}", "ascii"),
             principal_identifier_token="token",
-            http_version=HttpVersion.HTTP_1_1
+            http_version=HttpVersion.HTTP_1_1,
         )
         self.assertEqual(err.method, RestMethod.GET)
         self.assertEqual(err.uri, "/hello?v")

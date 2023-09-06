@@ -8,6 +8,7 @@
   - [Run Tests](#run-tests)
   - [Cleanup Code](#cleanup-code)
   - [Type Checking](#type-checking)
+- [License Headers](#license-headers)
 - [Visual Studio Code](#visual-studio-code)
 - [Transport Protocol Overview](#transport-protocol-overview)
 
@@ -81,6 +82,10 @@ poetry run autoflake -r --in-place --remove-unused-variables --remove-all-unused
 ### Type Checking
 
 This project uses [mypy](https://github.com/python/mypy) as an optional static type checker. Make sure that `poetry run mypy .` is clean before making pull requests.
+
+## License Headers
+
+All python code has a copy of the [license header](LICENSE_HEADER.txt) on top of it. To bulk apply license headers use `poetry run licenseheaders -t LICENSE_HEADER.txt -E .py`.
 
 ## Visual Studio Code
 

@@ -1,3 +1,12 @@
+#
+# Copyright OpenSearch Contributors
+# SPDX-License-Identifier: Apache-2.0
+#
+# The OpenSearch Contributors require contributions made to
+# this file be licensed under the Apache-2.0 license or a
+# compatible open source license.
+#
+
 import logging
 
 from opensearch_sdk_py.actions.request_handler import RequestHandler
@@ -19,9 +28,7 @@ class DiscoveryExtensionsRequestHandler(RequestHandler):
         super().__init__("internal:discovery/extensions")
 
     def handle(self, request: OutboundMessageRequest, input: StreamInput) -> StreamOutput:
-        initialize_extension_request = (
-            InitializeExtensionRequest().read_from(input)
-        )
+        initialize_extension_request = InitializeExtensionRequest().read_from(input)
         logging.info(
             f"\tsource node: {initialize_extension_request.source_node.address.host_name}"
             + f":{initialize_extension_request.source_node.address.port}"
@@ -37,15 +44,15 @@ class DiscoveryExtensionsRequestHandler(RequestHandler):
         # TODO: Other initialization, ideally async
         DiscoveryExtensionsRequestHandler.init_response_request_id = request.get_request_id()
 
-        return self.send(OutboundMessageRequest(
-            request.thread_context_struct,
-            request.features,
-            RegisterRestActionsRequest(
-                "hello-world", ["GET /hello hw_greeting"]
-            ),
-            request.get_version(),
-            "internal:discovery/registerrestactions",
-            DiscoveryExtensionsRequestHandler.REGISTER_REST_REQUEST_ID,
-            False,
-            False,
-        ))
+        return self.send(
+            OutboundMessageRequest(
+                request.thread_context_struct,
+                request.features,
+                RegisterRestActionsRequest("hello-world", ["GET /hello hw_greeting"]),
+                request.get_version(),
+                "internal:discovery/registerrestactions",
+                DiscoveryExtensionsRequestHandler.REGISTER_REST_REQUEST_ID,
+                False,
+                False,
+            )
+        )

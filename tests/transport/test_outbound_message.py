@@ -1,3 +1,12 @@
+#
+# Copyright OpenSearch Contributors
+# SPDX-License-Identifier: Apache-2.0
+#
+# The OpenSearch Contributors require contributions made to
+# this file be licensed under the Apache-2.0 license or a
+# compatible open source license.
+#
+
 import unittest
 
 from opensearch_sdk_py.transport.outbound_message import OutboundMessage
@@ -43,12 +52,8 @@ class TestOutboundMessage(unittest.TestCase):
             om.tcp_header.size,
             len(out.getvalue()) - TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE,
         )
-        self.assertEqual(
-            om.tcp_header.variable_header_size, 5
-        )  # 2 for context, 3 for subclass
+        self.assertEqual(om.tcp_header.variable_header_size, 5)  # 2 for context, 3 for subclass
         self.assertEqual(
             om.tcp_header.variable_header_size,
-            om.tcp_header.size
-            + TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE
-            - TcpHeader.HEADER_SIZE,
+            om.tcp_header.size + TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE - TcpHeader.HEADER_SIZE,
         )

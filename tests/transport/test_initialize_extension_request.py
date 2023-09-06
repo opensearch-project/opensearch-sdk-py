@@ -1,3 +1,12 @@
+#
+# Copyright OpenSearch Contributors
+# SPDX-License-Identifier: Apache-2.0
+#
+# The OpenSearch Contributors require contributions made to
+# this file be licensed under the Apache-2.0 license or a
+# compatible open source license.
+#
+
 import unittest
 
 from opensearch_sdk_py.transport.discovery_extension_node import DiscoveryExtensionNode
@@ -32,13 +41,11 @@ class TestInitializeExtensionRequest(unittest.TestCase):
         input = StreamInput(output.getvalue())
         request = InitializeExtensionRequest()
         ier = request.read_from(input)
-        self.assertEqual(ier.source_node.node_id, 'opensearch_node')
-        self.assertEqual(ier.extension.node_id, 'extension_node')
+        self.assertEqual(ier.source_node.node_id, "opensearch_node")
+        self.assertEqual(ier.extension.node_id, "extension_node")
 
     def test_read_write(self) -> None:
-        data = NettyTraceData.load(
-            "tests/transport/data/initialize_extension_request.txt"
-        ).data
+        data = NettyTraceData.load("tests/transport/data/initialize_extension_request.txt").data
 
         input = StreamInput(data)
         request = OutboundMessageRequest()

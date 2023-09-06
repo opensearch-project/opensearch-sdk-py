@@ -1,3 +1,12 @@
+#
+# Copyright OpenSearch Contributors
+# SPDX-License-Identifier: Apache-2.0
+#
+# The OpenSearch Contributors require contributions made to
+# this file be licensed under the Apache-2.0 license or a
+# compatible open source license.
+#
+
 import unittest
 
 from opensearch_sdk_py.transport.outbound_message_response import OutboundMessageResponse
@@ -22,9 +31,7 @@ class TestOutboundMessageResponse(unittest.TestCase):
         self.assertFalse(omr.is_handshake())
 
     def test_custom_outbound_message_response(self) -> None:
-        omr = OutboundMessageResponse(
-            features=["foo", "bar"], is_compress=True, is_handshake=True
-        )
+        omr = OutboundMessageResponse(features=["foo", "bar"], is_compress=True, is_handshake=True)
         self.assertListEqual(omr.features, ["foo", "bar"])
         self.assertTrue(omr.is_compress())
         self.assertTrue(omr.is_handshake())
@@ -41,9 +48,7 @@ class TestOutboundMessageResponse(unittest.TestCase):
         omr.write_to(out)
         self.assertEqual(
             out.getvalue(),
-            b"ES\x00\x00\x00\x18\x00\x00\x00\x00\x00\x00\x00\x02\x09\x08\x2d\xc7\x23\x00\x00\x00\x02"  # tcp header
-            + b"\x00\x00"  # context
-            + b"\x04test",
+            b"ES\x00\x00\x00\x18\x00\x00\x00\x00\x00\x00\x00\x02\x09\x08\x2d\xc7\x23\x00\x00\x00\x02" + b"\x00\x00" + b"\x04test",  # tcp header  # context
         )  # transport message
         self.assertEqual(
             len(out.getvalue()),
@@ -61,10 +66,7 @@ class TestOutboundMessageResponse(unittest.TestCase):
         self.assertEqual(omr.tcp_header.variable_header_size, 2)  # context
         self.assertEqual(
             omr.tcp_header.variable_header_size,
-            +omr.tcp_header.size
-            - 5  # transport message (strlen + str) included in header size
-            + TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE
-            - TcpHeader.HEADER_SIZE,
+            +omr.tcp_header.size - 5 + TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE - TcpHeader.HEADER_SIZE,  # transport message (strlen + str) included in header size
         )  # base header size
 
 

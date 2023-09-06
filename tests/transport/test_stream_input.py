@@ -1,3 +1,12 @@
+#
+# Copyright OpenSearch Contributors
+# SPDX-License-Identifier: Apache-2.0
+#
+# The OpenSearch Contributors require contributions made to
+# this file be licensed under the Apache-2.0 license or a
+# compatible open source license.
+#
+
 import unittest
 from enum import Enum
 
@@ -65,9 +74,7 @@ class TestStreamInput(unittest.TestCase):
         self.assertRaises(IndexError, input.read_optional_int)
 
     def test_read_long(self) -> None:
-        input = StreamInput(
-            b"\x00\x00\x00\x01\x02\x03\x04\x05\x00\x00\x00\x01\x02\x03\x04\x05\x00"
-        )
+        input = StreamInput(b"\x00\x00\x00\x01\x02\x03\x04\x05\x00\x00\x00\x01\x02\x03\x04\x05\x00")
         self.assertEqual(input.read_long(), 4328719365)
         self.assertEqual(input.read_long(), 4328719365)
         self.assertRaises(IndexError, input.read_long)
@@ -159,6 +166,6 @@ class TestStreamInput(unittest.TestCase):
         self.assertSetEqual(dict["qux"], set())
 
     def test_read_enum(self) -> None:
-        TestEnum = Enum('TestEnum', ['FOO', 'BAR', 'BAZ'], start=0)
-        input = StreamInput(b'\x01')
+        TestEnum = Enum("TestEnum", ["FOO", "BAR", "BAZ"], start=0)
+        input = StreamInput(b"\x01")
         self.assertEqual(input.read_enum(TestEnum), TestEnum.BAR)
