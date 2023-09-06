@@ -7,7 +7,7 @@ license = "Apache 2.0"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.9"
 aiohttp = "*"
 pytest = "*"
 isort = "*"
@@ -15,8 +15,10 @@ flake8 = "^5"
 black = "*"
 autoflake = "*"
 protobuf = "^3"
+types-protobuf = "*"
 2to3 = "*"
 sortedcollections = "*"
+mypy = "*"
 
 [tool.isort]
 profile = "black"
@@ -40,3 +42,10 @@ build-backend = "poetry.core.masonry.api"
 pythonpath = ["src", "tests"]
 log_cli = true
 log_cli_level = "DEBUG"
+
+[tool.mypy]
+python_version = 3.9
+disallow_untyped_defs = true
+warn_return_any = true
+exclude = ['src/opensearch_sdk_py/protobuf']
+ignore_missing_imports = true

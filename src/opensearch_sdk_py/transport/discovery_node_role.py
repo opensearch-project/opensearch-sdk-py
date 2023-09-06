@@ -13,7 +13,7 @@ class DiscoveryNodeRole:
         SEARCH_ROLE,
     ]
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.role_dict = dict()
         for role in DiscoveryNodeRole.BUILT_IN_ROLES:
             self.role_dict[role[0]] = role

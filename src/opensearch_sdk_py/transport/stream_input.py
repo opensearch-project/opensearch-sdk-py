@@ -1,18 +1,19 @@
 import io
 from enum import Enum
+from typing import Any, Optional, Union
 
 from opensearch_sdk_py.transport.version import Version
 
 
 class StreamInput:
-    def __init__(self, input):
+    def __init__(self, input: Union[bytearray, bytes]) -> None:
         self.raw = input
         self.data = io.BytesIO(input)
 
     def read_byte(self) -> int:
         return self.data.read(1)[0]
 
-    def read_bytes(self, len: int):
+    def read_bytes(self, len: int) -> bytes:
         return self.data.read(len)
 
     def read_int(self) -> int:
@@ -26,7 +27,7 @@ class StreamInput:
     def read_short(self) -> int:
         return ((self.read_byte() & 0xFF) << 8) | (self.read_byte() & 0xFF)
 
-    def read_boolean(self):
+    def read_boolean(self) -> bool:
         value = self.read_byte()
         if value == 0:
             return False
@@ -35,7 +36,7 @@ class StreamInput:
         else:
             raise Exception(f"Invalid boolean ({value})")
 
-    def read_optional_boolean(self):
+    def read_optional_boolean(self) -> Optional[bool]:
         value = self.read_byte()
         if value == 2:
             return None
@@ -77,7 +78,7 @@ class StreamInput:
         return Version(self.read_v_int() ^ Version.MASK)
 
     # reads an optional int
-    def read_optional_int(self) -> int:
+    def read_optional_int(self) -> Optional[int]:
         if self.read_boolean():
             return self.read_int()
         else:
@@ -128,23 +129,23 @@ class StreamInput:
         b = self.read_byte()
         if b != 0 and b != 1:
             # raise IOException("Invalid vlong (" + Integer.toHexString(b) + " << 63) | " + Long.toHexString(i))
-            raise Exception("Invalid vlong (" + b + " << 63) | " + i)
+            raise Exception(f"Invalid vlong ({b} << 63) | {i}")
         i |= ((b)) << 63
         return i
 
-    def read_optional_v_long(self) -> int:
+    def read_optional_v_long(self) -> Optional[int]:
         if self.read_boolean():
             return self.read_v_long()
         else:
             return None
 
-    def read_optional_long(self) -> int:
+    def read_optional_long(self) -> Optional[int]:
         if self.read_boolean():
             return self.read_long()
         else:
             return None
 
-    def read_optional_string(self) -> str:
+    def read_optional_string(self) -> Optional[str]:
         if self.read_boolean():
             return self.read_string()
         else:
@@ -178,7 +179,7 @@ class StreamInput:
 
         return result
 
-    def read_optional_string_array(self) -> list[str]:
+    def read_optional_string_array(self) -> Optional[list[str]]:
         if self.read_boolean():
             return self.read_string_array()
         else:
@@ -225,5 +226,5 @@ class StreamInput:
 
         return result
 
-    def read_enum(self, enum: Enum) -> Enum:
-        return enum(self.read_v_int())
+    def read_enum(self, enum: Enum) -> Any:
+        return enum(self.read_v_int())  # type:ignore

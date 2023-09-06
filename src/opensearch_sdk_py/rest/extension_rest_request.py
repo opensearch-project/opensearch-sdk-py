@@ -1,5 +1,6 @@
 # https://github.com/opensearch-project/OpenSearch/blob/main/server/src/main/java/org/opensearch/extensions/rest/ExtensionRestRequest.java
 
+
 from opensearch_sdk_py.rest.http_version import HttpVersion
 from opensearch_sdk_py.rest.rest_method import RestMethod
 from opensearch_sdk_py.transport.stream_input import StreamInput
@@ -19,7 +20,7 @@ class ExtensionRestRequest(TransportRequest):
         content: bytes = b"",
         principal_identifier_token: str = "",
         http_version: HttpVersion = None,
-    ):
+    ) -> None:
         super().__init__()
         self.method = method
         self.uri = uri
@@ -31,7 +32,7 @@ class ExtensionRestRequest(TransportRequest):
         self.principal_identifier_token = principal_identifier_token
         self.http_version = http_version
 
-    def read_from(self, input: StreamInput):
+    def read_from(self, input: StreamInput) -> "ExtensionRestRequest":
         super().read_from(input)
         self.method = input.read_enum(RestMethod)
         self.uri = input.read_string()
@@ -45,7 +46,7 @@ class ExtensionRestRequest(TransportRequest):
         self.http_version = input.read_enum(HttpVersion)
         return self
 
-    def write_to(self, output: StreamOutput):
+    def write_to(self, output: StreamOutput) -> "ExtensionRestRequest":
         super().write_to(output)
         output.write_enum(self.method)
         output.write_string(self.uri)

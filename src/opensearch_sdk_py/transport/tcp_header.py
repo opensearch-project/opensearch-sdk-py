@@ -1,5 +1,6 @@
 # https://github.com/opensearch-project/OpenSearch/blob/main/server/src/main/java/org/opensearch/transport/TcpHeader.java
 
+
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
 from opensearch_sdk_py.transport.transport_status import TransportStatus
@@ -25,13 +26,13 @@ class TcpHeader:
 
     def __init__(
         self,
-        prefix=b"ES",
-        request_id=1,
-        status=0,
-        version=None,
-        size=MESSAGE_SIZE,
-        variable_header_size=0,
-    ):
+        prefix: bytes = b"ES",
+        request_id: int = 1,
+        status: int = 0,
+        version: Version = Version.CURRENT,
+        size: int = MESSAGE_SIZE,
+        variable_header_size: int = 0,
+    ) -> None:
         self.prefix = prefix
         self.request_id = request_id
         self.status = status
@@ -39,7 +40,7 @@ class TcpHeader:
         self.size = size
         self.variable_header_size = variable_header_size
 
-    def read_from(self, input: StreamInput):
+    def read_from(self, input: StreamInput) -> "TcpHeader":
         self.prefix = input.read_bytes(2)
         self.size = input.read_int()
         self.request_id = input.read_long()
@@ -49,7 +50,7 @@ class TcpHeader:
         self.variable_header_size = input.read_int()
         return self
 
-    def write_to(self, output: StreamOutput):
+    def write_to(self, output: StreamOutput) -> "TcpHeader":
         output.write(self.prefix)
         output.write_int(self.size)
         output.write_long(self.request_id)
@@ -58,38 +59,38 @@ class TcpHeader:
         output.write_int(self.variable_header_size)
         return self
 
-    def __str__(self):
-        return f"{self.statuses} {self.prefix}, message={self.size} byte(s), request_id={self.request_id}, status={self.status}, version={self.version}"
+    def __str__(self) -> str:
+        return f"{self.statuses} {self.prefix!r}, message={self.size} byte(s), request_id={self.request_id}, status={self.status}, version={self.version}"
 
     def is_request(self) -> bool:
-        return (self.status & TransportStatus.STATUS_REQRES) == 0
+        return bool((self.status & TransportStatus.STATUS_REQRES) == 0)
 
-    def set_request(self):
+    def set_request(self) -> None:
         self.status &= ~TransportStatus.STATUS_REQRES
 
-    def set_response(self):
+    def set_response(self) -> None:
         self.status |= TransportStatus.STATUS_REQRES
 
     def is_error(self) -> bool:
-        return (self.status & TransportStatus.STATUS_ERROR) != 0
+        return bool((self.status & TransportStatus.STATUS_ERROR) != 0)
 
-    def set_error(self):
+    def set_error(self) -> None:
         self.status |= TransportStatus.STATUS_ERROR
 
     def is_compress(self) -> bool:
-        return (self.status & TransportStatus.STATUS_COMPRESS) != 0
+        return bool((self.status & TransportStatus.STATUS_COMPRESS) != 0)
 
-    def set_compress(self):
+    def set_compress(self) -> None:
         self.status |= TransportStatus.STATUS_COMPRESS
 
     def is_handshake(self) -> bool:
-        return (self.status & TransportStatus.STATUS_HANDSHAKE) != 0
+        return bool((self.status & TransportStatus.STATUS_HANDSHAKE) != 0)
 
-    def set_handshake(self):
+    def set_handshake(self) -> None:
         self.status |= TransportStatus.STATUS_HANDSHAKE
 
     @property
-    def statuses(self) -> str:
+    def statuses(self) -> list[str]:
         result = []
         if self.is_request():
             result.append("request")

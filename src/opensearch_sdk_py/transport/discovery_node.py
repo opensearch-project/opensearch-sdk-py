@@ -1,5 +1,6 @@
 import base64
 import uuid
+from typing import Optional
 
 from sortedcollections import OrderedSet
 
@@ -13,15 +14,15 @@ class DiscoveryNode:
     def __init__(
         self,
         node_name: str = "",
-        node_id: str = None,
-        ephemeral_id: str = None,
-        host_name: str = None,
-        host_address: str = None,
-        address: TransportAddress = None,
+        node_id: Optional[str] = None,
+        ephemeral_id: Optional[str] = None,
+        host_name: Optional[str] = None,
+        host_address: Optional[str] = None,
+        address: Optional[TransportAddress] = None,
         attributes: dict[str, str] = dict(),
         roles: set[tuple] = set(),  # DiscoveryNodeRole
-        version: Version = None,
-    ):
+        version: Optional[Version] = None,
+    ) -> None:
         # node_id and address are required unless we are just initializing for read_from
         if node_id and address:
             self.node_id = node_id
@@ -39,7 +40,7 @@ class DiscoveryNode:
             self.roles = roles
             self.version = version if version else Version(Version.CURRENT)
 
-    def read_from(self, input: StreamInput):
+    def read_from(self, input: StreamInput) -> "DiscoveryNode":
         self.node_name = input.read_string()
         self.node_id = input.read_string()
         self.ephemeral_id = input.read_string()
@@ -56,7 +57,7 @@ class DiscoveryNode:
         self.version = input.read_version()
         return self
 
-    def write_to(self, output: StreamOutput):
+    def write_to(self, output: StreamOutput) -> "DiscoveryNode":
         output.write_string(self.node_name)
         output.write_string(self.node_id)
         output.write_string(self.ephemeral_id)

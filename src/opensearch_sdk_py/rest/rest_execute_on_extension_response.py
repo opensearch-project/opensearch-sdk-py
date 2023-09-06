@@ -24,7 +24,7 @@ class RestExecuteOnExtensionResponse(TransportResponse):
         self.consumed_params = consumed_params
         self.content_consumed = content_consumed
 
-    def read_from(self, input: StreamInput):
+    def read_from(self, input: StreamInput) -> "RestExecuteOnExtensionResponse":
         super().read_from(input)
         self.status = input.read_enum(RestStatus)
         self.content_type = input.read_string()
@@ -34,7 +34,7 @@ class RestExecuteOnExtensionResponse(TransportResponse):
         self.content_consumed = input.read_boolean()
         return self
 
-    def write_to(self, output: StreamOutput):
+    def write_to(self, output: StreamOutput) -> "RestExecuteOnExtensionResponse":
         super().write_to(output)
         output.write_enum(self.status)
         output.write_string(self.content_type)

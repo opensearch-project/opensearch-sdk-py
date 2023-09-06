@@ -1,6 +1,5 @@
 # https://github.com/opensearch-project/OpenSearch/blob/main/server/src/main/java/org/opensearch/transport/OutboundMessage.java#L122
 
-
 from opensearch_sdk_py.transport.outbound_message import OutboundMessage
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
@@ -20,7 +19,7 @@ class OutboundMessageRequest(OutboundMessage):
         request_id: int = 1,
         is_handshake: bool = False,
         is_compress: bool = False,
-    ):
+    ) -> None:
         self.features = features
         self.action = action
         super().__init__(thread_context, version, 0, request_id, message)
@@ -29,12 +28,12 @@ class OutboundMessageRequest(OutboundMessage):
         if is_compress:
             self.tcp_header.set_compress()
 
-    def _read_variable_bytes(self):
+    def _read_variable_bytes(self) -> None:
         variable_stream = StreamInput(self.variable_bytes)
         self.features = variable_stream.read_string_array()
         self.action = variable_stream.read_string()
 
-    def _write_variable_bytes(self):
+    def _write_variable_bytes(self) -> None:
         output = StreamOutput()
         output.write_string_array(self.features)
         output.write_string(self.action)

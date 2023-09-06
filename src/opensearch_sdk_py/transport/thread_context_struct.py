@@ -5,22 +5,22 @@ from opensearch_sdk_py.transport.stream_output import StreamOutput
 
 
 class ThreadContextStruct:
-    def __init__(self):
+    def __init__(self) -> None:
         self.request_headers = dict[str, str]()
         self.response_headers = dict[str, set[str]]()
 
-    def read_from(self, input: StreamInput):
+    def read_from(self, input: StreamInput) -> "ThreadContextStruct":
         self.request_headers = input.read_string_to_string_dict()
         self.response_headers = input.read_string_to_string_set_dict()
         return self
 
-    def write_to(self, output: StreamOutput):
+    def write_to(self, output: StreamOutput) -> "ThreadContextStruct":
         output.write_string_to_string_dict(self.request_headers)
         output.write_string_to_string_array_dict(self.response_headers)
         return self
 
     @property
-    def size(self):
+    def size(self) -> int:
         if len(self.request_headers) == 0 and len(self.response_headers) == 0:
             return 2
         else:
@@ -29,5 +29,5 @@ class ThreadContextStruct:
             self.write_to(out)
             return len(out.getvalue())
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"request_headers: {self.request_headers} , response_headers: {self.response_headers}"

@@ -27,7 +27,7 @@ class DiscoveryExtensionNode(DiscoveryNode):
         self.minimum_compatible_version = minimum_compatible_version
         self.dependencies = dependencies
 
-    def read_from(self, input: StreamInput):
+    def read_from(self, input: StreamInput) -> "DiscoveryExtensionNode":
         super().read_from(input)
         self.minimum_compatible_version = input.read_version()
         self.dependencies = []
@@ -36,7 +36,7 @@ class DiscoveryExtensionNode(DiscoveryNode):
             self.dependencies.append(ExtensionDependency().read_from(input))
         return self
 
-    def write_to(self, output: StreamOutput):
+    def write_to(self, output: StreamOutput) -> "DiscoveryExtensionNode":
         super().write_to(output)
         output.write_version(self.minimum_compatible_version)
         output.write_v_int(len(self.dependencies))

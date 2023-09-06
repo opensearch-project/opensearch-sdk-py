@@ -8,13 +8,13 @@ from opensearch_sdk_py.transport.transport_request import TransportRequest
 
 
 class TransportServiceHandshakeRequest(TransportRequest):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
-    def read_from(self, input: StreamInput):
+    def read_from(self, input: StreamInput) -> "TransportServiceHandshakeRequest":
         super().read_from(input)
         return self
 
-    def write_to(self, output: StreamOutput):
+    def write_to(self, output: StreamOutput) -> "TransportServiceHandshakeRequest":
         super().write_to(output)
         return self
