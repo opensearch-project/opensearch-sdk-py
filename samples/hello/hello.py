@@ -2,6 +2,7 @@
 import asyncio
 import logging
 import socket
+from typing import Any
 
 from opensearch_sdk_py.actions.internal.discovery_extensions_request_handler import DiscoveryExtensionsRequestHandler
 from opensearch_sdk_py.actions.request_handlers import RequestHandlers
@@ -14,13 +15,14 @@ from opensearch_sdk_py.transport.stream_output import StreamOutput
 from opensearch_sdk_py.transport.tcp_header import TcpHeader
 
 
-async def handle_connection(conn, loop):
+async def handle_connection(conn: Any, loop: asyncio.AbstractEventLoop) -> None:
     try:
         conn.setblocking(False)
 
         while raw := await loop.sock_recv(conn, 1024 * 10):
             input = StreamInput(raw)
-            logging.info(f"\nreceived {input}, {len(raw)} byte(s)\n\t#{str(raw)}")
+            logging.info("")
+            logging.info(f"received {input}, {len(raw)} byte(s)\n  #{str(raw)}")
 
             header = TcpHeader().read_from(input)
             logging.info(f"\t{header}")
@@ -64,7 +66,7 @@ async def handle_connection(conn, loop):
                         response.is_compress(),
                     )
                     message.write_to(output)
-                    logging.info(f"\nsent request id {message.get_request_id()}, {len(output.getvalue())} byte(s):\n\t#{output}\n\t{message.tcp_header}")
+                    logging.info(f"sent request id {message.get_request_id()}, {len(output.getvalue())} byte(s):\n  #{output}\n  {message.tcp_header}")
 
             if output:
                 await loop.sock_sendall(conn, output.getvalue())
@@ -75,7 +77,7 @@ async def handle_connection(conn, loop):
         conn.close()
 
 
-async def run_server():
+async def run_server() -> None:
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind(("localhost", 1234))
     server.setblocking(False)

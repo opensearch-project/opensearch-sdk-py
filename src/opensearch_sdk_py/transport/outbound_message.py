@@ -1,5 +1,7 @@
 # https://github.com/opensearch-project/OpenSearch/blob/main/server/src/main/java/org/opensearch/transport/OutboundMessage.java
 
+from typing import Optional
+
 from opensearch_sdk_py.transport.network_message import NetworkMessage
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
@@ -18,22 +20,24 @@ class OutboundMessage(NetworkMessage):
         request_id: int = 1,
         message: TransportMessage = None,
     ):
+        self._message_bytes: Optional[bytes]
+        self._variable_bytes: Optional[bytes]
         super().__init__(thread_context, version, status, request_id)
         if message:
-            self._message = bytes(message)
-            self.tcp_header.size += len(self._message)
+            self._message_bytes = bytes(message)
+            self.tcp_header.size += len(self._message_bytes)
         else:
-            self._message = None
+            self._message_bytes = None
         self.tcp_header.variable_header_size = self.thread_context_struct.size
         self._variable_bytes = None
         self._write_variable_bytes()
 
     @property
-    def variable_bytes(self):
+    def variable_bytes(self) -> Optional[bytes]:
         return self._variable_bytes
 
     @variable_bytes.setter
-    def variable_bytes(self, variable_bytes: bytes):
+    def variable_bytes(self, variable_bytes: bytes) -> None:
         if self._variable_bytes:
             self.tcp_header.size -= len(self._variable_bytes)
             self.tcp_header.variable_header_size -= len(self._variable_bytes)
@@ -42,17 +46,17 @@ class OutboundMessage(NetworkMessage):
         self._variable_bytes = variable_bytes
 
     @property
-    def message(self):
-        return self._message
+    def message_bytes(self) -> Optional[bytes]:
+        return self._message_bytes
 
-    @message.setter
-    def message(self, message: bytes):
-        if self._message:
-            self.tcp_header.size -= len(self._message)
-        self.tcp_header.size += len(message)
-        self._message = message
+    @message_bytes.setter
+    def message_bytes(self, message_bytes: bytes) -> None:
+        if self._message_bytes:
+            self.tcp_header.size -= len(self._message_bytes)
+        self.tcp_header.size += len(message_bytes)
+        self._message_bytes = message_bytes
 
-    def read_from(self, input: StreamInput, header: TcpHeader = None):
+    def read_from(self, input: StreamInput, header: TcpHeader = None) -> "OutboundMessage":
         if header:
             self.tcp_header = header
         else:
@@ -64,17 +68,17 @@ class OutboundMessage(NetworkMessage):
         # TODO: read message
         return self
 
-    def _read_variable_bytes(self):
+    def _read_variable_bytes(self) -> None:
         pass
 
-    def _write_variable_bytes(self):
+    def _write_variable_bytes(self) -> None:
         pass
 
-    def write_to(self, output: StreamOutput):
+    def write_to(self, output: StreamOutput) -> "OutboundMessage":
         self.tcp_header.write_to(output)
         self.thread_context_struct.write_to(output)
         if self._variable_bytes:
             output.write(self._variable_bytes)
-        if self._message:
-            output.write(self._message)
+        if self._message_bytes:
+            output.write(self._message_bytes)
         return self

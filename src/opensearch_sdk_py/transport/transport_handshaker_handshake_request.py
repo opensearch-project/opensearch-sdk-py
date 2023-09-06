@@ -13,13 +13,13 @@ class TransportHandshakerHandshakeRequest(TransportRequest):
         super().__init__()
         self.version = version
 
-    def read_from(self, input: StreamInput):
+    def read_from(self, input: StreamInput) -> "TransportHandshakerHandshakeRequest":
         super().read_from(input)
         input.read_v_int()
         self.version = input.read_version()
         return self
 
-    def write_to(self, output: StreamOutput):
+    def write_to(self, output: StreamOutput) -> "TransportHandshakerHandshakeRequest":
         super().write_to(output)
         version_bytes = StreamOutput()
         if self.version:

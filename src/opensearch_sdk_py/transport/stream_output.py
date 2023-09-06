@@ -5,15 +5,15 @@ from opensearch_sdk_py.transport.version import Version
 
 
 class StreamOutput(BytesIO):
-    def write_byte(self, b: int):
+    def write_byte(self, b: int) -> int:
         return self.write(b.to_bytes(1, byteorder="big"))
 
     #  writes an int as four bytes.
-    def write_int(self, i: int):
+    def write_int(self, i: int) -> int:
         return self.write(i.to_bytes(4, byteorder="big"))
 
     # writes an int in a variable-length format
-    def write_v_int(self, i: int):
+    def write_v_int(self, i: int) -> int:
         # shortcut single byte
         if i < 0x80:
             return self.write_byte(i)
@@ -26,10 +26,10 @@ class StreamOutput(BytesIO):
                 break
         return self.write(result)
 
-    def write_version(self, version: Version):
+    def write_version(self, version: Version) -> int:
         return self.write_v_int(version.id)
 
-    def write_long(self, i: int):
+    def write_long(self, i: int) -> int:
         return self.write(i.to_bytes(8, byteorder="big"))
 
     # }
@@ -242,7 +242,7 @@ class StreamOutput(BytesIO):
     # }
 
     # writes a utf-8 string
-    def write_string(self, s: str):
+    def write_string(self, s: str) -> None:
         char_count = len(s.encode("utf-8"))
         self.write_v_int(char_count)
         if char_count > 0:
@@ -283,7 +283,7 @@ class StreamOutput(BytesIO):
     # private static byte TWO = 2;
 
     # writes a boolean
-    def write_boolean(self, b: bool):
+    def write_boolean(self, b: bool) -> int:
         return self.write_byte(1 if b else 0)
 
     # def writeOptionalBoolean(@Nullable Boolean b) throws IOException {
@@ -329,13 +329,13 @@ class StreamOutput(BytesIO):
     # }
 
     # writes a string array
-    def write_string_array(self, a: list[str]):
+    def write_string_array(self, a: list[str]) -> None:
         self.write_v_int(len(a))
         for s in a:
             self.write_string(s)
 
     # writes a string set
-    def write_string_set(self, a: set[str]):
+    def write_string_set(self, a: set[str]) -> None:
         self.write_v_int(len(a))
         for s in a:
             self.write_string(s)
@@ -356,19 +356,19 @@ class StreamOutput(BytesIO):
     #     writeGenericValue(map);
     # }
 
-    def write_string_to_string_dict(self, d: dict[str, str]):
+    def write_string_to_string_dict(self, d: dict[str, str]) -> None:
         self.write_v_int(len(d))
         for k in d:
             self.write_string(k)
             self.write_string(d[k])
 
-    def write_string_to_string_array_dict(self, d: dict[str, list[str]]):
+    def write_string_to_string_array_dict(self, d: dict[str, list[str]]) -> None:
         self.write_v_int(len(d))
         for k in d:
             self.write_string(k)
             self.write_string_array(d[k])
 
-    def write_string_to_string_set_dict(self, d: dict[str, set[str]]):
+    def write_string_to_string_set_dict(self, d: dict[str, set[str]]) -> None:
         self.write_v_int(len(d))
         for k in d:
             self.write_string(k)
@@ -1003,7 +1003,7 @@ class StreamOutput(BytesIO):
     # }
 
     # Writes an enum based on its value
-    def write_enum(self, e: Enum):
+    def write_enum(self, e: Enum) -> None:
         self.write_v_int(e.value)
 
     # /**

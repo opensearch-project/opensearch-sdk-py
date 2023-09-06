@@ -12,18 +12,18 @@ class InitializeExtensionRequest(TransportRequest):
         self,
         source_node: DiscoveryNode = None,
         extension: DiscoveryExtensionNode = None,
-    ):
+    ) -> None:
         super().__init__()
         self.source_node = source_node
         self.extension = extension
 
-    def read_from(self, input: StreamInput):
+    def read_from(self, input: StreamInput) -> "InitializeExtensionRequest":
         super().read_from(input)
         self.source_node = DiscoveryNode().read_from(input)
         self.extension = DiscoveryExtensionNode().read_from(input)
         return self
 
-    def write_to(self, output: StreamOutput):
+    def write_to(self, output: StreamOutput) -> "InitializeExtensionRequest":
         super().write_to(output)
         self.source_node.write_to(output)
         self.extension.write_to(output)

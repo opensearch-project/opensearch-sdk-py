@@ -11,7 +11,7 @@ from opensearch_sdk_py.transport.stream_output import StreamOutput
 
 
 class ExtensionRestRequestHandler(RequestHandler):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("internal:extensions/restexecuteonextensiontaction")
 
     def handle(self, request: OutboundMessageRequest, input: StreamInput) -> StreamOutput:

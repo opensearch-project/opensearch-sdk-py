@@ -7,6 +7,8 @@
   - [Install Dependencies](#install-dependencies)
   - [Run Tests](#run-tests)
   - [Cleanup Code](#cleanup-code)
+  - [Type Checking](#type-checking)
+- [Visual Studio Code](#visual-studio-code)
 - [Transport Protocol Overview](#transport-protocol-overview)
 
 ## Forking and Cloning
@@ -75,6 +77,14 @@ poetry run isort .
 poetry run black .
 poetry run autoflake -r --in-place --remove-unused-variables --remove-all-unused-imports .
 ```
+
+### Type Checking
+
+This project uses [mypy](https://github.com/python/mypy) as an optional static type checker. Make sure that `poetry run mypy .` is clean before making pull requests.
+
+## Visual Studio Code
+
+After opening Visual Studio Code, use `> Pythin: Select Interpreter` (also in the bottom right of VSCode when you edit a Python file) to properly resolve import paths.
 
 ## Transport Protocol Overview
 

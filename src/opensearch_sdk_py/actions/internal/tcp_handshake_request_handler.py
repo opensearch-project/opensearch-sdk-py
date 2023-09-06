@@ -10,7 +10,7 @@ from opensearch_sdk_py.transport.transport_handshaker_handshake_response import 
 
 
 class TcpHandshakeRequestHandler(RequestHandler):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("internal:tcp/handshake")
 
     def handle(self, request: OutboundMessageRequest, input: StreamInput) -> StreamOutput:

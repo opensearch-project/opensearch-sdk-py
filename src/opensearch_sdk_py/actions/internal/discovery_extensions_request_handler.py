@@ -15,7 +15,7 @@ class DiscoveryExtensionsRequestHandler(RequestHandler):
     # TODO: make this private to this class
     init_response_request_id = -1
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("internal:discovery/extensions")
 
     def handle(self, request: OutboundMessageRequest, input: StreamInput) -> StreamOutput:

@@ -6,16 +6,17 @@ from opensearch_sdk_py.transport.discovery_node_role import DiscoveryNodeRole
 from opensearch_sdk_py.transport.outbound_message_request import OutboundMessageRequest
 from opensearch_sdk_py.transport.outbound_message_response import OutboundMessageResponse
 from opensearch_sdk_py.transport.stream_input import StreamInput
+from opensearch_sdk_py.transport.stream_output import StreamOutput
 from opensearch_sdk_py.transport.transport_address import TransportAddress
 from opensearch_sdk_py.transport.transport_service_handshake_request import TransportServiceHandshakeRequest
 from opensearch_sdk_py.transport.transport_service_handshake_response import TransportServiceHandshakeResponse
 
 
 class TransportHandshakeRequestHandler(RequestHandler):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("internal:transport/handshake")
 
-    def handle(self, request: OutboundMessageRequest, input: StreamInput):
+    def handle(self, request: OutboundMessageRequest, input: StreamInput) -> StreamOutput:
         transport_handshake = TransportServiceHandshakeRequest().read_from(input)
         logging.info(f"\ttask_id: {transport_handshake.parent_task_id}")
         logging.info("\tparsed Transport handshake, returning a response")

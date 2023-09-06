@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional
 
 from opensearch_sdk_py.actions.internal.discovery_extensions_request_handler import DiscoveryExtensionsRequestHandler
 from opensearch_sdk_py.actions.internal.extensions_restexecuteonextensiontaction_handler import ExtensionRestRequestHandler
@@ -12,22 +12,18 @@ from opensearch_sdk_py.transport.stream_input import StreamInput
 class RequestHandlers(Dict[str, RequestHandler]):
     _singleton = None
 
-    def __new__(cls):
+    def __new__(cls):  # type:ignore
         if cls._singleton is None:
             cls._singleton = super(RequestHandlers, cls).__new__(cls)
         return cls._singleton
 
-    def register(self, klass):
+    def register(self, klass: RequestHandler) -> None:
         instance = klass()
         self[instance.action] = instance
 
-    def handle(self, request: OutboundMessageRequest, input: StreamInput):
+    def handle(self, request: OutboundMessageRequest, input: StreamInput) -> Optional[bytes]:
         handler = self[request.action]
-        if handler:
-            output = handler.handle(request, input)
-        else:
-            output = None
-        return output
+        return handler.handle(request, input) if handler else None
 
 
 RequestHandlers().register(DiscoveryExtensionsRequestHandler)

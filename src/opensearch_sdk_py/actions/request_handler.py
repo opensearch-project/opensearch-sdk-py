@@ -1,5 +1,6 @@
 import logging
 from abc import ABC, abstractmethod
+from typing import Optional
 
 from opensearch_sdk_py.transport.outbound_message import OutboundMessage
 from opensearch_sdk_py.transport.outbound_message_request import OutboundMessageRequest
@@ -12,12 +13,13 @@ class RequestHandler(ABC):
         self.action = action
 
     @abstractmethod
-    def handle(self, request: OutboundMessageRequest, input: StreamInput):
+    def handle(self, request: OutboundMessageRequest, input: StreamInput) -> Optional[bytes]:
         pass
 
     def send(self, message: OutboundMessage) -> StreamOutput:
         output = StreamOutput()
         message.write_to(output)
         raw_out = output.getvalue()
-        logging.info(f"\nsent request id {message.get_request_id()}, {len(raw_out)} byte(s):\n\t#{raw_out}\n\t{message.tcp_header}")
+        logging.info("")
+        logging.info(f"sent request id {message.get_request_id()}, {len(raw_out)} byte(s):\n  #{raw_out}\n  {message.tcp_header}")
         return output

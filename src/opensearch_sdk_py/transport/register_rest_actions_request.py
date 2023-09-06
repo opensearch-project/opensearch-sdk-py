@@ -12,21 +12,21 @@ class RegisterRestActionsRequest(TransportRequest):
         unique_id: str = "",
         rest_actions: list[str] = [],
         deprecated_rest_actions: list[str] = [],
-    ):
+    ) -> None:
         super().__init__()
         self.rra = RegisterRestActions()
         self.rra.identity.uniqueId = unique_id
         self.rra.restActions[:] = rest_actions
         self.rra.deprecatedRestActions[:] = deprecated_rest_actions
 
-    def read_from(self, input: StreamInput):
+    def read_from(self, input: StreamInput) -> "RegisterRestActionsRequest":
         super().read_from(input)
         rra_bytes = input.read_bytes(input.read_v_int())
         self.rra = RegisterRestActions()
         self.rra.ParseFromString(rra_bytes)
         return self
 
-    def write_to(self, output: StreamOutput):
+    def write_to(self, output: StreamOutput) -> "RegisterRestActionsRequest":
         super().write_to(output)
         rra_bytes = self.rra.SerializeToString()
         output.write_v_int(len(rra_bytes))

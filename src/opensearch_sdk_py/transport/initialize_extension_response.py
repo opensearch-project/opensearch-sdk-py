@@ -11,13 +11,13 @@ class InitializeExtensionResponse(TransportResponse):
         self.name = name
         self.implemented_interfaces = implemented_interfaces
 
-    def read_from(self, input: StreamInput):
+    def read_from(self, input: StreamInput) -> "InitializeExtensionResponse":
         super().read_from(input)
         self.name = input.read_string()
         self.implemented_interfaces = input.read_string_array()
         return self
 
-    def write_to(self, output: StreamOutput):
+    def write_to(self, output: StreamOutput) -> "InitializeExtensionResponse":
         super().write_to(output)
         output.write_string(self.name)
         output.write_string_array(self.implemented_interfaces)

@@ -9,16 +9,16 @@ from opensearch_sdk_py.transport.version import Version
 
 
 class TransportHandshakerHandshakeResponse(TransportResponse):
-    def __init__(self, version: Version = None):
+    def __init__(self, version: Version = None) -> None:
         super().__init__()
         self.version = version
 
-    def read_from(self, input: StreamInput):
+    def read_from(self, input: StreamInput) -> "TransportHandshakerHandshakeResponse":
         super().read_from(input)
         self.version = input.read_version()
         return self
 
-    def write_to(self, output: StreamOutput):
+    def write_to(self, output: StreamOutput) -> "TransportHandshakerHandshakeResponse":
         super().write_to(output)
         output.write_version(self.version)
         return self
