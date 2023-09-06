@@ -1,3 +1,12 @@
+#
+# Copyright OpenSearch Contributors
+# SPDX-License-Identifier: Apache-2.0
+#
+# The OpenSearch Contributors require contributions made to
+# this file be licensed under the Apache-2.0 license or a
+# compatible open source license.
+#
+
 from opensearch_sdk_py.transport.discovery_node import DiscoveryNode
 from opensearch_sdk_py.transport.extension_dependency import ExtensionDependency
 from opensearch_sdk_py.transport.stream_input import StreamInput

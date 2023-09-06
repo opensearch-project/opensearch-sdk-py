@@ -1,3 +1,12 @@
+#
+# Copyright OpenSearch Contributors
+# SPDX-License-Identifier: Apache-2.0
+#
+# The OpenSearch Contributors require contributions made to
+# this file be licensed under the Apache-2.0 license or a
+# compatible open source license.
+#
+
 import unittest
 
 from opensearch_sdk_py.transport.outbound_message_request import OutboundMessageRequest
@@ -67,15 +76,10 @@ class TestOutboundMessageRequest(unittest.TestCase):
             omr.tcp_header.size,
             len(out.getvalue()) - TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE,
         )
-        self.assertEqual(
-            omr.tcp_header.variable_header_size, 2 + 9 + 24
-        )  # context + features string array + action
+        self.assertEqual(omr.tcp_header.variable_header_size, 2 + 9 + 24)  # context + features string array + action
         self.assertEqual(
             omr.tcp_header.variable_header_size,
-            + omr.tcp_header.size
-            - 6  # transport message (task id + strlen + str) included in header size
-            + TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE
-            - TcpHeader.HEADER_SIZE,
+            +omr.tcp_header.size - 6 + TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE - TcpHeader.HEADER_SIZE,  # transport message (task id + strlen + str) included in header size
         )  # base header size
 
         # test two-part reading with optional argument
@@ -93,15 +97,10 @@ class TestOutboundMessageRequest(unittest.TestCase):
             omr.tcp_header.size,
             len(out.getvalue()) - TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE,
         )
-        self.assertEqual(
-            omr.tcp_header.variable_header_size, 2 + 9 + 24
-        )  # context + features string array + action
+        self.assertEqual(omr.tcp_header.variable_header_size, 2 + 9 + 24)  # context + features string array + action
         self.assertEqual(
             omr.tcp_header.variable_header_size,
-            +omr.tcp_header.size
-            - 6  # transport message (task id + strlen + str) included in header size
-            + TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE
-            - TcpHeader.HEADER_SIZE,
+            +omr.tcp_header.size - 6 + TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE - TcpHeader.HEADER_SIZE,  # transport message (task id + strlen + str) included in header size
         )  # base header size
 
 

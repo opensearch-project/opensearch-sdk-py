@@ -1,8 +1,16 @@
+#
+# Copyright OpenSearch Contributors
+# SPDX-License-Identifier: Apache-2.0
+#
+# The OpenSearch Contributors require contributions made to
+# this file be licensed under the Apache-2.0 license or a
+# compatible open source license.
+#
+
 from enum import Enum, auto
 
 
 class RestStatus(Enum):
-
     # The client SHOULD continue with its request. This interim response is used to inform the client that the
     # initial part of the request has been received and has not yet been rejected by the server. The client
     # SHOULD continue by sending the remainder of the request or, if the request has already been completed,

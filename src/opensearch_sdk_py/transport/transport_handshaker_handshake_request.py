@@ -1,4 +1,11 @@
-# https://github.com/opensearch-project/OpenSearch/blob/cc007e4511dfb7faec70eff656c02e53a1c410f7/server/src/main/java/org/opensearch/transport/TransportHandshaker.java#L192
+#
+# Copyright OpenSearch Contributors
+# SPDX-License-Identifier: Apache-2.0
+#
+# The OpenSearch Contributors require contributions made to
+# this file be licensed under the Apache-2.0 license or a
+# compatible open source license.
+#
 
 # this is the request for the internal:tcp/handshake action
 

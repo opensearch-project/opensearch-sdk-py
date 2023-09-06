@@ -8,8 +8,13 @@
   - [Run Tests](#run-tests)
   - [Cleanup Code](#cleanup-code)
   - [Type Checking](#type-checking)
+- [License Headers](#license-headers)
 - [Visual Studio Code](#visual-studio-code)
-- [Transport Protocol Overview](#transport-protocol-overview)
+- [Transport Protocol](#transport-protocol)
+  - [Overview](#overview)
+  - [REST Handlers](#rest-handlers)
+  - [Transport Actions](#transport-actions)
+  - [Transport Protocol](#transport-protocol-1)
 
 ## Forking and Cloning
 
@@ -82,37 +87,51 @@ poetry run autoflake -r --in-place --remove-unused-variables --remove-all-unused
 
 This project uses [mypy](https://github.com/python/mypy) as an optional static type checker. Make sure that `poetry run mypy .` is clean before making pull requests.
 
+## License Headers
+
+All python code has a copy of the [license header](LICENSE_HEADER.txt) on top of it. To bulk apply license headers use `poetry run licenseheaders -t LICENSE_HEADER.txt -E .py`.
+
 ## Visual Studio Code
 
 After opening Visual Studio Code, use `> Pythin: Select Interpreter` (also in the bottom right of VSCode when you edit a Python file) to properly resolve import paths.
 
-## Transport Protocol Overview
+## Transport Protocol
 
-The primary purpose of the SDK is to permit Extensions to provide additional functionality by simply registering that functionality through a set of extension points. Development on this project is focused on providing these extension points. When OpenSearch functionality is provided by a REST API, Extensions will use the OpenSearch Python Client to implement it.  However, when REST APIs do not provide this information, its binary Transport protocol is used.
+### Overview
+
+The primary purpose of the SDK is to permit Extensions to provide additional functionality to OpenSearch by registering that functionality through a set of extension points. Development on this project is focused on providing these extension points. When OpenSearch functionality is provided by a REST API, Extensions will use the OpenSearch Python Client to implement it. However, when REST APIs do not provide this information, its binary transport protocol is used. That protocol is implemented in this SDK.
+
+### REST Handlers
 
 One example of an extension point is REST handler registration. An extension communicates to OpenSearch which REST requests it will handle, and OpenSearch redirects those requests to the extension. This requires the SDK to implement two request-response workflows, one to register the supported REST methods and paths, and one to implement the functionality and return an appropriate response.
 
-A transport action's request-response workflow has 4 key components:
- - A request class containing information needed to execute
- - A response class, which may simply acknolwedge the request or provide requested information
- - A handler class on whichever side of the connection is handling the request and returning the response
- - A name, used to uniquely identify the above three components
+### Transport Actions
 
-In the REST handler registration example, the SDK sends the request, which includes the name; OpenSearch has a handler registered which adds the new paths to the RestController and returns and acknowledge response to the SDK.
+A transport action's request-response workflow has 4 key components.
 
-In the User REST request example, OpenSearch forwards the request to the SDK which must handle it. This handler will be provided by SDK implementers in the form of a class and function to take the request as input and return an appropriate response as output, which is then returned by the SDK to OpenSearch and ultimately the user.
+1. A request class containing information needed to execute.
+2. A response class, which may simply acknowledge the request or provide requested information.
+3. A handler class on whichever side of the connection is handling the request and returning the response.
+4. A name, used to uniquely identify the above three components.
 
-The Request and Response classes extend the `TransportMessage` class and implement `read_from()` and `write_to()` methods to communicate information via byte streams. When porting functionality from OpenSearch classes, care must be taken to precisely match the type of writeable stream values, which correspond to common cross-language primitives. These TransportMessage instances are passed as parameters to an `OutboundMessageRequest` or `OutboundMessageResponse` class.
+In the REST handler registration example, the SDK sends the request, which includes the API name. OpenSearch implements a handler that adds the new paths to the RestController and returns an acknowledge response to the SDK.
 
-The Transport Protocol is implemented in a loop performing the following:
+When the user makes a REST request, OpenSearch forwards the request to the SDK which must handle it. This handler will be provided by SDK implementers in the form of a class and function to take the request as input and return an appropriate response as output, which is then returned by the SDK to OpenSearch and ultimately to the user.
+
+The Request and Response classes extend the `TransportMessage` class and implement `read_from()` and `write_to()` methods to communicate information via byte streams. When porting functionality from OpenSearch classes, care must be taken to precisely match the type of writeable stream values, which correspond to common cross-language primitives. These `TransportMessage` instances are passed as parameters to an `OutboundMessageRequest` or `OutboundMessageResponse` classes.
+
+### Transport Protocol
+
+The transport protocol is implemented in a loop performing the following.
+
 1. Listen for any incoming connections.
-2. On connection, read initial bytes into an `OutboundMessage` instance and inspect the header.  The first bytes of the header are encoded as the `TcpHeader` class. This instance:
-   - identifies whether it is a request or response, and what the request ID is. A response will carry the same ID.
-   - identifies the version of the sender, used in case compatibility decisions may change the response
-   - identifies any thread context headers
+2. On connection, read initial bytes into a `TcpHeader` class.
+   1. Identify whether it is a request or response, and what the request ID is. A response will carry the same ID.
+   2. Identify the version of the sender, used in case compatibility decisions may change the response.
+   4. Identify any thread context headers.
 3. An `OutboundMessageRequest` or `OutboundMessageResponse` subclass is instantiated, picking up reading the input stream.
-   - for requests, this instance reads the features and the name of the Transport Action identifying the `TransportMessage` handler.
-   - for responses, there is no additional information read, as the request ID identifies the handler expecting the response.
-4. Following the fixed and variable headers, the content of the TransportRequest or TransportResponse is available for reading from the input stream. This stream and the instance created in the previous step are passed to the handler for the request (based on the Action name) or response (based on the request ID)
+   1. For requests, this instance reads the features and the name of the Transport Action identifying the `TransportMessage` handler.
+   2. For responses, there is no additional information read, as the request ID identifies the handler expecting the response.
+4. Following the fixed and variable headers, the content of the `TransportRequest` or `TransportResponse` is available for reading from the input stream. This stream and the instance created in the previous step are passed to the handler for the request (based on the action name) or response (based on the request ID).
 5. Handlers parse the request from the input stream, perform whatever actions they need to perform, and then return a response as an outbound stream, matching the request ID in the case of requests. This outbound stream is then sent back to OpenSearch.
 6. Sometimes the actions a handler performs are to send transport requests back to OpenSearch, where a similar loop will handle the request and return a response.

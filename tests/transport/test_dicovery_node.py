@@ -1,3 +1,12 @@
+#
+# Copyright OpenSearch Contributors
+# SPDX-License-Identifier: Apache-2.0
+#
+# The OpenSearch Contributors require contributions made to
+# this file be licensed under the Apache-2.0 license or a
+# compatible open source license.
+#
+
 import unittest
 
 from opensearch_sdk_py.transport.discovery_node import DiscoveryNode
@@ -38,9 +47,7 @@ class TestDiscoveryNode(unittest.TestCase):
         self.assertEqual(str(dn.address.address), "1.2.3.4")
         self.assertEqual(dn.address.port, 1234)
         self.assertDictEqual(dn.attributes, {"foo": "bar", "baz": "qux"})
-        self.assertSetEqual(
-            dn.roles, {DiscoveryNodeRole.DATA_ROLE, DiscoveryNodeRole.INGEST_ROLE}
-        )
+        self.assertSetEqual(dn.roles, {DiscoveryNodeRole.DATA_ROLE, DiscoveryNodeRole.INGEST_ROLE})
         self.assertEqual(dn.version.id, Version.CURRENT_ID)
         ephemeral_id = dn.ephemeral_id
 
@@ -56,7 +63,5 @@ class TestDiscoveryNode(unittest.TestCase):
         self.assertEqual(str(dn.address.address), "1.2.3.4")
         self.assertEqual(dn.address.port, 1234)
         self.assertDictEqual(dn.attributes, {"foo": "bar", "baz": "qux"})
-        self.assertSetEqual(
-            set(dn.roles), {DiscoveryNodeRole.DATA_ROLE, DiscoveryNodeRole.INGEST_ROLE}
-        )
+        self.assertSetEqual(set(dn.roles), {DiscoveryNodeRole.DATA_ROLE, DiscoveryNodeRole.INGEST_ROLE})
         self.assertEqual(dn.version.id, Version.CURRENT_ID)

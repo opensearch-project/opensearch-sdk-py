@@ -1,4 +1,13 @@
 #!/usr/bin/env python
+#
+# Copyright OpenSearch Contributors
+# SPDX-License-Identifier: Apache-2.0
+#
+# The OpenSearch Contributors require contributions made to
+# this file be licensed under the Apache-2.0 license or a
+# compatible open source license.
+#
+
 import asyncio
 import logging
 import socket
@@ -38,17 +47,13 @@ async def handle_connection(conn: Any, loop: asyncio.AbstractEventLoop) -> None:
 
                 output = RequestHandlers().handle(request, input)
                 if output is None:
-                    logging.info(
-                        f"\tparsed action {header}, haven't yet written what to do with it"
-                    )
+                    logging.info(f"\tparsed action {header}, haven't yet written what to do with it")
             else:
                 response = OutboundMessageResponse().read_from(input, header)
                 # TODO: Error handling
                 if response.is_error():
                     output = None
-                    logging.info(
-                        f"\tparsed {header}, this is an ERROR response"
-                    )
+                    logging.info(f"\tparsed {header}, this is an ERROR response")
                 else:
                     ack_response = AcknowledgedResponse().read_from(input)
                     logging.info(f"\trequest {response.get_request_id()} acknowledged: {ack_response.status}")
@@ -57,9 +62,7 @@ async def handle_connection(conn: Any, loop: asyncio.AbstractEventLoop) -> None:
                     message = OutboundMessageResponse(
                         response.thread_context_struct,
                         response.features,
-                        InitializeExtensionResponse(
-                            "hello-world", ["Extension", "ActionExtension"]
-                        ),
+                        InitializeExtensionResponse("hello-world", ["Extension", "ActionExtension"]),
                         response.get_version(),
                         DiscoveryExtensionsRequestHandler.init_response_request_id,
                         response.is_handshake(),
@@ -91,5 +94,6 @@ async def run_server() -> None:
         logging.info(f"got a connection, {conn}")
         loop.create_task(handle_connection(conn, loop))
 
-logging.basicConfig(encoding='utf-8', level=logging.INFO)
+
+logging.basicConfig(encoding="utf-8", level=logging.INFO)
 asyncio.run(run_server())

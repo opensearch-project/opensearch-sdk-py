@@ -19,6 +19,7 @@ types-protobuf = "*"
 2to3 = "*"
 sortedcollections = "*"
 mypy = "*"
+licenseheaders = "*"
 
 [tool.isort]
 profile = "black"
@@ -27,9 +28,9 @@ skip = ["protobuf"]
 line_length = 240
 
 [tool.black]
-exclude = ["protobuf"]
 line-length = 240
 target-version = ['py37']
+extend-exclude = "protobuf"
 
 [tool.autoflake]
 exclude = ["protobuf"]

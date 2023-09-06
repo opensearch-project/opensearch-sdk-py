@@ -1,3 +1,12 @@
+#
+# Copyright OpenSearch Contributors
+# SPDX-License-Identifier: Apache-2.0
+#
+# The OpenSearch Contributors require contributions made to
+# this file be licensed under the Apache-2.0 license or a
+# compatible open source license.
+#
+
 import unittest
 
 from opensearch_sdk_py.transport.discovery_node_role import DiscoveryNodeRole
@@ -8,9 +17,7 @@ class TestDiscoveryNodeRole(unittest.TestCase):
         role_dict = DiscoveryNodeRole().role_dict
         self.assertTupleEqual(DiscoveryNodeRole.DATA_ROLE, role_dict["data"])
         self.assertTupleEqual(DiscoveryNodeRole.INGEST_ROLE, role_dict["ingest"])
-        self.assertTupleEqual(
-            DiscoveryNodeRole.CLUSTER_MANAGER_ROLE, role_dict["cluster_manager"]
-        )
+        self.assertTupleEqual(DiscoveryNodeRole.CLUSTER_MANAGER_ROLE, role_dict["cluster_manager"])
         self.assertTupleEqual(
             DiscoveryNodeRole.REMOTE_CLUSTER_CLIENT_ROLE,
             role_dict["remote_cluster_client"],

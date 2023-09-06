@@ -1,3 +1,12 @@
+#
+# Copyright OpenSearch Contributors
+# SPDX-License-Identifier: Apache-2.0
+#
+# The OpenSearch Contributors require contributions made to
+# this file be licensed under the Apache-2.0 license or a
+# compatible open source license.
+#
+
 import io
 from enum import Enum
 from typing import Any, Optional, Union
@@ -17,12 +26,7 @@ class StreamInput:
         return self.data.read(len)
 
     def read_int(self) -> int:
-        return (
-            ((self.read_byte() & 0xFF) << 24)
-            | ((self.read_byte() & 0xFF) << 16)
-            | ((self.read_byte() & 0xFF) << 8)
-            | (self.read_byte() & 0xFF)
-        )
+        return ((self.read_byte() & 0xFF) << 24) | ((self.read_byte() & 0xFF) << 16) | ((self.read_byte() & 0xFF) << 8) | (self.read_byte() & 0xFF)
 
     def read_short(self) -> int:
         return ((self.read_byte() & 0xFF) << 8) | (self.read_byte() & 0xFF)

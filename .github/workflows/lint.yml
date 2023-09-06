@@ -18,9 +18,11 @@ jobs:
         uses: abatilo/actions-poetry@v2
         with:
           poetry-version: '1.5.1'
-      - name: Run Tests
-        run: |
-          poetry install
-          poetry run isort --check .
-          poetry run flake8 .
-          poetry run mypy .
+      - run: poetry install
+      - run: poetry run isort --check .
+      - run: poetry run flake8 .
+      - run: poetry run mypy .
+      - run: |
+          poetry run licenseheaders -t LICENSE_HEADER.txt -E .py
+          git diff --name-only .
+          git diff --quiet --name-only . || exit -1 

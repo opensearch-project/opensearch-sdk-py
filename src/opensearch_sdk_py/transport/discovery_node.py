@@ -1,3 +1,12 @@
+#
+# Copyright OpenSearch Contributors
+# SPDX-License-Identifier: Apache-2.0
+#
+# The OpenSearch Contributors require contributions made to
+# this file be licensed under the Apache-2.0 license or a
+# compatible open source license.
+#
+
 import base64
 import uuid
 from typing import Optional
@@ -28,11 +37,7 @@ class DiscoveryNode:
             self.node_id = node_id
             self.node_name = node_name
             # OpenSearch uses Encoder.RFC4648_URLSAFE and strips the last 2 bytes of padding
-            self.ephemeral_id = (
-                ephemeral_id
-                if ephemeral_id
-                else base64.urlsafe_b64encode(uuid.uuid4().bytes)[:-2].decode()
-            )
+            self.ephemeral_id = ephemeral_id if ephemeral_id else base64.urlsafe_b64encode(uuid.uuid4().bytes)[:-2].decode()
             self.host_name = host_name if host_name else address.host_name
             self.host_address = host_address if host_address else str(address.address)
             self.address = address
@@ -51,9 +56,7 @@ class DiscoveryNode:
         self.roles = OrderedSet()
         roles_size = input.read_v_int()
         for i in range(roles_size):
-            self.roles.add(
-                (input.read_string(), input.read_string(), input.read_boolean())
-            )
+            self.roles.add((input.read_string(), input.read_string(), input.read_boolean()))
         self.version = input.read_version()
         return self
 

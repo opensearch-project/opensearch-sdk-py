@@ -1,3 +1,12 @@
+#
+# Copyright OpenSearch Contributors
+# SPDX-License-Identifier: Apache-2.0
+#
+# The OpenSearch Contributors require contributions made to
+# this file be licensed under the Apache-2.0 license or a
+# compatible open source license.
+#
+
 import logging
 
 from opensearch_sdk_py.actions.request_handler import RequestHandler
@@ -17,12 +26,14 @@ class TcpHandshakeRequestHandler(RequestHandler):
         tcp_handshake = TransportHandshakerHandshakeRequest().read_from(input)
         logging.info(f"\topensearch_version: {tcp_handshake.version}")
         logging.info("\tparsed TCP handshake, returning a response")
-        return self.send(OutboundMessageResponse(
-            request.thread_context_struct,
-            request.features,
-            TransportHandshakerHandshakeResponse(request.get_version()),
-            request.get_version(),
-            request.get_request_id(),
-            request.is_handshake(),
-            request.is_compress(),
-        ))
+        return self.send(
+            OutboundMessageResponse(
+                request.thread_context_struct,
+                request.features,
+                TransportHandshakerHandshakeResponse(request.get_version()),
+                request.get_version(),
+                request.get_request_id(),
+                request.is_handshake(),
+                request.is_compress(),
+            )
+        )

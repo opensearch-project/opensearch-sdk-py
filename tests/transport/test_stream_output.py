@@ -1,3 +1,12 @@
+#
+# Copyright OpenSearch Contributors
+# SPDX-License-Identifier: Apache-2.0
+#
+# The OpenSearch Contributors require contributions made to
+# this file be licensed under the Apache-2.0 license or a
+# compatible open source license.
+#
+
 import unittest
 from enum import Enum
 from typing import Any
@@ -110,7 +119,7 @@ class TestStreamOutput(unittest.TestCase):
         )
 
     def test_write_enum(self) -> None:
-        TestEnum = Enum('TestEnum', ['FOO', 'BAR', 'BAZ'], start=0)
+        TestEnum = Enum("TestEnum", ["FOO", "BAR", "BAZ"], start=0)
         out = StreamOutput()
         out.write_enum(TestEnum.BAZ)
         self.assertEqual(out.getvalue(), b"\x02")

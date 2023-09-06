@@ -1,3 +1,12 @@
+#
+# Copyright OpenSearch Contributors
+# SPDX-License-Identifier: Apache-2.0
+#
+# The OpenSearch Contributors require contributions made to
+# this file be licensed under the Apache-2.0 license or a
+# compatible open source license.
+#
+
 import unittest
 
 from opensearch_sdk_py.transport.outbound_message_request import OutboundMessageRequest
@@ -19,9 +28,7 @@ class TestTransportServiceHandshakeRequest(unittest.TestCase):
         tshr.read_from(input=StreamInput(out.getvalue()))
 
     def test_read_write_transport_handshake_request(self) -> None:
-        data = NettyTraceData.load(
-            "tests/transport/data/transport_service_handshake_request.txt"
-        ).data
+        data = NettyTraceData.load("tests/transport/data/transport_service_handshake_request.txt").data
 
         input = StreamInput(data)
         request = OutboundMessageRequest()

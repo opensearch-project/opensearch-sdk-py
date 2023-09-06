@@ -1,3 +1,12 @@
+#
+# Copyright OpenSearch Contributors
+# SPDX-License-Identifier: Apache-2.0
+#
+# The OpenSearch Contributors require contributions made to
+# this file be licensed under the Apache-2.0 license or a
+# compatible open source license.
+#
+
 import unittest
 
 from opensearch_sdk_py.transport.discovery_node import DiscoveryNode
@@ -28,9 +37,7 @@ class TestTransportServiceHandshakeResponse(unittest.TestCase):
         self.assertEqual(tshr.version.id, 136317827)
 
     def test_read_write_transport_handshake_response(self) -> None:
-        data = NettyTraceData.load(
-            "tests/transport/data/transport_service_handshake_response.txt"
-        ).data
+        data = NettyTraceData.load("tests/transport/data/transport_service_handshake_response.txt").data
 
         input = StreamInput(data)
         request = OutboundMessage()

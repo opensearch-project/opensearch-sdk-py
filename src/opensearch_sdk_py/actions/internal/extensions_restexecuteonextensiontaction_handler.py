@@ -1,3 +1,12 @@
+#
+# Copyright OpenSearch Contributors
+# SPDX-License-Identifier: Apache-2.0
+#
+# The OpenSearch Contributors require contributions made to
+# this file be licensed under the Apache-2.0 license or a
+# compatible open source license.
+#
+
 import logging
 
 from opensearch_sdk_py.actions.request_handler import RequestHandler
@@ -22,16 +31,14 @@ class ExtensionRestRequestHandler(RequestHandler):
         response_bytes = bytes("Hello from Python!", "utf-8")
         response_bytes += b"\x20\xf0\x9f\x91\x8b"
 
-        return self.send(OutboundMessageResponse(
-            request.thread_context_struct,
-            request.features,
-            RestExecuteOnExtensionResponse(
-                RestStatus.OK,
-                "text/html; charset=utf-8",
-                response_bytes
-            ),
-            request.get_version(),
-            request.get_request_id(),
-            request.is_handshake(),
-            request.is_compress(),
-        ))
+        return self.send(
+            OutboundMessageResponse(
+                request.thread_context_struct,
+                request.features,
+                RestExecuteOnExtensionResponse(RestStatus.OK, "text/html; charset=utf-8", response_bytes),
+                request.get_version(),
+                request.get_request_id(),
+                request.is_handshake(),
+                request.is_compress(),
+            )
+        )

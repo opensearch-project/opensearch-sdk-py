@@ -1,3 +1,12 @@
+#
+# Copyright OpenSearch Contributors
+# SPDX-License-Identifier: Apache-2.0
+#
+# The OpenSearch Contributors require contributions made to
+# this file be licensed under the Apache-2.0 license or a
+# compatible open source license.
+#
+
 import unittest
 
 from opensearch_sdk_py.transport.initialize_extension_response import InitializeExtensionResponse
@@ -13,9 +22,7 @@ class TestInitializeExtensionResponse(unittest.TestCase):
 
         ier = InitializeExtensionResponse("test", ["Extension", "ActionExtension"])
         self.assertEqual(ier.name, "test")
-        self.assertListEqual(
-            ier.implemented_interfaces, ["Extension", "ActionExtension"]
-        )
+        self.assertListEqual(ier.implemented_interfaces, ["Extension", "ActionExtension"])
 
         out = StreamOutput()
         ier.write_to(out)
@@ -23,6 +30,4 @@ class TestInitializeExtensionResponse(unittest.TestCase):
         input = StreamInput(out.getvalue())
         ier = InitializeExtensionResponse().read_from(input)
         self.assertEqual(ier.name, "test")
-        self.assertListEqual(
-            ier.implemented_interfaces, ["Extension", "ActionExtension"]
-        )
+        self.assertListEqual(ier.implemented_interfaces, ["Extension", "ActionExtension"])
