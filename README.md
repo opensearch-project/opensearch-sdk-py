@@ -4,7 +4,7 @@
 
 # OpenSearch Python SDK
 
-[![tests](https://github.com/dblock/opensearch-sdk-py/actions/workflows/test.yml/badge.svg)](https://github.com/dblock/opensearch-sdk-py/actions/workflows/test.yml)
+[![tests](https://github.com/opensearch-project/opensearch-sdk-py/actions/workflows/test.yml/badge.svg)](https://github.com/opensearch-project/opensearch-sdk-py/actions/workflows/test.yml)
 
 The experimental OpenSearch Python SDK enables you to implement Extensions that provide additional functionality to OpenSearch by registering that functionality through a set of extension points.
 
