@@ -10,6 +10,7 @@
 # https://github.com/opensearch-project/OpenSearch/blob/main/server/src/main/java/org/opensearch/transport/TcpHeader.java
 
 import itertools
+from typing import Optional
 
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
@@ -37,7 +38,7 @@ class TcpHeader:
     def __init__(
         self,
         prefix: bytes = b"ES",
-        request_id: int = None,
+        request_id: Optional[int] = None,
         status: int = 0,
         version: Version = Version.CURRENT,
         size: int = MESSAGE_SIZE,

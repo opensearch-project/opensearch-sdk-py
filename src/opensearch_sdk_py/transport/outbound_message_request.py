@@ -9,6 +9,8 @@
 
 # https://github.com/opensearch-project/OpenSearch/blob/main/server/src/main/java/org/opensearch/transport/OutboundMessage.java#L122
 
+from typing import Optional
+
 from opensearch_sdk_py.transport.outbound_message import OutboundMessage
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
@@ -26,7 +28,7 @@ class OutboundMessageRequest(OutboundMessage):
         message: TransportMessage = None,
         version: Version = None,
         action: str = "",
-        request_id: int = None,
+        request_id: Optional[int] = None,
         is_handshake: bool = False,
         is_compress: bool = False,
     ) -> None:
