@@ -22,7 +22,7 @@ class NetworkMessage:
         thread_context: ThreadContextStruct = None,
         version: Version = None,
         status: int = TransportStatus.STATUS_REQRES,
-        request_id: int = 1,
+        request_id: int = -1,
     ) -> None:
         self.thread_context_struct = thread_context if thread_context else ThreadContextStruct()
         self.tcp_header = TcpHeader(version=version, status=status, request_id=request_id)

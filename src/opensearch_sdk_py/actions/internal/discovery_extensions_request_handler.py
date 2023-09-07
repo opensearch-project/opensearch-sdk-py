@@ -18,9 +18,6 @@ from opensearch_sdk_py.transport.stream_output import StreamOutput
 
 
 class DiscoveryExtensionsRequestHandler(RequestHandler):
-    # TODO: replace this constant with auto-incremented value
-    REGISTER_REST_REQUEST_ID = 101
-
     # TODO: make this private to this class
     init_response_request_id = -1
 
@@ -45,7 +42,6 @@ class DiscoveryExtensionsRequestHandler(RequestHandler):
                 message=RegisterRestActionsRequest("hello-world", ["GET /hello hw_greeting"]),
                 version=request.version,
                 action="internal:discovery/registerrestactions",
-                request_id=DiscoveryExtensionsRequestHandler.REGISTER_REST_REQUEST_ID,
                 is_handshake=False,
                 is_compress=False,
             )

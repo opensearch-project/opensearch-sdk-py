@@ -26,7 +26,7 @@ class OutboundMessageRequest(OutboundMessage):
         message: TransportMessage = None,
         version: Version = None,
         action: str = "",
-        request_id: int = 1,
+        request_id: int = -1,
         is_handshake: bool = False,
         is_compress: bool = False,
     ) -> None:

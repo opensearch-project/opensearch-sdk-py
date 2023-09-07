@@ -23,7 +23,7 @@ class OutboundMessageResponse(OutboundMessage):
         features: list[str] = [],
         message: TransportMessage = None,
         version: Version = None,
-        request_id: int = 1,
+        request_id: int = -1,
         is_handshake: bool = False,
         is_compress: bool = False,
     ):

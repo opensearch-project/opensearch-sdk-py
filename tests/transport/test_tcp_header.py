@@ -83,3 +83,13 @@ class TestTcpHeader(unittest.TestCase):
         self.assertGreater(header1.request_id, 0)
         header_with_assigned_id = TcpHeader(request_id=42)
         self.assertEqual(header_with_assigned_id.request_id, 42)
+
+    def test_auto_increment_id(self) -> None:
+        header1 = TcpHeader()
+        self.assertGreater(header1.request_id, 0)
+        header2 = TcpHeader()
+        self.assertEqual(header1.request_id + 1, header2.request_id)
+        header_with_assigned_id = TcpHeader(request_id=42)
+        self.assertEqual(header_with_assigned_id.request_id, 42)
+        header3 = TcpHeader()
+        self.assertEqual(header2.request_id + 1, header3.request_id)
