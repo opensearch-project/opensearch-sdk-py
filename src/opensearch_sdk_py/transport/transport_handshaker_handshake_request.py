@@ -28,13 +28,10 @@ class TransportHandshakerHandshakeRequest(TransportRequest):
 
     def write_to(self, output: StreamOutput) -> "TransportHandshakerHandshakeRequest":
         super().write_to(output)
-        version_bytes = StreamOutput()
+        StreamOutput()
         if self.version:
-            # TODO: can we know the future size of version without writing it to a stream?
-            version_bytes = StreamOutput()
-            version_bytes.write_version(self.version)
-            output.write_v_int(len(version_bytes.getvalue()))
-            output.write(version_bytes.getvalue())
+            output.write_v_int(StreamOutput.version_size(self.version))
+            output.write_version(self.version)
         return self
 
     def __str__(self) -> str:

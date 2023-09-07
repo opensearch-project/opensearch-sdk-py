@@ -67,6 +67,26 @@ class TestStreamOutput(unittest.TestCase):
         out.write_version(v)
         self.assertEqual(out.getvalue(), b"\x83\x97\x80\x41")
 
+    def test_version_size(self) -> None:
+        out = StreamOutput()
+        v = Version(2100099)
+        out.write_version(v)
+        self.assertEqual(StreamOutput.version_size(v), len(out.getvalue()))
+
+    def test_write_version_zero(self) -> None:
+        out = StreamOutput()
+        v = Version()
+        v.id = 0
+        out.write_version(v)
+        self.assertEqual(out.getvalue(), b"\x00")
+
+    def test_version_zero_size(self) -> None:
+        out = StreamOutput()
+        v = Version()
+        v.id = 0
+        out.write_version(v)
+        self.assertEqual(StreamOutput.version_size(v), len(out.getvalue()))
+
     def test_write_long(self) -> None:
         out = StreamOutput()
         out.write_long(5409454583320448)

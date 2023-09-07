@@ -35,6 +35,23 @@ class StreamOutput(BytesIO):
                 break
         return self.write(result)
 
+    @classmethod
+    def v_int_size(self, i: int) -> int:
+        if i < 0x80:
+            return 1
+        result = 0
+        while True:
+            result += 1
+            i >>= 7
+            if (i & ~0x7F) == 0:
+                result += 1
+                break
+        return result
+
+    @classmethod
+    def version_size(self, version: Version) -> int:
+        return self.v_int_size(version.id)
+
     def write_version(self, version: Version) -> int:
         return self.write_v_int(version.id)
 
