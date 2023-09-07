@@ -37,14 +37,14 @@ class TcpHeader:
     def __init__(
         self,
         prefix: bytes = b"ES",
-        request_id: int = -1,
+        request_id: int = None,
         status: int = 0,
         version: Version = Version.CURRENT,
         size: int = MESSAGE_SIZE,
         variable_header_size: int = 0,
     ) -> None:
         self.prefix = prefix
-        self.request_id = request_id if request_id > 0 else next(self.id_iter)
+        self.request_id = request_id if request_id else next(self.id_iter)
         self.status = status
         self.version = version
         self.size = size

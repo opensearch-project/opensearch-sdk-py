@@ -19,7 +19,7 @@ from opensearch_sdk_py.transport.stream_output import StreamOutput
 
 class DiscoveryExtensionsRequestHandler(RequestHandler):
     # TODO: make this private to this class
-    init_response_request_id = -1
+    init_response_request_id = None
 
     def __init__(self) -> None:
         super().__init__("internal:discovery/extensions")

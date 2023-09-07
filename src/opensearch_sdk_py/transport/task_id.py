@@ -14,7 +14,7 @@ from opensearch_sdk_py.transport.stream_output import StreamOutput
 
 
 class TaskId:
-    def __init__(self, node_id: str = "", id: int = -1) -> None:
+    def __init__(self, node_id: str = "", id: int = None) -> None:
         self.node_id = node_id
         self.id = id
 
@@ -23,7 +23,7 @@ class TaskId:
         if self.node_id:
             self.id = input.read_long()
         else:
-            self.id = -1
+            self.id = None
         return self
 
     def write_to(self, output: StreamOutput) -> "TaskId":

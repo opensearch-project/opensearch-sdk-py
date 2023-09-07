@@ -27,7 +27,7 @@ class OutboundMessage(NetworkMessage):
         thread_context: ThreadContextStruct = None,
         version: Version = None,
         status: int = TransportStatus.STATUS_REQRES,
-        request_id: int = -1,
+        request_id: int = None,
         message: TransportMessage = None,
     ):
         self._message_bytes: Optional[bytes]

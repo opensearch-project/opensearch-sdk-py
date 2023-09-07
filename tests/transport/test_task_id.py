@@ -31,7 +31,7 @@ class TestTaskId(unittest.TestCase):
     def test_empty_task_id(self) -> None:
         ti = TaskId()
         self.assertEqual(ti.node_id, "")
-        self.assertEqual(ti.id, -1)
+        self.assertIsNone(ti.id)
         out = StreamOutput()
         ti.write_to(out)
         self.assertEqual(out.getvalue(), b"\x00")
