@@ -74,11 +74,10 @@ You should see some output on the extension.
 
 ```
 INFO:root:< server=<socket.socket fd=7, family=2, type=1, proto=0, laddr=('127.0.0.1', 1234)>
-INFO:root:< prefix=b'ES', version=2.10.0.99, type=['request', 'handshake'], message=49 byte(s), id=8, ctx=req={}, res={}, None
+INFO:root:< prefix=b'ES', version=2.10.0.99, type=['request', 'handshake'], message=49 byte(s), id=8, ctx=req={}, res={}, None, features=[], action=internal:tcp/handshake
 INFO:root:> prefix=b'ES', version=2.10.0.99, type=['response', 'handshake'], message=23 byte(s), id=8, ctx=req={}, res={}, version=2.10.0.99, features=[], size=29 byte(s)
-INFO:root:< prefix=b'ES', version=2.10.0.99, type=['request'], message=50 byte(s), id=9, ctx=req={}, res={}, None
-INFO:root:> prefix=b'ES', version=2.10.0.99, type=['response'], message=179 byte(s), id=9, ctx=req={}, res={}, id=hello-world, version=3.0.0.99, name=hello-world, host=127.0.0.1, addr=127.0.0.1, attr={}, roles={('ingest', 'i', False), ('remote_cluster_client', 'r', False), ('data', 'd', True), ('cluster_manager', 'm', False)}, cluster name=, version=3.0.0.99, features=[], size=185 byte(s)
-INFO:root:< prefix=b'ES', version=2.10.0.99, type=['request'], message=469 byte(s), id=10, ctx=req={'_system_index_access_allowed': 'false'}, res={}, None
-INFO:root:> prefix=b'ES', version=2.10.0.99, type=['request'], message=167 byte(s), id=101, ctx=req={'_system_index_access_allowed': 'false', 'extension_unique_id': 'hello-world'}, res={}, node=, id=-1, size=173 byte(s)
-INFO:root:> prefix=b'ES', version=2.10.0.99, type=['response'], message=125 byte(s), id=10, ctx=req={'extension_unique_id': 'hello-world', '_system_index_access_allowed': 'false'}, res={}, name=hello-world, interfaces=['Extension', 'ActionExtension'], features=[]
+INFO:root:< prefix=b'ES', version=2.10.0.99, type=['request'], message=50 byte(s), id=9, ctx=req={}, res={}, None, features=[], action=internal:transport/handshake
+INFO:root:> prefix=b'ES', version=2.10.0.99, type=['response'], message=179 byte(s), id=9, ctx=req={}, res={}, id=hello-world, version=3.0.0.99, name=hello-world, host=127.0.0.1, addr=127.0.0.1, attr={}, roles={('data', 'd', True), ('ingest', 'i', False), ('remote_cluster_client', 'r', False), ('cluster_manager', 'm', False)}, cluster name=, version=3.0.0.99, features=[], size=185 byte(s)
+INFO:root:< prefix=b'ES', version=2.10.0.99, type=['request'], message=469 byte(s), id=10, ctx=req={'_system_index_access_allowed': 'false'}, res={}, None, features=[], action=internal:discovery/extensions
+INFO:root:> prefix=b'ES', version=2.10.0.99, type=['response'], message=167 byte(s), id=6, ctx=req={'_system_index_access_allowed': 'false', 'extension_unique_id': 'hello-world'}, res={}, node=, id=None, features=[], action=internal:discovery/registerrestactions, size=173 byte(s)
 ```
