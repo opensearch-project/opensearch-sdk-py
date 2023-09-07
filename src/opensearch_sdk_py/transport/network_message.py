@@ -10,6 +10,8 @@
 # https://github.com/opensearch-project/OpenSearch/blob/main/server/src/main/java/org/opensearch/transport/NetworkMessage.java
 
 
+from typing import Optional
+
 from opensearch_sdk_py.transport.tcp_header import TcpHeader
 from opensearch_sdk_py.transport.thread_context_struct import ThreadContextStruct
 from opensearch_sdk_py.transport.transport_status import TransportStatus
@@ -22,7 +24,7 @@ class NetworkMessage:
         thread_context: ThreadContextStruct = None,
         version: Version = None,
         status: int = TransportStatus.STATUS_REQRES,
-        request_id: int = 1,
+        request_id: Optional[int] = None,
     ) -> None:
         self.thread_context_struct = thread_context if thread_context else ThreadContextStruct()
         self.tcp_header = TcpHeader(version=version, status=status, request_id=request_id)

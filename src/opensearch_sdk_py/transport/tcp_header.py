@@ -9,6 +9,9 @@
 
 # https://github.com/opensearch-project/OpenSearch/blob/main/server/src/main/java/org/opensearch/transport/TcpHeader.java
 
+import itertools
+from typing import Optional
+
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
 from opensearch_sdk_py.transport.transport_status import TransportStatus
@@ -30,17 +33,19 @@ class TcpHeader:
     HEADER_SIZE = PRE_76_HEADER_SIZE + VARIABLE_HEADER_SIZE
     MESSAGE_SIZE = HEADER_SIZE - BYTES_REQUIRED_FOR_MESSAGE_SIZE
 
+    id_iter = itertools.count()
+
     def __init__(
         self,
         prefix: bytes = b"ES",
-        request_id: int = 1,
+        request_id: Optional[int] = None,
         status: int = 0,
         version: Version = Version.CURRENT,
         size: int = MESSAGE_SIZE,
         variable_header_size: int = 0,
     ) -> None:
         self.prefix = prefix
-        self.request_id = request_id
+        self.request_id = request_id if request_id else next(self.id_iter)
         self.status = status
         self.version = version
         self.size = size

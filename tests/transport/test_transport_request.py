@@ -28,7 +28,7 @@ class TestTransportRequest(unittest.TestCase):
 
         tr = TransportRequest()
         self.assertEqual(tr.parent_task_id.node_id, "")
-        self.assertEqual(tr.parent_task_id.id, -1)
+        self.assertIsNone(tr.parent_task_id.id)
         tr.read_from(input=StreamInput(out.getvalue()))
         self.assertEqual(tr.parent_task_id.node_id, "test")
         self.assertEqual(tr.parent_task_id.id, 42)
