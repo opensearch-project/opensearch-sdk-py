@@ -88,7 +88,7 @@ Pre-commit hook will run `isort`, `flake8`, `mypy` and `pytest` before making a 
 
 ### Code Linting
 
-This project uses [isort](https://github.com/PyCQA/isort) to ensure that imports are sorted, and [flake8](https://flake8.pycqa.org/en/latest/) to enforce code style.
+This project uses a set of tools, such as [isort](https://github.com/PyCQA/isort) to ensure that imports are sorted, and [flake8](https://flake8.pycqa.org/en/latest/) to enforce code style.
 
 ```
 $ poetry run flake8
@@ -109,6 +109,14 @@ $ poetry run black .
 All done! ✨ 🍰 ✨
 23 files left unchanged.
 ```
+
+You can run a combination of these tools by installing [poetry-exec-plugin](https://github.com/keattang/poetry-exec-plugin) once.
+
+```
+poetry self add poetry-exec-plugin
+```
+
+Then use `poetry exec auto`.
 
 ### Type Checking
 
