@@ -1,0 +1,28 @@
+---
+default_stages: [commit]
+default_language_version:
+  python: python3.9
+repos:
+  - repo: local
+    hooks:
+      - id: isort
+        stages: [commit]
+        name: isort
+        entry: bash -c 'poetry run isort --check .'
+        language: system
+        types: [python]
+      - id: flake8
+        stages: [commit]
+        name: flake8
+        entry: bash -c 'poetry run flake8 .'
+        language: system
+      - id: mypy
+        stages: [commit]
+        name: mypy
+        entry: bash -c 'poetry run mypy .'
+        language: system
+      - id: pytest
+        stages: [commit]
+        name: pytest
+        entry: bash -c 'poetry run pytest'
+        language: system

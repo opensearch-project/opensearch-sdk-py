@@ -20,6 +20,7 @@ types-protobuf = "*"
 sortedcollections = "*"
 mypy = "*"
 licenseheaders = "*"
+pre-commit = "*"
 
 [tool.isort]
 profile = "black"
@@ -50,3 +51,10 @@ disallow_untyped_defs = true
 warn_return_any = true
 exclude = ['src/opensearch_sdk_py/protobuf']
 ignore_missing_imports = true
+
+[tool.poetry-exec-plugin.commands]
+auto = """
+ isort . ;
+ black . ;
+ autoflake -r --in-place --remove-unused-variables --remove-all-unused-imports . ;
+"""
