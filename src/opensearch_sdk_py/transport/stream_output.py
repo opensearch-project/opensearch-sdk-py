@@ -50,6 +50,8 @@ class StreamOutput(BytesIO):
 
     @classmethod
     def version_size(self, version: Version) -> int:
+        if version.id & Version.MASK:
+            return 4
         return self.v_int_size(version.id)
 
     def write_version(self, version: Version) -> int:
