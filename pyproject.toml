@@ -20,6 +20,7 @@ types-protobuf = "*"
 sortedcollections = "*"
 mypy = "*"
 licenseheaders = "*"
+pre-commit = "*"
 
 [tool.isort]
 profile = "black"

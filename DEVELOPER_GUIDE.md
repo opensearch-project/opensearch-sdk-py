@@ -1,15 +1,16 @@
 - [Forking and Cloning](#forking-and-cloning)
-- [Building](#building)
-  - [Install Prerequisites](#install-prerequisites)
-    - [Pyenv](#pyenv)
-    - [Python 3.9](#python-39)
-    - [Poetry](#poetry)
+- [Building and Testing](#building-and-testing)
+  - [Install Pyenv](#install-pyenv)
+  - [Install Python 3.9](#install-python-39)
+  - [Install Poetry](#install-poetry)
   - [Install Dependencies](#install-dependencies)
   - [Run Tests](#run-tests)
-  - [Cleanup Code](#cleanup-code)
+  - [Install Pre Commit](#install-pre-commit)
+- [Developing](#developing)
+  - [Code Linting](#code-linting)
   - [Type Checking](#type-checking)
-- [License Headers](#license-headers)
-- [Visual Studio Code](#visual-studio-code)
+  - [License Headers](#license-headers)
+  - [Visual Studio Code](#visual-studio-code)
 - [Transport Protocol](#transport-protocol)
   - [Overview](#overview)
   - [REST Handlers](#rest-handlers)
@@ -20,13 +21,9 @@
 
 Fork this repository on GitHub, and clone locally with `git clone`.
 
-## Building
+## Building and Testing
 
-This project contains a collection of tools to build, test and release `opensearch_sdk_py`.
-
-### Install Prerequisites
-
-#### Pyenv
+### Install Pyenv
 
 Use pyenv to manage multiple versions of Python. This can be installed with [pyenv-installer](https://github.com/pyenv/pyenv-installer) on Linux and MacOS, and [pyenv-win](https://github.com/pyenv-win/pyenv-win#installation) on Windows.
 
@@ -34,7 +31,7 @@ Use pyenv to manage multiple versions of Python. This can be installed with [pye
 curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash
 ```
 
-#### Python 3.9
+### Install Python 3.9
 
 Python projects in this repository use Python 3.9. See the [Python Beginners Guide](https://wiki.python.org/moin/BeginnersGuide) if you have never worked with the language.
 
@@ -50,7 +47,7 @@ pyenv install 3.9
 pyenv global 3.9
 ```
 
-#### Poetry
+### Install Poetry
 
 This project uses [poetry](https://python-poetry.org/), which is typically installed with `curl -sSL https://install.python-poetry.org | python3 -`. Poetry automatically creates and manages a virtualenv for your projects, as well as adds/removes packages from your `pyproject.toml` as you install/uninstall packages. It also generates the ever-important `poetry.lock`, which is used to produce deterministic builds.
 
@@ -69,29 +66,59 @@ poetry install
 
 ### Run Tests
 
+Run tests and ensure they pass.
+
 ```
 poetry run pytest -v
 ```
 
-### Cleanup Code
+### Install Pre Commit
 
-The [lint workflow](.github/workflows/lint.ml) runs `flake8`. Make sure `poetry run flake8 .` is clean before making pull requests. Use the following to auto-clean and auto-format.
+This project uses a [pre-commit hook](https://pre-commit.com/) for linting Python code which is then checked in the [lint workflow](.github/workflows/lint.ml).
+.
 
 ```
-poetry run isort .
-poetry run black .
-poetry run autoflake -r --in-place --remove-unused-variables --remove-all-unused-imports .
+$ poetry run pre-commit install
+$ poetry run pre-commit run --all-files
+```
+
+Pre-commit hook will run `isort`, `flake8`, `mypy` and `pytest` before making a commit.
+
+## Developing
+
+### Code Linting
+
+This project uses [isort](https://github.com/PyCQA/isort) to ensure that imports are sorted, and [flake8](https://flake8.pycqa.org/en/latest/) to enforce code style.
+
+```
+$ poetry run flake8
+./src/assemble_workflow/bundle_recorder.py:30:13: W503 line break before binary operator
+```
+
+Use `isort .` to fix any sorting order.
+
+```
+$ poetry run isort .
+Fixing tests/system/test_arch.py
+```
+
+Use [black](https://black.readthedocs.io/en/stable/) to auto-format your code.
+
+```
+$ poetry run black .
+All done! ✨ 🍰 ✨
+23 files left unchanged.
 ```
 
 ### Type Checking
 
 This project uses [mypy](https://github.com/python/mypy) as an optional static type checker. Make sure that `poetry run mypy .` is clean before making pull requests.
 
-## License Headers
+### License Headers
 
 All python code has a copy of the [license header](LICENSE_HEADER.txt) on top of it. To bulk apply license headers use `poetry run licenseheaders -t LICENSE_HEADER.txt -E .py`.
 
-## Visual Studio Code
+### Visual Studio Code
 
 After opening Visual Studio Code, use `> Pythin: Select Interpreter` (also in the bottom right of VSCode when you edit a Python file) to properly resolve import paths.
 
