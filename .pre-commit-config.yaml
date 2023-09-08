@@ -1,7 +1,7 @@
 ---
 default_stages: [commit]
 default_language_version:
-  python: python3.7
+  python: python3.9
 repos:
   - repo: local
     hooks:
