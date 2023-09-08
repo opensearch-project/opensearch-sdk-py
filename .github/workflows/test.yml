@@ -25,9 +25,13 @@ jobs:
           poetry-version: '1.5.1'
       - name: Set up Protobuf
         uses: arduino/setup-protoc@v2
-      - name: Run Tests
+      - name: Run Tests with Coverage
         run: |
           poetry install
           protoc -I=$SRC_DIR --python_out=$SRC_DIR $SRC_DIR/*.proto
           2to3 --no-diff -n -w $SRC_DIR
-          poetry run pytest -v
+          poetry run coverage run --source=src -m pytest -v --cov-report=xml
+      - name: Upload Coverage Report
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./coverage.xml
