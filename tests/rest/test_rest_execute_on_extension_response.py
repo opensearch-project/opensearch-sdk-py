@@ -16,7 +16,7 @@ from opensearch_sdk_py.transport.stream_output import StreamOutput
 
 
 class TestRestExecuteOnExtensionResponse(unittest.TestCase):
-    def test_initialize_extension_request(self) -> None:
+    def test_rest_execute_on_extension_request(self) -> None:
         reoer = RestExecuteOnExtensionResponse(status=RestStatus.OK, content_type="application/json; charset=utf-8", content=bytes("{}", "ascii"), headers={"foo": ["bar", "baz"]}, consumed_params=["bar", "baz"], content_consumed=True)
         self.assertEqual(reoer.status, RestStatus.OK)
         self.assertEqual(reoer.content_type, "application/json; charset=utf-8")

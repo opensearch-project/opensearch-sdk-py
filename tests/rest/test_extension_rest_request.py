@@ -17,7 +17,7 @@ from opensearch_sdk_py.transport.stream_output import StreamOutput
 
 
 class TestExtensionRestRequest(unittest.TestCase):
-    def test_initialize_extension_request(self) -> None:
+    def test_extension_rest_request(self) -> None:
         err = ExtensionRestRequest(
             method=RestMethod.GET,
             uri="/hello?v",
