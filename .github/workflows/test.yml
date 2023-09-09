@@ -30,8 +30,9 @@ jobs:
           poetry install
           protoc -I=$SRC_DIR --python_out=$SRC_DIR $SRC_DIR/*.proto
           2to3 --no-diff -n -w $SRC_DIR
-          poetry run coverage run --source=src -m pytest -v --cov-report=xml
+          poetry run coverage run --source=src -m pytest -v
+          poetry run coverage xml
       - name: Upload Coverage Report
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           files: ./coverage.xml
