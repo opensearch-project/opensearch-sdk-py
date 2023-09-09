@@ -15,14 +15,16 @@ from opensearch_sdk_py.rest.rest_method import RestMethod
 class NamedRoute:
     def __init__(
         self,
-        method: RestMethod = None,
-        path: str = "",
-        unique_name: str = "",
+        method: RestMethod,
+        path: str,
+        unique_name: str,
     ):
         super().__init__()
         self.method = method
         self.path = path
         self.unique_name = unique_name
+        # Key for SDK handler registry.
+        self.key = f"{self.method.name} {self.path}"
 
     def __str__(self) -> str:
         return f"{self.method.name} {self.path} {self.unique_name}"

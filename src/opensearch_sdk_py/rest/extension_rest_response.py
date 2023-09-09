@@ -25,6 +25,7 @@ class ExtensionRestResponse(TransportResponse):
         status: RestStatus = None,
         content: bytes = b"",
         content_type: str = TEXT_CONTENT_TYPE,
+        headers: dict[str, list[str]] = dict(),
         consumed_params: list[str] = [],
         content_consumed: bool = False,
     ) -> None:
@@ -32,6 +33,7 @@ class ExtensionRestResponse(TransportResponse):
         self.status = status
         self.content = content
         self.content_type = content_type
+        self.headers = headers
         self.consumed_params = consumed_params
         self.content_consumed = content_consumed
 
@@ -40,6 +42,7 @@ class ExtensionRestResponse(TransportResponse):
         self.status = input.read_enum(RestStatus)
         self.content = input.read_bytes(input.read_array_size())
         self.content_type = input.read_string()
+        self.headers = input.read_string_to_string_array_dict()
         self.consumed_params = input.read_string_array()
         self.content_consumed = input.read_boolean()
         return self
@@ -50,6 +53,7 @@ class ExtensionRestResponse(TransportResponse):
         output.write_v_int(len(self.content))
         output.write(self.content)
         output.write_string(self.content_type)
+        output.write_string_to_string_array_dict(self.headers)
         output.write_string_array(self.consumed_params)
         output.write_boolean(self.content_consumed)
         return self

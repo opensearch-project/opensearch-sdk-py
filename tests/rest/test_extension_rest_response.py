@@ -20,13 +20,15 @@ class TestExtensionRestResponse(unittest.TestCase):
         err = ExtensionRestResponse()
         self.assertEqual(err.content, b"")
         self.assertEqual(err.content_type, ExtensionRestResponse.TEXT_CONTENT_TYPE)
+        self.assertDictEqual(err.headers, {})
         self.assertListEqual(err.consumed_params, [])
         self.assertFalse(err.content_consumed)
 
-        err = ExtensionRestResponse(status=RestStatus.OK, content=b"test", content_type=ExtensionRestResponse.JSON_CONTENT_TYPE, consumed_params=["foo", "bar"], content_consumed=True)
+        err = ExtensionRestResponse(status=RestStatus.OK, content=b"test", content_type=ExtensionRestResponse.JSON_CONTENT_TYPE, headers={"foo": ["bar", "baz"]}, consumed_params=["foo", "bar"], content_consumed=True)
         self.assertEqual(err.status, RestStatus.OK)
         self.assertEqual(err.content, b"test")
         self.assertEqual(err.content_type, ExtensionRestResponse.JSON_CONTENT_TYPE)
+        self.assertDictEqual(err.headers, {"foo": ["bar", "baz"]})
         self.assertListEqual(err.consumed_params, ["foo", "bar"])
         self.assertTrue(err.content_consumed)
 
@@ -38,5 +40,6 @@ class TestExtensionRestResponse(unittest.TestCase):
         self.assertEqual(err.status, RestStatus.OK)
         self.assertEqual(err.content, b"test")
         self.assertEqual(err.content_type, ExtensionRestResponse.JSON_CONTENT_TYPE)
+        self.assertDictEqual(err.headers, {"foo": ["bar", "baz"]})
         self.assertListEqual(err.consumed_params, ["foo", "bar"])
         self.assertTrue(err.content_consumed)

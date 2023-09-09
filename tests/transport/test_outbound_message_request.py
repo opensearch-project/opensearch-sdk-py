@@ -26,8 +26,8 @@ class TestOutboundMessageRequest(unittest.TestCase):
         self.assertEqual(omr.action, "")
         self.assertEqual(omr.request_id, 42)
         self.assertEqual(omr.version.id, 136317827)
-        self.assertFalse(omr.is_request)
-        self.assertTrue(omr.is_response)
+        self.assertTrue(omr.is_request)
+        self.assertFalse(omr.is_response)
         self.assertFalse(omr.is_error)
         self.assertFalse(omr.is_compress)
         self.assertFalse(omr.is_handshake)
@@ -58,7 +58,7 @@ class TestOutboundMessageRequest(unittest.TestCase):
 
         self.assertEqual(
             out.getvalue(),
-            b"ES\x00\x00\x00\x3a\x00\x00\x00\x00\x00\x00\x00\x02\t\x08\x2d\xc7\x23\x00\x00\x00\x23"  # tcp header
+            b"ES\x00\x00\x00\x3a\x00\x00\x00\x00\x00\x00\x00\x02\x08\x08\x2d\xc7\x23\x00\x00\x00\x23"  # tcp header
             + b"\x00\x00"  # context
             + b"\x02\x03foo\x03bar"  # features
             + b"\x17internal:test/handshake"  # action
