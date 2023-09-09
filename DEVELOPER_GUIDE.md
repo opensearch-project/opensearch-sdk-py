@@ -9,7 +9,8 @@
 - [Developing](#developing)
   - [Code Linting](#code-linting)
   - [Type Checking](#type-checking)
-  - [License Headers](#license-headers)
+  - [Code Coverage](#code-coverage)
+- [License Headers](#license-headers)
   - [Visual Studio Code](#visual-studio-code)
 - [Transport Protocol](#transport-protocol)
   - [Overview](#overview)
@@ -122,7 +123,18 @@ Then use `poetry exec auto`.
 
 This project uses [mypy](https://github.com/python/mypy) as an optional static type checker. Make sure that `poetry run mypy .` is clean before making pull requests.
 
-### License Headers
+### Code Coverage
+
+This project uses [codecov](https://about.codecov.io/) for code coverage. Use `poetry run codecov` to run codecov locally.
+
+```
+$ poetry run coverage run -m pytest
+47 passed in 5.89s
+$ poetry run coverage report
+TOTAL 23491 12295 48%
+```
+
+## License Headers
 
 All python code has a copy of the [license header](LICENSE_HEADER.txt) on top of it. To bulk apply license headers use `poetry run licenseheaders -t LICENSE_HEADER.txt -E .py`.
 

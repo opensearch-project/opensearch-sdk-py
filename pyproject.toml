@@ -21,6 +21,8 @@ sortedcollections = "*"
 mypy = "*"
 licenseheaders = "*"
 pre-commit = "*"
+coverage = "*"
+pytest-cov = "*"
 
 [tool.isort]
 profile = "black"
