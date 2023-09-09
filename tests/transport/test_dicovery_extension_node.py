@@ -48,6 +48,7 @@ class TestDiscoveryExtensionNode(unittest.TestCase):
         for i in range(2):
             self.assertEqual(dependencies[i].unique_id, den.dependencies[i].unique_id)
             self.assertEqual(dependencies[i].version.id, den.dependencies[i].version.id)
+        self.assertIn("id=id, version=0.0.0.0, name=, host=foo.bar, addr=1.2.3.4", str(den))
 
         output = StreamOutput()
         den.write_to(output)

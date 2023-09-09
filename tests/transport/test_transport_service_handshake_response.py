@@ -26,6 +26,8 @@ class TestTransportServiceHandshakeResponse(unittest.TestCase):
         self.assertEqual(tshr.discovery_node.node_id, "id")
         self.assertEqual(tshr.cluster_name, "hello-world")
         self.assertEqual(tshr.version.id, 136317827)
+        self.assertIn(str(tshr.discovery_node), str(tshr))
+        self.assertIn("cluster name=hello-world, version=2.10.0.99", str(tshr))
 
         out = StreamOutput()
         tshr.write_to(out)
@@ -35,6 +37,14 @@ class TestTransportServiceHandshakeResponse(unittest.TestCase):
         self.assertEqual(tshr.discovery_node.node_id, "id")
         self.assertEqual(tshr.cluster_name, "hello-world")
         self.assertEqual(tshr.version.id, 136317827)
+
+        tshr.discovery_node = None
+        out = StreamOutput()
+        tshr.write_to(out)
+
+        input = StreamInput(out.getvalue())
+        tshr = TransportServiceHandshakeResponse().read_from(input)
+        self.assertEqual(tshr.discovery_node, None)
 
     def test_read_write_transport_handshake_response(self) -> None:
         data = NettyTraceData.load("tests/transport/data/transport_service_handshake_response.txt").data

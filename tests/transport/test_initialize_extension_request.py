@@ -43,6 +43,8 @@ class TestInitializeExtensionRequest(unittest.TestCase):
         ier = request.read_from(input)
         self.assertEqual(ier.source_node.node_id, "opensearch_node")
         self.assertEqual(ier.extension.node_id, "extension_node")
+        self.assertIn("opensearch_node", str(ier))
+        self.assertIn("extension_node", str(ier))
 
     def test_read_write(self) -> None:
         data = NettyTraceData.load("tests/transport/data/initialize_extension_request.txt").data

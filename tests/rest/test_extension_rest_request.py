@@ -38,6 +38,7 @@ class TestExtensionRestRequest(unittest.TestCase):
         self.assertEqual(err.content, bytes("{}", "ascii"))
         self.assertEqual(err.principal_identifier_token, "token")
         self.assertEqual(err.http_version, HttpVersion.HTTP_1_1)
+        self.assertIn("method=RestMethod.GET, uri=/hello?v, path=/hello", str(err))
 
         output = StreamOutput()
         err.write_to(output)

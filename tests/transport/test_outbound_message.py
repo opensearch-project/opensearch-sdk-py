@@ -13,6 +13,7 @@ from opensearch_sdk_py.transport.outbound_message import OutboundMessage
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
 from opensearch_sdk_py.transport.tcp_header import TcpHeader
+from opensearch_sdk_py.transport.transport_request import TransportRequest
 from opensearch_sdk_py.transport.transport_status import TransportStatus
 from opensearch_sdk_py.transport.version import Version
 
@@ -31,11 +32,7 @@ class TestOutboundMessage(unittest.TestCase):
         self.assertFalse(om.is_handshake)
 
     def test_outbound_message_stream(self) -> None:
-        om = OutboundMessage(
-            request_id=2,
-            version=Version(3000099),
-            status=TransportStatus.STATUS_HANDSHAKE,
-        )
+        om = OutboundMessage(request_id=2, version=Version(3000099), status=TransportStatus.STATUS_HANDSHAKE, message=TransportRequest())
         out = StreamOutput()
         om.variable_bytes = b"\x01\x02\x03"
         om.write_to(out)
@@ -54,7 +51,4 @@ class TestOutboundMessage(unittest.TestCase):
             len(out.getvalue()) - TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE,
         )
         self.assertEqual(om.tcp_header.variable_header_size, 5)  # 2 for context, 3 for subclass
-        self.assertEqual(
-            om.tcp_header.variable_header_size,
-            om.tcp_header.size + TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE - TcpHeader.HEADER_SIZE,
-        )
+        self.assertEqual(om.tcp_header.size + TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE - TcpHeader.HEADER_SIZE, om.tcp_header.variable_header_size + len(bytes(TransportRequest())))
