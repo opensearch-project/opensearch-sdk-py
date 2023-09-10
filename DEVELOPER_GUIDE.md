@@ -125,13 +125,14 @@ This project uses [mypy](https://github.com/python/mypy) as an optional static t
 
 ### Code Coverage
 
-This project uses [codecov](https://about.codecov.io/) for code coverage. Use `poetry run codecov` to run codecov locally.
+This project uses [codecov](https://about.codecov.io/) for code coverage. Use `poetry run coverage` to run code coverage locally.
 
 ```
-$ poetry run coverage run -m pytest
+$ poetry run coverage run --source=src -m pytest
 47 passed in 5.89s
+
 $ poetry run coverage report
-TOTAL 23491 12295 48%
+TOTAL 1207 79 93%
 ```
 
 ## License Headers
