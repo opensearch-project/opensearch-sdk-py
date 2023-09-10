@@ -45,3 +45,5 @@ class TestTransportAddress(unittest.TestCase):
 
     def test_address_invalid(self) -> None:
         self.assertRaises(AddressValueError, TransportAddress, "1.2.3.4.5", 1234)
+        ta = TransportAddress()
+        self.assertRaises(Exception, ta.read_from, input=StreamInput(b"\x05\x01\x02\x03\x04\x05\x09host.name\x00\x00\x04\xd2"))

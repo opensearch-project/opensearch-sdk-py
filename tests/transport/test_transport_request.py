@@ -32,3 +32,4 @@ class TestTransportRequest(unittest.TestCase):
         tr.read_from(input=StreamInput(out.getvalue()))
         self.assertEqual(tr.parent_task_id.node_id, "test")
         self.assertEqual(tr.parent_task_id.id, 42)
+        self.assertEqual(str(tr), "node=test, id=42")

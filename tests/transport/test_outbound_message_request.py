@@ -69,6 +69,7 @@ class TestOutboundMessageRequest(unittest.TestCase):
             len(out.getvalue()),
             omr.tcp_header.size + TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE,
         )
+        self.assertIn("internal:test/handshake", str(omr))
 
         omr = OutboundMessageRequest()
         omr.read_from(StreamInput(out.getvalue()))

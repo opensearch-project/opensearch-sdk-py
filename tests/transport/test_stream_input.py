@@ -147,16 +147,18 @@ class TestStreamInput(unittest.TestCase):
     def test_read_string_to_string_dict(self) -> None:
         input = StreamInput(b"\x02\x03foo\x03bar\x03baz\x03qux")
         dict = input.read_string_to_string_dict()
-        self.assertEqual(len(dict), 2)
-        self.assertEqual(dict["foo"], "bar")
-        self.assertEqual(dict["baz"], "qux")
+        self.assertDictEqual(dict, {"foo": "bar", "baz": "qux"})
+        input = StreamInput(b"\x00")
+        dict = input.read_string_to_string_dict()
+        self.assertDictEqual(dict, {})
 
     def test_read_string_to_string_array_dict(self) -> None:
         input = StreamInput(b"\x02\x03foo\x02\x03bar\x03baz\x03qux\x00")
         dict = input.read_string_to_string_array_dict()
-        self.assertEqual(len(dict), 2)
-        self.assertEqual(dict["foo"], ["bar", "baz"])
-        self.assertEqual(dict["qux"], [])
+        self.assertDictEqual(dict, {"foo": ["bar", "baz"], "qux": []})
+        input = StreamInput(b"\x00")
+        dict = input.read_string_to_string_array_dict()
+        self.assertDictEqual(dict, {})
 
     def test_read_string_to_string_set_dict(self) -> None:
         input = StreamInput(b"\x02\x03foo\x03\x03bar\x03baz\x03bar\x03qux\x00")

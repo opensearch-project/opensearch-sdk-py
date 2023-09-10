@@ -23,6 +23,7 @@ class TestInitializeExtensionResponse(unittest.TestCase):
         ier = InitializeExtensionResponse("test", ["Extension", "ActionExtension"])
         self.assertEqual(ier.name, "test")
         self.assertListEqual(ier.implemented_interfaces, ["Extension", "ActionExtension"])
+        self.assertEqual(str(ier), "name=test, interfaces=['Extension', 'ActionExtension']")
 
         out = StreamOutput()
         ier.write_to(out)

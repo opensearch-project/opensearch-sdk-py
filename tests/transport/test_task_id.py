@@ -27,6 +27,7 @@ class TestTaskId(unittest.TestCase):
         ti2.read_from(input=StreamInput(out.getvalue()))
         self.assertEqual(ti.node_id, "test")
         self.assertEqual(ti.id, 42)
+        self.assertEqual(str(ti), "node=test, id=42")
 
     def test_empty_task_id(self) -> None:
         ti = TaskId()
@@ -35,3 +36,4 @@ class TestTaskId(unittest.TestCase):
         out = StreamOutput()
         ti.write_to(out)
         self.assertEqual(out.getvalue(), b"\x00")
+        self.assertEqual(str(ti), "node=, id=None")

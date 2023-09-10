@@ -18,9 +18,11 @@ class TestAcknowledgedResponse(unittest.TestCase):
     def test_initialize_extension_response(self) -> None:
         ar = AcknowledgedResponse()
         self.assertFalse(ar.status)
+        self.assertEqual(str(ar), "status=False")
 
         ar = AcknowledgedResponse(True)
         self.assertTrue(ar.status)
+        self.assertEqual(str(ar), "status=True")
 
         out = StreamOutput()
         ar.write_to(out)

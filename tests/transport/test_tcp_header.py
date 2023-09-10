@@ -37,15 +37,20 @@ class TestTcpHeader(unittest.TestCase):
         header.is_response = True
         self.assertFalse(header.is_request)
         self.assertTrue(header.is_response)
+        self.assertIn("response", str(header))
         header.is_request = True
         self.assertTrue(header.is_request)
         self.assertFalse(header.is_response)
+        self.assertIn("request", str(header))
         header.is_error = True
         self.assertTrue(header.is_error)
+        self.assertIn("error", str(header))
         header.is_compress = True
         self.assertTrue(header.is_compress)
+        self.assertIn("compressed", str(header))
         header.is_handshake = True
         self.assertTrue(header.is_handshake)
+        self.assertIn("handshake", str(header))
 
     def test_tcp_header_stream(self) -> None:
         out = StreamOutput()
