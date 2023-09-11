@@ -98,13 +98,13 @@ extension = HelloExtension()
 # TODO Move this code to SDK "runner" class
 # Map interface name to instance
 interfaces = dict()
-for interface in extension.get_implemented_interfaces():
+for interface in extension.implemented_interfaces:
     interfaces[interface[0]] = interface[1]
     logging.info(f"Registering {interface[0]} to point to {interface[1]}")
 # If it's an ActionExtension it has this extension point
 # TODO This could perhaps be better with isinstance()
 if "ActionExtension" in interfaces.keys():
-    for handler in getattr(interfaces["ActionExtension"], "get_extension_rest_handlers")():
+    for handler in getattr(interfaces["ActionExtension"], "extension_rest_handlers"):
         ExtensionRestHandlers().register(handler)
         logging.info(f"Registering {handler}")
 

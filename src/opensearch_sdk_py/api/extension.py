@@ -13,8 +13,9 @@ from abc import ABC, abstractmethod
 
 
 class Extension(ABC):
+    @property
     @abstractmethod
-    def get_implemented_interfaces(self) -> list[tuple]:
+    def implemented_interfaces(self) -> list[tuple]:
         """
         Implementer should return a list of tuples containing the implemented interface (such as
         Extension, ActionExtension, etc.) and the implementing class.
