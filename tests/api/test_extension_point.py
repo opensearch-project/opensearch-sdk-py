@@ -10,5 +10,5 @@
 import unittest
 
 
-class TestExtensionPoint(unittest.TestCase):
+class TestExtension(unittest.TestCase):
     pass

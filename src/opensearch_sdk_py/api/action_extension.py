@@ -9,20 +9,20 @@
 
 # https://github.com/opensearch-project/opensearch-sdk-java/blob/main/src/main/java/org/opensearch/sdk/api/ActionExtension.java
 
-from typing import Optional
+from abc import abstractmethod
 
-from opensearch_sdk_py.api.extension_point import ExtensionPoint
+from opensearch_sdk_py.api.extension import Extension
 from opensearch_sdk_py.rest.extension_rest_handler import ExtensionRestHandler
 from opensearch_sdk_py.rest.extension_rest_handlers import ExtensionRestHandlers
 
 
-class ActionExtensionPoint(ExtensionPoint):
+class ActionExtension(Extension):
     @property
-    def implemented_interfaces(self) -> list[str]:
-        return ["ActionExtension"]
+    @abstractmethod
+    def rest_handlers(self) -> list[ExtensionRestHandler]:
+        pass
 
-    def __init__(self, rest_handlers: Optional[list[ExtensionRestHandler]] = None) -> None:
+    def __init__(self) -> None:
         super().__init__()
-        if rest_handlers:
-            for handler in rest_handlers:
-                ExtensionRestHandlers().register(handler)
+        for handler in self.rest_handlers or []:
+            ExtensionRestHandlers().register(handler)

@@ -9,8 +9,13 @@
 
 # https://github.com/opensearch-project/opensearch-sdk-java/blob/main/src/main/java/org/opensearch/sdk/Extension.java
 
-from abc import ABC
+from opensearch_sdk_py.api.extension import Extension
 
 
-class Extension(ABC):
-    pass
+class Extension(Extension):  # type:ignore
+    @property
+    def implemented_interfaces(self) -> list[str]:
+        result = []
+        for cls in self.__class__.__bases__:
+            result.append(cls.__name__)
+        return result

@@ -8,11 +8,15 @@
 # compatible open source license.
 #
 
-from hello_extension_action_point import HelloExtensionActionPoint
 
-from opensearch_sdk_py.api.extension import Extension
+from hello_rest_handler import HelloRestHandler
+
+from opensearch_sdk_py.api.action_extension import ActionExtension
+from opensearch_sdk_py.extension import Extension
+from opensearch_sdk_py.rest.extension_rest_handler import ExtensionRestHandler
 
 
-class HelloExtension(Extension):
-    def __init__(self) -> None:
-        super().__init__([HelloExtensionActionPoint()])
+class HelloExtension(Extension, ActionExtension):
+    @property
+    def rest_handlers(self) -> list[ExtensionRestHandler]:
+        return [HelloRestHandler()]
