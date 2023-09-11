@@ -17,7 +17,6 @@ from hello_extension import HelloExtension
 
 from opensearch_sdk_py.actions.internal.discovery_extensions_request_handler import DiscoveryExtensionsRequestHandler
 from opensearch_sdk_py.actions.request_handlers import RequestHandlers
-from opensearch_sdk_py.rest.extension_rest_handlers import ExtensionRestHandlers
 from opensearch_sdk_py.transport.acknowledged_response import AcknowledgedResponse
 from opensearch_sdk_py.transport.initialize_extension_response import InitializeExtensionResponse
 from opensearch_sdk_py.transport.outbound_message_request import OutboundMessageRequest
@@ -94,19 +93,7 @@ logging.basicConfig(encoding="utf-8", level=logging.INFO)
 
 # TODO We should pass this instance to the SDK and SDK should execute the code below
 extension = HelloExtension()
-
-# TODO Move this code to SDK "runner" class
-# Map interface name to instance
-interfaces = dict()
-for interface in extension.implemented_interfaces:
-    interfaces[interface[0]] = interface[1]
-    logging.info(f"Registering {interface[0]} to point to {interface[1]}")
-# If it's an ActionExtension it has this extension point
-# TODO This could perhaps be better with isinstance()
-if "ActionExtension" in interfaces.keys():
-    for handler in getattr(interfaces["ActionExtension"], "extension_rest_handlers"):
-        ExtensionRestHandlers().register(handler)
-        logging.info(f"Registering {handler}")
+logging.info(f"Starting {extension} that implements {extension.implemented_interfaces}.")
 
 # Back to your regularly scheduled asyncio.
 # TODO: move this loop to SDK

@@ -7,6 +7,7 @@
 # compatible open source license.
 #
 
+import logging
 from typing import Dict
 
 from opensearch_sdk_py.rest.extension_rest_handler import ExtensionRestHandler
@@ -24,6 +25,7 @@ class ExtensionRestHandlers(Dict[str, ExtensionRestHandler]):
         return cls._singleton
 
     def register(self, klass: ExtensionRestHandler) -> None:
+        logging.info(f"Registering {klass}")
         for route in klass.routes:
             # for matching the handler on the extension side only method and path matter
             self[route.key] = klass
