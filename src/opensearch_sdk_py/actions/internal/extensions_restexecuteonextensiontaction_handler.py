@@ -10,9 +10,9 @@
 import logging
 
 from opensearch_sdk_py.actions.request_handler import RequestHandler
+from opensearch_sdk_py.rest.extension_rest_handlers import ExtensionRestHandlers
 from opensearch_sdk_py.rest.extension_rest_request import ExtensionRestRequest
 from opensearch_sdk_py.rest.rest_execute_on_extension_response import RestExecuteOnExtensionResponse
-from opensearch_sdk_py.rest.rest_status import RestStatus
 from opensearch_sdk_py.transport.outbound_message_request import OutboundMessageRequest
 from opensearch_sdk_py.transport.outbound_message_response import OutboundMessageResponse
 from opensearch_sdk_py.transport.stream_input import StreamInput
@@ -27,14 +27,21 @@ class ExtensionRestRequestHandler(RequestHandler):
         extension_rest_request = ExtensionRestRequest().read_from(input)
         logging.debug(f"< {extension_rest_request}")
 
-        response_bytes = bytes("Hello from Python!", "utf-8")
-        response_bytes += b"\x20\xf0\x9f\x91\x8b"
+        route = f"{extension_rest_request.method.name} {extension_rest_request.path}"
+        response = ExtensionRestHandlers().handle(route, extension_rest_request)
 
         return self.send(
             OutboundMessageResponse(
                 request.thread_context_struct,
                 request.features,
-                RestExecuteOnExtensionResponse(RestStatus.OK, "text/html; charset=utf-8", response_bytes),
+                RestExecuteOnExtensionResponse(
+                    status=response.status,
+                    content_type=response.content_type,
+                    content=response.content,
+                    headers=response.headers,
+                    consumed_params=response.consumed_params,
+                    content_consumed=response.content_consumed,
+                ),
                 request.version,
                 request.request_id,
                 request.is_handshake,

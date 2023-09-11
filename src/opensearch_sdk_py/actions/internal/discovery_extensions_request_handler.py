@@ -10,6 +10,7 @@
 import logging
 
 from opensearch_sdk_py.actions.request_handler import RequestHandler
+from opensearch_sdk_py.rest.extension_rest_handlers import ExtensionRestHandlers
 from opensearch_sdk_py.transport.initialize_extension_request import InitializeExtensionRequest
 from opensearch_sdk_py.transport.outbound_message_request import OutboundMessageRequest
 from opensearch_sdk_py.transport.register_rest_actions_request import RegisterRestActionsRequest
@@ -39,7 +40,7 @@ class DiscoveryExtensionsRequestHandler(RequestHandler):
             OutboundMessageRequest(
                 thread_context=request.thread_context_struct,
                 features=request.features,
-                message=RegisterRestActionsRequest("hello-world", ["GET /hello hw_greeting"]),
+                message=RegisterRestActionsRequest("hello-world", ExtensionRestHandlers().named_routes()),
                 version=request.version,
                 action="internal:discovery/registerrestactions",
                 is_handshake=False,
