@@ -25,7 +25,7 @@ class TestExtensionRestHandlers(unittest.TestCase):
         self.assertEqual(len(ExtensionRestHandlers()), 2)
         self.assertIsInstance(ExtensionRestHandlers()["GET /foo"], FakeRestHandler)
         self.assertIsInstance(ExtensionRestHandlers()["GET /bar"], FakeRestHandler)
-        self.assertListEqual(ExtensionRestHandlers().named_routes(), ["GET /foo get_foo", "GET /bar get_bar"])
+        self.assertListEqual(ExtensionRestHandlers().named_routes, ["GET /foo get_foo", "GET /bar get_bar"])
 
         response = handlers.handle("GET /foo", ExtensionRestRequest())
         self.assertEqual(response.status, RestStatus.NOT_IMPLEMENTED)
@@ -38,5 +38,6 @@ class FakeRestHandler(ExtensionRestHandler):
     def handle_request(self, rest_request: ExtensionRestRequest) -> ExtensionRestResponse:
         return ExtensionRestResponse(status=RestStatus.NOT_IMPLEMENTED)
 
+    @property
     def routes(self) -> list[NamedRoute]:
         return [NamedRoute(RestMethod.GET, "/foo", "get_foo"), NamedRoute(RestMethod.GET, "/bar", "get_bar")]

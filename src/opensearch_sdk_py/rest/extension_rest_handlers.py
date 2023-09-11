@@ -24,12 +24,13 @@ class ExtensionRestHandlers(Dict[str, ExtensionRestHandler]):
         return cls._singleton
 
     def register(self, klass: ExtensionRestHandler) -> None:
-        for route in getattr(klass, "routes")():
+        for route in klass.routes:
             # for matching the handler on the extension side only method and path matter
             self[route.key] = klass
             # but we have to send the full named route to OpenSearch
             self._named_routes.append(str(route))
 
+    @property
     def named_routes(self) -> list[str]:
         return self._named_routes
 

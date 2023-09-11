@@ -21,5 +21,6 @@ class ExtensionRestHandler(ABC):
     def handle_request(rest_request: ExtensionRestRequest) -> ExtensionRestResponse:
         pass
 
+    @property
     def routes(self) -> list[NamedRoute]:
         return []
