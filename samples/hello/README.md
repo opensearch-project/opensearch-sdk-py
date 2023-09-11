@@ -1,4 +1,12 @@
+- [Hello World](#hello-world)
+    - [Start OpenSearch](#start-opensearch)
+    - [Start the Extension](#start-the-extension)
+    - [Register the Extension](#register-the-extension)
+    - [Call an Extension API](#call-an-extension-api)
+
 # Hello World
+
+This sample implements an extension that exposes a REST API.
 
 ### Start OpenSearch
 
@@ -80,4 +88,18 @@ INFO:root:< prefix=b'ES', version=2.10.0.99, type=['request'], message=50 byte(s
 INFO:root:> prefix=b'ES', version=2.10.0.99, type=['response'], message=179 byte(s), id=9, ctx=req={}, res={}, id=hello-world, version=3.0.0.99, name=hello-world, host=127.0.0.1, addr=127.0.0.1, attr={}, roles={('data', 'd', True), ('ingest', 'i', False), ('remote_cluster_client', 'r', False), ('cluster_manager', 'm', False)}, cluster name=, version=3.0.0.99, features=[], size=185 byte(s)
 INFO:root:< prefix=b'ES', version=2.10.0.99, type=['request'], message=469 byte(s), id=10, ctx=req={'_system_index_access_allowed': 'false'}, res={}, None, features=[], action=internal:discovery/extensions
 INFO:root:> prefix=b'ES', version=2.10.0.99, type=['response'], message=167 byte(s), id=6, ctx=req={'_system_index_access_allowed': 'false', 'extension_unique_id': 'hello-world'}, res={}, node=, id=None, features=[], action=internal:discovery/registerrestactions, size=173 byte(s)
+```
+
+### Call an Extension API
+
+```bash
+curl -XGET "localhost:9200/_extensions/_hello-world/hello"
+Hello from Python! 👋
+```
+
+OpenSearch invokes an extension endpoint, and you should see some output there.
+
+```
+INFO:root:< prefix=b'ES', version=2.10.0.99, type=['request'], message=161 byte(s), id=15, ctx=req={'_system_index_access_allowed': 'false'}, res={}, None, features=[], action=internal:extensions/restexecuteonextensiontaction
+INFO:root:> prefix=b'ES', version=2.10.0.99, type=['response'], message=108 byte(s), id=15, ctx=req={'_system_index_access_allowed': 'false'}, res={}, <opensearch_sdk_py.rest.rest_execute_on_extension_response.RestExecuteOnExtensionResponse object at 0x1048cb450>, features=[], size=114 byte(s)
 ```
