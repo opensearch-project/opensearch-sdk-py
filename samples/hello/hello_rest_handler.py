@@ -25,5 +25,6 @@ class HelloRestHandler(ExtensionRestHandler):
         response_bytes = bytes("Hello from Python!", "utf-8") + b"\x20\xf0\x9f\x91\x8b"
         return ExtensionRestResponse(RestStatus.OK, response_bytes, ExtensionRestResponse.TEXT_CONTENT_TYPE)
 
+    @property
     def routes(self) -> list[NamedRoute]:
         return [NamedRoute(method=RestMethod.GET, path="/hello", unique_name="greeting")]

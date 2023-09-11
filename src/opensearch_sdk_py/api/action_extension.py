@@ -15,8 +15,9 @@ from opensearch_sdk_py.rest.extension_rest_handler import ExtensionRestHandler
 
 
 class ActionExtension(ABC):
+    @property
     @abstractmethod
-    def get_extension_rest_handlers(self) -> list[ExtensionRestHandler]:
+    def extension_rest_handlers(self) -> list[ExtensionRestHandler]:
         """
         Implementer should return a list of classes implementing ExtensionRestHandler
         """

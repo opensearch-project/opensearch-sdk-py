@@ -40,7 +40,7 @@ class DiscoveryExtensionsRequestHandler(RequestHandler):
             OutboundMessageRequest(
                 thread_context=request.thread_context_struct,
                 features=request.features,
-                message=RegisterRestActionsRequest("hello-world", ExtensionRestHandlers().named_routes()),
+                message=RegisterRestActionsRequest("hello-world", ExtensionRestHandlers().named_routes),
                 version=request.version,
                 action="internal:discovery/registerrestactions",
                 is_handshake=False,

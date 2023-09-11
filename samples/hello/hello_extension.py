@@ -16,7 +16,8 @@ from opensearch_sdk_py.rest.extension_rest_handler import ExtensionRestHandler
 
 
 class HelloExtension(Extension, ActionExtension):
-    def get_implemented_interfaces(self) -> list[tuple]:
+    @property
+    def implemented_interfaces(self) -> list[tuple]:
         # TODO: This is lazy and temporary.
         # Really we should be using this class to call some SDK class run(),
         # passing an instance of ourself to the SDK and letting it parse out
@@ -24,5 +25,6 @@ class HelloExtension(Extension, ActionExtension):
         # implemented functions from the interfaces.
         return [("Extension", self), ("ActionExtension", self)]
 
-    def get_extension_rest_handlers(self) -> list[ExtensionRestHandler]:
+    @property
+    def extension_rest_handlers(self) -> list[ExtensionRestHandler]:
         return [HelloRestHandler()]
