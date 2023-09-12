@@ -19,6 +19,10 @@ from opensearch_sdk_py.rest.rest_status import RestStatus
 
 
 class TestExtensionRestHandlers(unittest.TestCase):
+    def setUp(self) -> None:
+        ExtensionRestHandlers.__reset__()
+        return super().setUp()
+
     def test_registers_handler(self) -> None:
         handlers = ExtensionRestHandlers()
         handlers.register(FakeRestHandler())

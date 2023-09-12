@@ -10,6 +10,7 @@
 import unittest
 
 from opensearch_sdk_py.api.action_extension import ActionExtension
+from opensearch_sdk_py.extension import Extension
 from opensearch_sdk_py.rest.extension_rest_handler import ExtensionRestHandler
 from opensearch_sdk_py.rest.extension_rest_request import ExtensionRestRequest
 from opensearch_sdk_py.rest.extension_rest_response import ExtensionRestResponse
@@ -26,15 +27,14 @@ class TestActionExtension(unittest.TestCase):
         def routes(self) -> list[NamedRoute]:
             return [NamedRoute(method=RestMethod.GET, path="/route", unique_name="unique")]
 
-    class MyActionExtension(ActionExtension):
-        def __init__(self) -> None:
-            super().__init__([TestActionExtension.MyHelloRestHandler()])
+    class MyActionExtension(Extension, ActionExtension):
+        @property
+        def rest_handlers(self) -> list[ExtensionRestHandler]:
+            return [TestActionExtension.MyHelloRestHandler()]
 
-    # TODO: get rid of the singleton in ExtensionRestHandlers()
+    def setUp(self) -> None:
+        self._extension = TestActionExtension.MyActionExtension()
+        return super().setUp()
 
-    # def setUp(self) -> None:
-    #     self._extension = TestActionExtension.MyActionExtension()
-    #     return super().setUp()
-
-    # def test_implemented_interfaces(self):
-    #     self.assertListEqual(self._extension.implemented_interfaces, ["ActionExtension"])
+    def test_implemented_interfaces(self) -> None:
+        self.assertListEqual(self._extension.implemented_interfaces, ["Extension", "ActionExtension"])
