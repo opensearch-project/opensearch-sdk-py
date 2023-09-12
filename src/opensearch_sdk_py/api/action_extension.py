@@ -11,12 +11,11 @@
 
 from abc import abstractmethod
 
-from opensearch_sdk_py.api.extension import Extension
 from opensearch_sdk_py.rest.extension_rest_handler import ExtensionRestHandler
 from opensearch_sdk_py.rest.extension_rest_handlers import ExtensionRestHandlers
 
 
-class ActionExtension(Extension):
+class ActionExtension:
     @property
     @abstractmethod
     def rest_handlers(self) -> list[ExtensionRestHandler]:

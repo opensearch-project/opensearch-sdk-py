@@ -10,8 +10,6 @@
 import unittest
 
 from opensearch_sdk_py.api.action_extension import ActionExtension
-
-# from opensearch_sdk_py.api.extension import Extension
 from opensearch_sdk_py.extension import Extension
 from opensearch_sdk_py.rest.extension_rest_handler import ExtensionRestHandler
 

@@ -9,10 +9,8 @@
 
 # https://github.com/opensearch-project/opensearch-sdk-java/blob/main/src/main/java/org/opensearch/sdk/Extension.java
 
-from opensearch_sdk_py.api.extension import Extension
 
-
-class Extension(Extension):  # type:ignore
+class Extension:
     @property
     def implemented_interfaces(self) -> list[str]:
         result = []
