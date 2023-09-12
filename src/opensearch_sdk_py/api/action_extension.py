@@ -9,15 +9,19 @@
 
 # https://github.com/opensearch-project/opensearch-sdk-java/blob/main/src/main/java/org/opensearch/sdk/api/ActionExtension.java
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
 from opensearch_sdk_py.rest.extension_rest_handler import ExtensionRestHandler
+from opensearch_sdk_py.rest.extension_rest_handlers import ExtensionRestHandlers
 
 
-class ActionExtension(ABC):
+class ActionExtension:
     @property
     @abstractmethod
-    def extension_rest_handlers(self) -> list[ExtensionRestHandler]:
-        """
-        Implementer should return a list of classes implementing ExtensionRestHandler
-        """
+    def rest_handlers(self) -> list[ExtensionRestHandler]:
+        pass
+
+    def __init__(self) -> None:
+        super().__init__()
+        for handler in self.rest_handlers or []:
+            ExtensionRestHandlers().register(handler)

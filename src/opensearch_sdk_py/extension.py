@@ -9,14 +9,11 @@
 
 # https://github.com/opensearch-project/opensearch-sdk-java/blob/main/src/main/java/org/opensearch/sdk/Extension.java
 
-from abc import ABC, abstractmethod
 
-
-class Extension(ABC):
+class Extension:
     @property
-    @abstractmethod
-    def implemented_interfaces(self) -> list[tuple]:
-        """
-        Implementer should return a list of tuples containing the implemented interface (such as
-        Extension, ActionExtension, etc.) and the implementing class.
-        """
+    def implemented_interfaces(self) -> list[str]:
+        result = []
+        for cls in self.__class__.__bases__:
+            result.append(cls.__name__)
+        return result
