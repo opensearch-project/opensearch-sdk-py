@@ -30,13 +30,21 @@ class ThreadContextStruct:
 
     @property
     def size(self) -> int:
-        if len(self.request_headers) == 0 and len(self.response_headers) == 0:
-            return 2
-        else:
-            # TODO: math instead of writing to a stream
-            out = StreamOutput()
-            self.write_to(out)
-            return len(out.getvalue())
+        size: int = StreamOutput.v_int_size(len(self.request_headers))
+        for k, h in self.request_headers.items():
+            size += StreamOutput.v_int_size(len(k))
+            size += len(bytes(k, "utf-8"))
+            size += StreamOutput.v_int_size(len(h))
+            size += len(bytes(h, "utf-8"))
+        size += StreamOutput.v_int_size(len(self.response_headers))
+        for k, v in self.response_headers.items():
+            size += StreamOutput.v_int_size(len(k))
+            size += len(bytes(k, "utf-8"))
+            size += StreamOutput.v_int_size(len(v))
+            for h in v:
+                size += StreamOutput.v_int_size(len(h))
+                size += len(bytes(h, "utf-8"))
+        return size
 
     def __str__(self) -> str:
         return f"req={self.request_headers}, res={self.response_headers}"
