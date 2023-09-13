@@ -30,20 +30,8 @@ class ThreadContextStruct:
 
     @property
     def size(self) -> int:
-        size: int = StreamOutput.v_int_size(len(self.request_headers))
-        for k, h in self.request_headers.items():
-            size += StreamOutput.v_int_size(len(k))
-            size += len(bytes(k, "utf-8"))
-            size += StreamOutput.v_int_size(len(h))
-            size += len(bytes(h, "utf-8"))
-        size += StreamOutput.v_int_size(len(self.response_headers))
-        for k, v in self.response_headers.items():
-            size += StreamOutput.v_int_size(len(k))
-            size += len(bytes(k, "utf-8"))
-            size += StreamOutput.v_int_size(len(v))
-            for h in v:
-                size += StreamOutput.v_int_size(len(h))
-                size += len(bytes(h, "utf-8"))
+        size: int = StreamOutput.string_to_string_dict_size(self.request_headers)
+        size += StreamOutput.string_to_string_collection_dict_size(self.response_headers)
         return size
 
     def __str__(self) -> str:

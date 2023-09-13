@@ -9,6 +9,7 @@
 
 from enum import Enum
 from io import BytesIO
+from typing import Union
 
 from opensearch_sdk_py.transport.version import Version
 
@@ -390,6 +391,16 @@ class StreamOutput(BytesIO):
             self.write_string(k)
             self.write_string(d[k])
 
+    @classmethod
+    def string_to_string_dict_size(self, d: dict[str, str]) -> int:
+        result: int = StreamOutput.v_int_size(len(d))
+        for k, v in d.items():
+            result += StreamOutput.v_int_size(len(k))
+            result += len(bytes(k, "utf-8"))
+            result += StreamOutput.v_int_size(len(v))
+            result += len(bytes(v, "utf-8"))
+        return result
+
     def write_string_to_string_array_dict(self, d: dict[str, list[str]]) -> None:
         self.write_v_int(len(d))
         for k in d:
@@ -401,6 +412,18 @@ class StreamOutput(BytesIO):
         for k in d:
             self.write_string(k)
             self.write_string_set(d[k])
+
+    @classmethod
+    def string_to_string_collection_dict_size(self, d: dict[str, Union[list[str], set[str]]]) -> int:
+        result: int = StreamOutput.v_int_size(len(d))
+        for k, v in d.items():
+            result += StreamOutput.v_int_size(len(k))
+            result += len(bytes(k, "utf-8"))
+            result += StreamOutput.v_int_size(len(v))
+            for s in v:
+                result += StreamOutput.v_int_size(len(s))
+                result += len(bytes(s, "utf-8"))
+        return result
 
     # /**
     #  write map to stream with consistent order

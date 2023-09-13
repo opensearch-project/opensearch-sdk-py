@@ -123,6 +123,7 @@ class TestStreamOutput(unittest.TestCase):
         out = StreamOutput()
         out.write_string_to_string_dict(d)
         self.assertEqual(out.getvalue(), b"\x02\x03foo\x03bar\x03baz\x03qux")
+        self.assertEqual(StreamOutput.string_to_string_dict_size(d), len(out.getvalue()))
 
     def test_write_string_to_string_array_dict(self) -> None:
         d = dict()
@@ -131,6 +132,7 @@ class TestStreamOutput(unittest.TestCase):
         out = StreamOutput()
         out.write_string_to_string_array_dict(d)
         self.assertEqual(out.getvalue(), b"\x02\x03foo\x02\x03bar\x03baz\x03qux\x00")
+        self.assertEqual(StreamOutput.string_to_string_collection_dict_size(d), len(out.getvalue()))
 
     def test_write_string_to_string_set_dict(self) -> None:
         d: dict[str, Any] = dict()
@@ -145,6 +147,7 @@ class TestStreamOutput(unittest.TestCase):
                 b"\x02\x03foo\x02\x03baz\x03bar\x03qux\x00",
             ],
         )
+        self.assertEqual(StreamOutput.string_to_string_collection_dict_size(d), len(out.getvalue()))
 
     def test_write_enum(self) -> None:
         TestEnum = Enum("TestEnum", ["FOO", "BAR", "BAZ"], start=0)
