@@ -10,9 +10,16 @@
 import logging
 from typing import Dict
 
+from opensearch_sdk_py.actions.request_handler import RequestHandler
 from opensearch_sdk_py.rest.extension_rest_handler import ExtensionRestHandler
 from opensearch_sdk_py.rest.extension_rest_request import ExtensionRestRequest
 from opensearch_sdk_py.rest.extension_rest_response import ExtensionRestResponse
+from opensearch_sdk_py.rest.rest_execute_on_extension_response import RestExecuteOnExtensionResponse
+from opensearch_sdk_py.rest.rest_status import RestStatus
+from opensearch_sdk_py.transport.outbound_message_request import OutboundMessageRequest
+from opensearch_sdk_py.transport.outbound_message_response import OutboundMessageResponse
+from opensearch_sdk_py.transport.stream_input import StreamInput
+from opensearch_sdk_py.transport.stream_output import StreamOutput
 
 
 class ExtensionRestHandlers(Dict[str, ExtensionRestHandler]):
@@ -42,6 +49,35 @@ class ExtensionRestHandlers(Dict[str, ExtensionRestHandler]):
         return self._named_routes
 
     def handle(self, route: str, request: ExtensionRestRequest) -> ExtensionRestResponse:
-        handler = self[route]
-        # TODO error response if no handler found (handler is None)
-        return getattr(handler, "handle_request")(request)
+        if route in self:
+            return getattr(self[route], "handle_request")(request)
+        return ErrorHandler(status=RestStatus.NOT_FOUND, content_type=ExtensionRestResponse.JSON_CONTENT_TYPE, content=bytes(f'{{"error": "No handler found for {request.method.name} {request.path}"}}', "utf-8"))
+
+
+class ErrorHandler(RequestHandler):
+    def __init__(
+        self,
+        status: RestStatus,
+        content: bytes,
+        content_type: str,
+    ):
+        self.status = status
+        self.content = content
+        self.content_type = content_type
+
+    def handle(self, request: OutboundMessageRequest, input: StreamInput) -> StreamOutput:
+        self.send(
+            OutboundMessageResponse(
+                request.thread_context_struct,
+                request.features,
+                RestExecuteOnExtensionResponse(
+                    status=self.status,
+                    content_type=self.content_type,
+                    content=self.content,
+                ),
+                request.version,
+                request.request_id,
+                request.is_handshake,
+                request.is_compress,
+            )
+        )
