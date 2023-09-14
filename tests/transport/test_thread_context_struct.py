@@ -49,3 +49,13 @@ class TestThreadContextStruct(unittest.TestCase):
         tcs.read_from(StreamInput(b"\x00\x00"))
         self.assertEqual(len(tcs.request_headers), 0)
         self.assertEqual(len(tcs.response_headers), 0)
+
+    def test_thread_context_struct_size(self) -> None:
+        tcs = ThreadContextStruct()
+        self.assertEqual(tcs.size, 2)
+
+        tcs.request_headers["foo"] = "bar"
+        self.assertEqual(tcs.size, 10)
+
+        tcs.response_headers["baz"] = {"qux", "quux"}
+        self.assertEqual(tcs.size, 24)
