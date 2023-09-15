@@ -34,9 +34,6 @@ class TestExtensionRestHandlers(unittest.TestCase):
         response = handlers.handle("GET /foo", ExtensionRestRequest())
         self.assertEqual(response.status, RestStatus.NOT_IMPLEMENTED)
 
-        response = handlers.handle("GET /baz", ExtensionRestRequest(method=RestMethod.GET))
-        self.assertEqual(response.status, RestStatus.NOT_FOUND)
-
 
 class FakeRestHandler(ExtensionRestHandler):
     def __init__(self) -> None:

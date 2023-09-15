@@ -16,7 +16,10 @@ from typing import Any
 from hello_extension import HelloExtension
 
 from opensearch_sdk_py.actions.internal.discovery_extensions_request_handler import DiscoveryExtensionsRequestHandler
+from opensearch_sdk_py.actions.internal.request_error_handler import RequestErrorHandler
 from opensearch_sdk_py.actions.request_handlers import RequestHandlers
+from opensearch_sdk_py.rest.extension_rest_response import ExtensionRestResponse
+from opensearch_sdk_py.rest.rest_status import RestStatus
 from opensearch_sdk_py.transport.acknowledged_response import AcknowledgedResponse
 from opensearch_sdk_py.transport.initialize_extension_response import InitializeExtensionResponse
 from opensearch_sdk_py.transport.outbound_message_request import OutboundMessageRequest
@@ -38,11 +41,14 @@ async def handle_connection(conn: Any, loop: asyncio.AbstractEventLoop) -> None:
             logging.debug(f"< {header}")
 
             if header.is_request:
-                request = OutboundMessageRequest().read_from(input, header)
+                request: OutboundMessageRequest = OutboundMessageRequest().read_from(input, header)
                 logging.info(f"< {request}")
-                output = RequestHandlers().handle(request, input)
-                if output is None:
-                    logging.warn(f"< unhandled {header}")
+                if request.action in RequestHandlers:
+                    output = RequestHandlers().handle(request, input)
+                else:
+                    output = RequestErrorHandler(status=RestStatus.NOT_FOUND, content_type=ExtensionRestResponse.JSON_CONTENT_TYPE, content=bytes(f'{{"error": "No handler found for {request.method.name} {request.path}"}}', "utf-8")).handle(
+                        request, input
+                    )
             else:
                 response = OutboundMessageResponse().read_from(input, header)
                 # TODO: Error handling
