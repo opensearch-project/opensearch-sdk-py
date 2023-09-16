@@ -28,7 +28,7 @@ class RequestErrorHandler(RequestHandler):
         self.content_type = content_type
 
     def handle(self, request: OutboundMessageRequest, input: StreamInput) -> StreamOutput:
-        self.send(
+        return self.send(
             OutboundMessageResponse(
                 request.thread_context_struct,
                 request.features,
