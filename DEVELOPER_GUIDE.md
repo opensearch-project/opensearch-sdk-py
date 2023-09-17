@@ -79,8 +79,10 @@ poetry run pytest -v
 Run integration tests with Docker and an instance of OpenSearch.
 
 ```
-.ci/run-tests false latest samples/hello/tests
+poetry exec integration
 ```
+
+This will run `.ci/run-tests false latest samples/hello/tests`.
 
 ### Install Pre Commit
 
