@@ -5,6 +5,7 @@
   - [Install Poetry](#install-poetry)
   - [Install Dependencies](#install-dependencies)
   - [Run Tests](#run-tests)
+  - [Run Integration Tests](#run-integration-tests)
   - [Install Pre Commit](#install-pre-commit)
 - [Developing](#developing)
   - [Code Linting](#code-linting)
@@ -71,6 +72,14 @@ Run tests and ensure they pass.
 
 ```
 poetry run pytest -v
+```
+
+### Run Integration Tests
+
+Run integration tests with Docker and an instance of OpenSearch.
+
+```
+.ci/run-tests false latest samples/hello/tests
 ```
 
 ### Install Pre Commit
