@@ -42,6 +42,4 @@ class ExtensionRestHandlers(Dict[str, ExtensionRestHandler]):
         return self._named_routes
 
     def handle(self, route: str, request: ExtensionRestRequest) -> ExtensionRestResponse:
-        handler = self[route]
-        # TODO error response if no handler found (handler is None)
-        return getattr(handler, "handle_request")(request)
+        return getattr(self[route], "handle_request")(request)
