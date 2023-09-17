@@ -42,4 +42,4 @@ class ExtensionRestHandlers(Dict[str, ExtensionRestHandler]):
         return self._named_routes
 
     def handle(self, route: str, request: ExtensionRestRequest) -> ExtensionRestResponse:
-        return getattr(self[route], "handle_request")(request)
+        return self[route].handle_request(request)
