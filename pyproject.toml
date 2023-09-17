@@ -25,6 +25,7 @@ coverage = "*"
 pytest-cov = "*"
 mock = "^5.1.0"
 types-mock = "^5.1.0.2"
+httpx = "*"
 
 [tool.isort]
 profile = "black"
@@ -48,6 +49,7 @@ build-backend = "poetry.core.masonry.api"
 pythonpath = ["src", "tests"]
 log_cli = true
 log_cli_level = "DEBUG"
+testpaths = ["tests"]
 
 [tool.mypy]
 python_version = 3.9
@@ -61,4 +63,7 @@ auto = """
  isort . ;
  black . ;
  autoflake -r --in-place --remove-unused-variables --remove-all-unused-imports . ;
+"""
+integration = """
+  poetry run pytest samples/hello/tests
 """

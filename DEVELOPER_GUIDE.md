@@ -5,6 +5,8 @@
   - [Install Poetry](#install-poetry)
   - [Install Dependencies](#install-dependencies)
   - [Run Tests](#run-tests)
+  - [Run OpenSearch](#run-opensearch)
+  - [Run Integration Tests](#run-integration-tests)
   - [Install Pre Commit](#install-pre-commit)
 - [Developing](#developing)
   - [Code Linting](#code-linting)
@@ -72,6 +74,37 @@ Run tests and ensure they pass.
 ```
 poetry run pytest -v
 ```
+
+### Run OpenSearch
+
+Set the value of `opensearch.experimental.feature.extensions.enabled` to `true` as described in [the developer guide](https://github.com/opensearch-project/opensearch-sdk-java/blob/main/DEVELOPER_GUIDE.md#enable-the-extensions-feature-flag).
+
+For example, check out [OpenSearch](https://github.com/opensearch-project/OpenSearch) with `git clone`, then edit `gradle/run.gradle`.
+
+```
+testClusters {
+  runTask {
+    ...
+    systemProperty 'opensearch.experimental.feature.extensions.enabled', 'true'
+  }
+}
+```
+
+When you start OpenSearch with `./gradlew run` you will see the following line in the logs.
+
+```
+[2023-08-15T12:22:30,661][INFO ][o.o.e.ExtensionsManager  ] [runTask-0] ExtensionsManager initialized
+```
+
+### Run Integration Tests
+
+Run integration tests and a locally running instance of OpenSearch as described above.
+
+```
+poetry exec integration
+```
+
+This will start and install the [hello sample](samples/hello) and execute some tests.
 
 ### Install Pre Commit
 
