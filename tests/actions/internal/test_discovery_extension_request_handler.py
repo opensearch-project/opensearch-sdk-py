@@ -11,4 +11,5 @@ import unittest
 
 
 class TestDiscoveryExtensionsRequestHandler(unittest.TestCase):
+    # TODO Add tests once iniitalization sequence is properly handled
     pass
