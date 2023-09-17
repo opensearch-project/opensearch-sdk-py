@@ -28,7 +28,7 @@ DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, "ExtensionIdentityProto_pb2", _globals)
-if _descriptor._USE_C_DESCRIPTORS == False:
+if _descriptor._USE_C_DESCRIPTORS == False:  # pragma: no cover
     DESCRIPTOR._options = None
     DESCRIPTOR._serialized_options = b"B\026ExtensionIdentityProto"
     _globals["_EXTENSIONIDENTITY"]._serialized_start = 65

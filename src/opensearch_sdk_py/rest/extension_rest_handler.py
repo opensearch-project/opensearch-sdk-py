@@ -19,7 +19,7 @@ from opensearch_sdk_py.rest.named_route import NamedRoute
 class ExtensionRestHandler(ABC):
     @abstractmethod
     def handle_request(rest_request: ExtensionRestRequest) -> ExtensionRestResponse:
-        pass
+        pass  # pragma: no cover
 
     @property
     def routes(self) -> list[NamedRoute]:

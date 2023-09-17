@@ -19,7 +19,7 @@ class ActionExtension:
     @property
     @abstractmethod
     def rest_handlers(self) -> list[ExtensionRestHandler]:
-        pass
+        pass  # pragma: no cover
 
     def __init__(self) -> None:
         super().__init__()
