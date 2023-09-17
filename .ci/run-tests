@@ -33,14 +33,5 @@ set -euo pipefail
 echo -e "\033[1m>>>>> Start server container >>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m"
 DETACH=true bash .ci/run-opensearch.sh
 
-if [[ -n "$RUNSCRIPTS" ]]; then
-  for RUNSCRIPT in ${RUNSCRIPTS//,/ } ; do
-    echo -e "\033[1m>>>>> Running run-$RUNSCRIPT.sh >>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m"
-    CONTAINER_NAME=${RUNSCRIPT} \
-      DETACH=true \
-      bash .ci/run-${RUNSCRIPT}.sh
-  done
-fi
-
 echo -e "\033[1m>>>>> Repository specific tests >>>>>>>>>>>>>>>>>>>>>>>>>>>>>\033[0m"
 bash .ci/run-repository.sh

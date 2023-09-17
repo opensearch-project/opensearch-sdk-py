@@ -64,5 +64,5 @@ auto = """
  autoflake -r --in-place --remove-unused-variables --remove-all-unused-imports . ;
 """
 integration = """
- .ci/run-tests false latest samples/hello/tests
+  ./.ci/run-tests false latest samples/hello/tests
 """

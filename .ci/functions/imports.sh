@@ -12,7 +12,6 @@
 if [[ -z $opensearch_node_name ]]; then
   # only set these once
   set -euo pipefail
-  export RUNSCRIPTS=${RUNSCRIPTS-}
   export DETACH=${DETACH-false}
   export CLEANUP=${CLEANUP-false}
   export OPENSEARCH_URL_EXTENSION=${OPENSEARCH_URL_EXTENSION-http}

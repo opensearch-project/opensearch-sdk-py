@@ -5,14 +5,9 @@ on: [push, pull_request]
 jobs:
   integration:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        opensearch_version: ["2.9.0"]
-        secured: ["false"]
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Integration Tests with OpenSearch (secured=${{ matrix.secured }}, version=${{ matrix.opensearch_version }})
-        run: "./.ci/run-tests ${{ matrix.secured }} ${{ matrix.opensearch_version }} samples/hello/tests"
+      - name: Integration Tests with OpenSearch
+        run: poetry exec integration
