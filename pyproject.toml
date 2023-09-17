@@ -23,6 +23,8 @@ licenseheaders = "*"
 pre-commit = "*"
 coverage = "*"
 pytest-cov = "*"
+mock = "^5.1.0"
+types-mock = "^5.1.0.2"
 
 [tool.isort]
 profile = "black"
