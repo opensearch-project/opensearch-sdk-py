@@ -32,6 +32,7 @@ from opensearch_sdk_py.transport.tcp_header import TcpHeader
 async def handle_connection(conn: Any, loop: asyncio.AbstractEventLoop) -> None:
     try:
         conn.setblocking(False)
+        request_handlers = RequestHandlers()
 
         while raw := await loop.sock_recv(conn, 1024 * 10):
             input = StreamInput(raw)
@@ -43,8 +44,8 @@ async def handle_connection(conn: Any, loop: asyncio.AbstractEventLoop) -> None:
             if header.is_request:
                 request: OutboundMessageRequest = OutboundMessageRequest().read_from(input, header)
                 logging.info(f"< {request}")
-                if request.action in RequestHandlers:
-                    output = RequestHandlers().handle(request, input)
+                if request.action in request_handlers:
+                    output = request_handlers.handle(request, input)
                 else:
                     output = RequestErrorHandler(status=RestStatus.NOT_FOUND, content_type=ExtensionRestResponse.JSON_CONTENT_TYPE, content=bytes(f'{{"error": "No handler found for {request.method.name} {request.path}"}}', "utf-8")).handle(
                         request, input
