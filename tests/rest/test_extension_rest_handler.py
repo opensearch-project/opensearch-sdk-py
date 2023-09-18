@@ -22,8 +22,5 @@ class TestExtensionRestHandler(unittest.TestCase):
 
 
 class DefaultRestHandler(ExtensionRestHandler):
-    def __init__(self) -> None:
-        super().__init__()
-
     def handle_request(self, rest_request: ExtensionRestRequest) -> ExtensionRestResponse:
         return ExtensionRestResponse(status=RestStatus.NOT_IMPLEMENTED)
