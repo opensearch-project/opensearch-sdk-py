@@ -23,7 +23,7 @@ class RequestHandler(ABC):
 
     @abstractmethod
     def handle(self, request: OutboundMessageRequest, input: StreamInput) -> Optional[bytes]:
-        pass
+        pass  # pragma: no cover
 
     def send(self, message: OutboundMessage) -> StreamOutput:
         output = StreamOutput()

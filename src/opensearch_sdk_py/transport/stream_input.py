@@ -161,8 +161,8 @@ class StreamInput:
         if array_size > 2**31:
             raise Exception(f"array length must be <= to {2**31} but was: {array_size}")
 
-        if array_size < 0:
-            raise Exception(f"array size must be positive but was: {array_size}")
+        # if array_size < 0:
+        #    raise Exception(f"array size must be positive but was: {array_size}")
 
         # ensureCanReadBytes(arraySize);
 
