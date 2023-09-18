@@ -23,9 +23,5 @@ class TestRegisterRestActionsProto_pb2(unittest.TestCase):
         parsed_actions = RegisterRestActionsProto_pb2.RegisterRestActions()
         parsed_actions.ParseFromString(serialized_str)
         self.assertEqual(parsed_actions.identity.uniqueId, actions.identity.uniqueId)
-        self.assertCountEqual(parsed_actions.restActions, actions.restActions)
-        for i in range(len(actions.restActions)):
-            self.assertEqual(parsed_actions.restActions[i], actions.restActions[i])
-        self.assertCountEqual(parsed_actions.restActions, actions.restActions)
-        for i in range(len(actions.deprecatedRestActions)):
-            self.assertEqual(parsed_actions.deprecatedRestActions[i], actions.deprecatedRestActions[i])
+        self.assertEqual(parsed_actions.restActions, actions.restActions)
+        self.assertEqual(parsed_actions.deprecatedRestActions, actions.deprecatedRestActions)
