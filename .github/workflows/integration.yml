@@ -8,8 +8,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        opensearch_ref: [ 'main' ]
-        
+        opensearch_ref: ["main"]
+    env:
+      PYTHON_VERSION: "3.9"
     steps:
       - name: Checkout OpenSearch
         uses: actions/checkout@v3
@@ -18,12 +19,12 @@ jobs:
           ref: ${{ matrix.opensearch_ref }}
           path: opensearch
 
-      - name: Get OpenSearch branch top
+      - name: Get Branch HEAD
         id: get-key
         working-directory: opensearch
         run: echo key=`git log -1 --format='%H'` >> $GITHUB_OUTPUT
 
-      - name: Restore cached build
+      - name: Restore Cached Build
         id: cache-restore
         uses: actions/cache/restore@v3
         with:
@@ -32,15 +33,15 @@ jobs:
 
       - uses: actions/setup-java@v3
         with:
-          distribution: 'temurin' # See 'Supported distributions' for available options
-          java-version: '11'
+          distribution: "temurin"
+          java-version: "11"
 
       - name: Assemble OpenSearch
         if: steps.cache-restore.outputs.cache-hit != 'true'
         working-directory: opensearch
         run: ./gradlew :distribution:archives:linux-tar:assemble
 
-      - name: Save cached build
+      - name: Save Cached Build
         if: steps.cache-restore.outputs.cache-hit != 'true'
         uses: actions/cache/save@v3
         with:
@@ -52,13 +53,13 @@ jobs:
         run: |
           tar xf opensearch-min-*
           echo "opensearch.experimental.feature.extensions.enabled: true" >> ./opensearch-*/config/opensearch.yml
-          ./opensearch-*/bin/opensearch -E path.repo=/tmp &
+          ./opensearch-*/bin/opensearch &
           for attempt in {1..20}; do sleep 5; if curl -s localhost:9200; then echo '=====> ready'; break; fi; echo '=====> waiting...'; done
 
       - name: Set up Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Checkout Python SDK
         uses: actions/checkout@v3
@@ -68,7 +69,7 @@ jobs:
       - name: Set up Poetry
         uses: abatilo/actions-poetry@v2
         with:
-          poetry-version: '1.5.1'
+          poetry-version: "1.5.1"
 
       - name: Run Tests
         run: |

@@ -12,7 +12,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       PYTHON_VERSION: '3.9'
-      SRC_DIR: ./src/opensearch_sdk_py/protobuf
+      PROTOBUF_SRC_DIR: ./src/opensearch_sdk_py/protobuf
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python ${{ env.PYTHON_VERSION }}
@@ -28,8 +28,8 @@ jobs:
       - name: Run Tests with Coverage
         run: |
           poetry install
-          protoc -I=$SRC_DIR --python_out=$SRC_DIR $SRC_DIR/*.proto
-          2to3 --no-diff -n -w $SRC_DIR
+          protoc -I=$PROTOBUF_SRC_DIR --python_out=$PROTOBUF_SRC_DIR $PROTOBUF_SRC_DIR/*.proto
+          2to3 --no-diff -n -w $PROTOBUF_SRC_DIR
           poetry run coverage run --source=src -m pytest -v
           poetry run coverage xml
       - name: Upload Coverage Report
