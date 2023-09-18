@@ -14,9 +14,6 @@ from opensearch_sdk_py.transport.stream_output import StreamOutput
 
 
 class TransportMessage:
-    def __init__(self) -> None:
-        pass
-
     def read_from(self, input: StreamInput) -> "TransportMessage":
         return self
 

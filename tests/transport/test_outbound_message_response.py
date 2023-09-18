@@ -72,9 +72,6 @@ class TestOutboundMessageResponse(unittest.TestCase):
 
 
 class FakeTransportResponse(TransportResponse):
-    def __init__(self) -> None:
-        super().__init__()
-
     def write_to(self, output: StreamOutput) -> None:
         super().write_to(output)
         output.write_string("test")
