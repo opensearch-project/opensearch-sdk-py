@@ -11,7 +11,7 @@
 
 
 class Extension:
-    init_response_request_id: str
+    init_response_request_id: int
 
     def __init__(self, name: str) -> None:
         self.name = name
