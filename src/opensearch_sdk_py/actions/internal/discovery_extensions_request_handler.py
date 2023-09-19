@@ -10,7 +10,7 @@
 import logging
 
 from opensearch_sdk_py.actions.request_handler import RequestHandler
-from opensearch_sdk_py.rest.extension_rest_handlers import ExtensionRestHandlers
+from opensearch_sdk_py.api.action_extension import ActionExtension
 from opensearch_sdk_py.transport.initialize_extension_request import InitializeExtensionRequest
 from opensearch_sdk_py.transport.outbound_message_request import OutboundMessageRequest
 from opensearch_sdk_py.transport.register_rest_actions_request import RegisterRestActionsRequest
@@ -19,11 +19,9 @@ from opensearch_sdk_py.transport.stream_output import StreamOutput
 
 
 class DiscoveryExtensionsRequestHandler(RequestHandler):
-    # TODO: make this private to this class
-    init_response_request_id = None
-
-    def __init__(self) -> None:
-        super().__init__("internal:discovery/extensions")
+    def __init__(self, extension: ActionExtension) -> None:
+        super().__init__("internal:discovery/extensions", extension)
+        self.init_response_request_id = None
 
     def handle(self, request: OutboundMessageRequest, input: StreamInput) -> StreamOutput:
         initialize_extension_request = InitializeExtensionRequest().read_from(input)
@@ -31,7 +29,7 @@ class DiscoveryExtensionsRequestHandler(RequestHandler):
 
         # Sometime between tcp and transport handshakes and the eventual response,
         # the uniqueId gets added to the thread context.
-        request.thread_context_struct.request_headers["extension_unique_id"] = "hello-world"
+        request.thread_context_struct.request_headers["extension_unique_id"] = self.extension.name
 
         # TODO: Other initialization, ideally async
         DiscoveryExtensionsRequestHandler.init_response_request_id = request.request_id
@@ -40,7 +38,7 @@ class DiscoveryExtensionsRequestHandler(RequestHandler):
             OutboundMessageRequest(
                 thread_context=request.thread_context_struct,
                 features=request.features,
-                message=RegisterRestActionsRequest("hello-world", ExtensionRestHandlers().named_routes),
+                message=RegisterRestActionsRequest(self.extension.name, self.extension.named_routes),
                 version=request.version,
                 action="internal:discovery/registerrestactions",
                 is_handshake=False,

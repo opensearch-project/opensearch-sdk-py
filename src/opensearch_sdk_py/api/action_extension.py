@@ -13,6 +13,8 @@ from abc import abstractmethod
 
 from opensearch_sdk_py.rest.extension_rest_handler import ExtensionRestHandler
 from opensearch_sdk_py.rest.extension_rest_handlers import ExtensionRestHandlers
+from opensearch_sdk_py.rest.extension_rest_request import ExtensionRestRequest
+from opensearch_sdk_py.rest.extension_rest_response import ExtensionRestResponse
 
 
 class ActionExtension:
@@ -21,7 +23,14 @@ class ActionExtension:
     def rest_handlers(self) -> list[ExtensionRestHandler]:
         pass  # pragma: no cover
 
+    @property
+    def named_routes(self) -> list[str]:
+        return self.extension_rest_handlers.named_routes or []
+
     def __init__(self) -> None:
-        super().__init__()
+        self.extension_rest_handlers = ExtensionRestHandlers()
         for handler in self.rest_handlers or []:
-            ExtensionRestHandlers().register(handler)
+            self.extension_rest_handlers.register(handler)
+
+    def handle(self, route: str, request: ExtensionRestRequest) -> ExtensionRestResponse:
+        return self.extension_rest_handlers.handle(route, request)

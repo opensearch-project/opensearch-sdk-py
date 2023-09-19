@@ -19,26 +19,21 @@ from opensearch_sdk_py.rest.rest_status import RestStatus
 
 
 class TestExtensionRestHandlers(unittest.TestCase):
-    def setUp(self) -> None:
-        ExtensionRestHandlers.__reset__()
-        return super().setUp()
+    class FakeRestHandler(ExtensionRestHandler):
+        def handle_request(self, rest_request: ExtensionRestRequest) -> ExtensionRestResponse:
+            return ExtensionRestResponse(status=RestStatus.NOT_IMPLEMENTED)
+
+        @property
+        def routes(self) -> list[NamedRoute]:
+            return [NamedRoute(RestMethod.GET, "/foo", "get_foo"), NamedRoute(RestMethod.GET, "/bar", "get_bar")]
 
     def test_registers_handler(self) -> None:
         handlers = ExtensionRestHandlers()
-        handlers.register(FakeRestHandler())
-        self.assertEqual(len(ExtensionRestHandlers()), 2)
-        self.assertIsInstance(ExtensionRestHandlers()["GET /foo"], FakeRestHandler)
-        self.assertIsInstance(ExtensionRestHandlers()["GET /bar"], FakeRestHandler)
-        self.assertListEqual(ExtensionRestHandlers().named_routes, ["GET /foo get_foo", "GET /bar get_bar"])
+        handlers.register(TestExtensionRestHandlers.FakeRestHandler())
+        self.assertEqual(len(handlers), 2)
+        self.assertIsInstance(handlers["GET /foo"], TestExtensionRestHandlers.FakeRestHandler)
+        self.assertIsInstance(handlers["GET /bar"], TestExtensionRestHandlers.FakeRestHandler)
+        self.assertListEqual(handlers.named_routes, ["GET /foo get_foo", "GET /bar get_bar"])
 
         response = handlers.handle("GET /foo", ExtensionRestRequest())
         self.assertEqual(response.status, RestStatus.NOT_IMPLEMENTED)
-
-
-class FakeRestHandler(ExtensionRestHandler):
-    def handle_request(self, rest_request: ExtensionRestRequest) -> ExtensionRestResponse:
-        return ExtensionRestResponse(status=RestStatus.NOT_IMPLEMENTED)
-
-    @property
-    def routes(self) -> list[NamedRoute]:
-        return [NamedRoute(RestMethod.GET, "/foo", "get_foo"), NamedRoute(RestMethod.GET, "/bar", "get_bar")]

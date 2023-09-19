@@ -17,6 +17,10 @@ from opensearch_sdk_py.rest.extension_rest_handler import ExtensionRestHandler
 
 
 class HelloExtension(Extension, ActionExtension):
+    def __init__(self) -> None:
+        Extension.__init__(self, "hello-world")
+        ActionExtension.__init__(self)
+
     @property
     def rest_handlers(self) -> list[ExtensionRestHandler]:
         return [HelloRestHandler()]

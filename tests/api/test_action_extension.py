@@ -28,6 +28,10 @@ class TestActionExtension(unittest.TestCase):
             return [NamedRoute(method=RestMethod.GET, path="/route", unique_name="unique")]
 
     class MyActionExtension(Extension, ActionExtension):
+        def __init__(self) -> None:
+            Extension.__init__(self, "hello-world")
+            ActionExtension.__init__(self)
+
         @property
         def rest_handlers(self) -> list[ExtensionRestHandler]:
             return [TestActionExtension.MyHelloRestHandler()]
