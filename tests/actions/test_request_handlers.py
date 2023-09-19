@@ -33,7 +33,6 @@ class TestRequestHandlers(unittest.TestCase):
         self.request_handlers.register(ExtensionRestRequestHandler(self.extension))
         self.request_handlers.register(TcpHandshakeRequestHandler(self.extension))
         self.request_handlers.register(TransportHandshakeRequestHandler(self.extension))
-        return super().setUp()
 
     def test_registers_handler(self) -> None:
         self.assertEqual(len(self.request_handlers), 4)

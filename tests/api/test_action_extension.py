@@ -38,10 +38,9 @@ class TestActionExtension(unittest.TestCase):
 
     def setUp(self) -> None:
         self.extension = TestActionExtension.MyActionExtension()
-        return super().setUp()
 
     def test_implemented_interfaces(self) -> None:
         self.assertListEqual(self.extension.implemented_interfaces, ["Extension", "ActionExtension"])
 
     def test_named_routes(self) -> None:
-        self.assertEqual(self.extension.named_routes, ['GET /route unique'])
+        self.assertEqual(self.extension.named_routes, ["GET /route unique"])
