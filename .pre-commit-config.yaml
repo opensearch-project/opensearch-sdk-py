@@ -26,3 +26,5 @@ repos:
         name: pytest
         entry: bash -c 'poetry run pytest'
         language: system
+        pass_filenames: false
+        always_run: true
