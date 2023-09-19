@@ -71,7 +71,7 @@ class AsyncExtensionHost(AsyncHost):
                     response.features,
                     InitializeExtensionResponse(self.extension.name, self.extension.implemented_interfaces),
                     response.version,
-                    DiscoveryExtensionsRequestHandler.init_response_request_id,
+                    self.extension.init_response_request_id,
                     response.is_handshake,
                     response.is_compress,
                 )

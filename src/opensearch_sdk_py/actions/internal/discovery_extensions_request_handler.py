@@ -21,7 +21,6 @@ from opensearch_sdk_py.transport.stream_output import StreamOutput
 class DiscoveryExtensionsRequestHandler(RequestHandler):
     def __init__(self, extension: ActionExtension) -> None:
         super().__init__("internal:discovery/extensions", extension)
-        self.init_response_request_id = None
 
     def handle(self, request: OutboundMessageRequest, input: StreamInput) -> StreamOutput:
         initialize_extension_request = InitializeExtensionRequest().read_from(input)
@@ -29,10 +28,8 @@ class DiscoveryExtensionsRequestHandler(RequestHandler):
 
         # Sometime between tcp and transport handshakes and the eventual response,
         # the uniqueId gets added to the thread context.
-        request.thread_context_struct.request_headers["extension_unique_id"] = self.extension.name
-
-        # TODO: Other initialization, ideally async
-        DiscoveryExtensionsRequestHandler.init_response_request_id = request.request_id
+        # request.thread_context_struct.request_headers["extension_unique_id"] = self.extension.name
+        self.extension.init_response_request_id = request.request_id
 
         return self.send(
             OutboundMessageRequest(
