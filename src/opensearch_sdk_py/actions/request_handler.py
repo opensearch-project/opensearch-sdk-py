@@ -11,6 +11,7 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Optional
 
+from opensearch_sdk_py.extension import Extension
 from opensearch_sdk_py.transport.outbound_message import OutboundMessage
 from opensearch_sdk_py.transport.outbound_message_request import OutboundMessageRequest
 from opensearch_sdk_py.transport.stream_input import StreamInput
@@ -18,8 +19,9 @@ from opensearch_sdk_py.transport.stream_output import StreamOutput
 
 
 class RequestHandler(ABC):
-    def __init__(self, action: str):
+    def __init__(self, action: str, extension: Extension):
         self.action = action
+        self.extension = extension
 
     @abstractmethod
     def handle(self, request: OutboundMessageRequest, input: StreamInput) -> Optional[bytes]:

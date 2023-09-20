@@ -10,6 +10,7 @@
 import unittest
 
 from opensearch_sdk_py.actions.internal.request_error_handler import RequestErrorHandler
+from opensearch_sdk_py.extension import Extension
 from opensearch_sdk_py.rest.extension_rest_request import ExtensionRestRequest
 from opensearch_sdk_py.rest.extension_rest_response import ExtensionRestResponse
 from opensearch_sdk_py.rest.http_version import HttpVersion
@@ -23,8 +24,15 @@ from opensearch_sdk_py.transport.version import Version
 
 
 class TestRequestErrorHandler(unittest.TestCase):
+    class MyExtension(Extension):
+        def __init__(self) -> None:
+            super().__init__("test-extension")
+
+    def setUp(self) -> None:
+        self.extension = TestRequestErrorHandler.MyExtension()
+
     def test_request_error_handler(self) -> None:
-        reh = RequestErrorHandler(status=RestStatus.NOT_FOUND, content_type=ExtensionRestResponse.JSON_CONTENT_TYPE, content=bytes('{{"error": "test"}}', "utf-8"))
+        reh = RequestErrorHandler(self.extension, status=RestStatus.NOT_FOUND, content_type=ExtensionRestResponse.JSON_CONTENT_TYPE, content=bytes('{{"error": "test"}}', "utf-8"))
         self.assertEqual(RestStatus.NOT_FOUND, reh.status)
         self.assertEqual(ExtensionRestResponse.JSON_CONTENT_TYPE, reh.content_type)
         self.assertEqual('{{"error": "test"}}', str(reh.content, "utf-8"))

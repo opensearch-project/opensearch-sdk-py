@@ -60,6 +60,7 @@ class AsyncHost(Host):
 
     def __listen(self) -> socket.socket:
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         server.bind((self.address, self.port))
         server.setblocking(False)
         server.listen()

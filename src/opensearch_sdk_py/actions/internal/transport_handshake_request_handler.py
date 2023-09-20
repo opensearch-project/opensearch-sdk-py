@@ -10,6 +10,7 @@
 import logging
 
 from opensearch_sdk_py.actions.request_handler import RequestHandler
+from opensearch_sdk_py.extension import Extension
 from opensearch_sdk_py.transport.discovery_node import DiscoveryNode
 from opensearch_sdk_py.transport.discovery_node_role import DiscoveryNodeRole
 from opensearch_sdk_py.transport.outbound_message_request import OutboundMessageRequest
@@ -22,8 +23,8 @@ from opensearch_sdk_py.transport.transport_service_handshake_response import Tra
 
 
 class TransportHandshakeRequestHandler(RequestHandler):
-    def __init__(self) -> None:
-        super().__init__("internal:transport/handshake")
+    def __init__(self, extension: Extension) -> None:
+        super().__init__("internal:transport/handshake", extension)
 
     def handle(self, request: OutboundMessageRequest, input: StreamInput) -> StreamOutput:
         transport_handshake = TransportServiceHandshakeRequest().read_from(input)

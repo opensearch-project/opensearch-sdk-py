@@ -8,6 +8,7 @@
 #
 
 from opensearch_sdk_py.actions.request_handler import RequestHandler
+from opensearch_sdk_py.extension import Extension
 from opensearch_sdk_py.rest.rest_execute_on_extension_response import RestExecuteOnExtensionResponse
 from opensearch_sdk_py.rest.rest_status import RestStatus
 from opensearch_sdk_py.transport.outbound_message_request import OutboundMessageRequest
@@ -19,6 +20,7 @@ from opensearch_sdk_py.transport.stream_output import StreamOutput
 class RequestErrorHandler(RequestHandler):
     def __init__(
         self,
+        extension: Extension,
         status: RestStatus,
         content: bytes,
         content_type: str,
@@ -26,6 +28,7 @@ class RequestErrorHandler(RequestHandler):
         self.status = status
         self.content = content
         self.content_type = content_type
+        super().__init__("internal:error", extension)
 
     def handle(self, request: OutboundMessageRequest, input: StreamInput) -> StreamOutput:
         return self.send(

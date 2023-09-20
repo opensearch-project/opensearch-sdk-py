@@ -16,11 +16,16 @@ from opensearch_sdk_py.rest.extension_rest_handler import ExtensionRestHandler
 
 class TestExtension(unittest.TestCase):
     class MyExtension(Extension, ActionExtension):
+        def __init__(self) -> None:
+            Extension.__init__(self, "hello-world")
+            ActionExtension.__init__(self)
+
         @property
         def rest_handlers(self) -> list[ExtensionRestHandler]:
             return []
 
     def test_implemented_interfaces(self) -> None:
         extension = TestExtension.MyExtension()
+        self.assertEqual(extension.name, "hello-world")
         self.assertListEqual(extension.implemented_interfaces, ["Extension", "ActionExtension"])
         self.assertListEqual(extension.rest_handlers, [])

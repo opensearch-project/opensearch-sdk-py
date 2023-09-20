@@ -10,7 +10,7 @@
 import logging
 
 from opensearch_sdk_py.actions.request_handler import RequestHandler
-from opensearch_sdk_py.rest.extension_rest_handlers import ExtensionRestHandlers
+from opensearch_sdk_py.api.action_extension import ActionExtension
 from opensearch_sdk_py.rest.extension_rest_request import ExtensionRestRequest
 from opensearch_sdk_py.rest.rest_execute_on_extension_response import RestExecuteOnExtensionResponse
 from opensearch_sdk_py.transport.outbound_message_request import OutboundMessageRequest
@@ -20,15 +20,15 @@ from opensearch_sdk_py.transport.stream_output import StreamOutput
 
 
 class ExtensionRestRequestHandler(RequestHandler):
-    def __init__(self) -> None:
-        super().__init__("internal:extensions/restexecuteonextensiontaction")
+    def __init__(self, extension: ActionExtension) -> None:
+        super().__init__("internal:extensions/restexecuteonextensiontaction", extension)
 
     def handle(self, request: OutboundMessageRequest, input: StreamInput) -> StreamOutput:
         extension_rest_request = ExtensionRestRequest().read_from(input)
         logging.debug(f"< {extension_rest_request}")
 
         route = f"{extension_rest_request.method.name} {extension_rest_request.path}"
-        response = ExtensionRestHandlers().handle(route, extension_rest_request)
+        response = self.extension.handle(route, extension_rest_request)
 
         return self.send(
             OutboundMessageResponse(

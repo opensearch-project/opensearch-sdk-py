@@ -28,13 +28,19 @@ class TestActionExtension(unittest.TestCase):
             return [NamedRoute(method=RestMethod.GET, path="/route", unique_name="unique")]
 
     class MyActionExtension(Extension, ActionExtension):
+        def __init__(self) -> None:
+            Extension.__init__(self, "hello-world")
+            ActionExtension.__init__(self)
+
         @property
         def rest_handlers(self) -> list[ExtensionRestHandler]:
             return [TestActionExtension.MyHelloRestHandler()]
 
     def setUp(self) -> None:
-        self._extension = TestActionExtension.MyActionExtension()
-        return super().setUp()
+        self.extension = TestActionExtension.MyActionExtension()
 
     def test_implemented_interfaces(self) -> None:
-        self.assertListEqual(self._extension.implemented_interfaces, ["Extension", "ActionExtension"])
+        self.assertListEqual(self.extension.implemented_interfaces, ["Extension", "ActionExtension"])
+
+    def test_named_routes(self) -> None:
+        self.assertEqual(self.extension.named_routes, ["GET /route unique"])

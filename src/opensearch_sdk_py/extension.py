@@ -11,6 +11,11 @@
 
 
 class Extension:
+    init_response_request_id: int
+
+    def __init__(self, name: str) -> None:
+        self.name = name
+
     @property
     def implemented_interfaces(self) -> list[str]:
         result = []

@@ -29,7 +29,6 @@ class TestAsyncHost(unittest.TestCase):
 
     def setUp(self) -> None:
         self.host = TestAsyncHost.MyAsyncHost()
-        return super().setUp()
 
     def test_init(self) -> None:
         self.assertEqual(self.host.address, "localhost")
