@@ -168,6 +168,8 @@ $ poetry run coverage report
 TOTAL 1207 79 93%
 ```
 
+You can run a combination of these by installing [poetry-exec-plugin](https://github.com/keattang/poetry-exec-plugin) once and using the `poetry exec coverage` shortcut.
+
 ## License Headers
 
 All python code has a copy of the [license header](LICENSE_HEADER.txt) on top of it. To bulk apply license headers use `poetry run licenseheaders -t LICENSE_HEADER.txt -E .py`.

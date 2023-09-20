@@ -67,3 +67,7 @@ auto = """
 integration = """
   poetry run pytest samples/hello/tests
 """
+coverage = """
+  poetry run coverage run --source=src -m pytest
+  poetry run coverage report
+"""
