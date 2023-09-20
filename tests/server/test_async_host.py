@@ -32,7 +32,7 @@ class TestAsyncHost(unittest.TestCase):
 
     def test_init(self) -> None:
         self.assertEqual(self.host.address, "localhost")
-        self.assertEqual(self.host.port, 1234)
+        self.assertIsNone(self.host.port)
 
     @patch("opensearch_sdk_py.server.async_host.AsyncHost.async_run")
     def test_run_calls_async_run(self, mock_async_run: Any) -> None:

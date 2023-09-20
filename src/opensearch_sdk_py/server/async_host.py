@@ -12,7 +12,7 @@ import asyncio
 import logging
 import socket
 from abc import abstractmethod
-from typing import Any
+from typing import Any, Optional
 
 from opensearch_sdk_py.server.host import Host
 from opensearch_sdk_py.transport.stream_input import StreamInput
@@ -20,12 +20,15 @@ from opensearch_sdk_py.transport.stream_output import StreamOutput
 
 
 class AsyncHost(Host):
+    server: Optional[socket.socket] = None
+
     def run(self) -> None:
         asyncio.run(self.async_run())
 
     async def async_run(self) -> None:
         self.terminating = False
         self.server = self.__listen()
+        self.port = self.server.getsockname()[1]
         loop = asyncio.get_event_loop()
         logging.info(f"< server={self.server}")
         while not self.terminating:
@@ -36,7 +39,7 @@ class AsyncHost(Host):
                 logging.debug(f"< connection={conn}")
                 loop.create_task(self.on_connection(conn))
             except asyncio.exceptions.CancelledError:
-                pass
+                self.terminating = True
 
     async def on_connection(self, conn: Any) -> None:
         try:
@@ -61,7 +64,7 @@ class AsyncHost(Host):
     def __listen(self) -> socket.socket:
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        server.bind((self.address, self.port))
+        server.bind((self.address, self.port or 0))
         server.setblocking(False)
         server.listen()
         return server
