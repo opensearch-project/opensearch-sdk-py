@@ -70,4 +70,5 @@ integration = """
 coverage = """
   poetry run coverage run --source=src -m pytest
   poetry run coverage report
+  poetry run coverage html
 """
