@@ -9,7 +9,7 @@
 
 # https://github.com/opensearch-project/OpenSearch/blob/main/server/src/main/java/org/opensearch/transport/OutboundMessage.java
 
-from typing import Optional
+from typing import Any, Optional, Union
 
 from opensearch_sdk_py.transport.network_message import NetworkMessage
 from opensearch_sdk_py.transport.stream_input import StreamInput
@@ -96,3 +96,8 @@ class OutboundMessage(NetworkMessage):
 
     def __str__(self) -> str:
         return f"{super().__str__()}, {self.message.__str__()}"
+
+    def __bytes__(self) -> Union[Any, bytes]:
+        output = StreamOutput()
+        self.write_to(output)
+        return output.getvalue()

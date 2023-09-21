@@ -52,3 +52,26 @@ class TestOutboundMessage(unittest.TestCase):
         )
         self.assertEqual(om.tcp_header.variable_header_size, 5)  # 2 for context, 3 for subclass
         self.assertEqual(om.tcp_header.size + TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE - TcpHeader.HEADER_SIZE, om.tcp_header.variable_header_size + len(bytes(TransportRequest())))
+
+    def test_outbound_message_variable_bytes(self) -> None:
+        om = OutboundMessage()
+        self.assertEqual(om.tcp_header.size, TcpHeader.VARIABLE_HEADER_SIZE_POSITION)
+        self.assertEqual(om.tcp_header.variable_header_size, om.thread_context_struct.size)
+        om.variable_bytes = b"\x01\x02\x03"
+        self.assertEqual(om.variable_bytes, b"\x01\x02\x03")
+        self.assertEqual(om.tcp_header.size, TcpHeader.VARIABLE_HEADER_SIZE_POSITION + 3)
+        self.assertEqual(om.tcp_header.variable_header_size, om.thread_context_struct.size + 3)
+        om.variable_bytes = b"\x01\x02\x03\x04"
+        self.assertEqual(om.tcp_header.size, TcpHeader.VARIABLE_HEADER_SIZE_POSITION + 4)
+        self.assertEqual(om.variable_bytes, b"\x01\x02\x03\x04")
+        self.assertEqual(om.tcp_header.variable_header_size, om.thread_context_struct.size + 4)
+
+    def test_outbound_message_message_bytes(self) -> None:
+        om = OutboundMessage()
+        self.assertEqual(om.tcp_header.size, TcpHeader.VARIABLE_HEADER_SIZE_POSITION)
+        om.message_bytes = b"\x01\x02\x03"
+        self.assertEqual(om.tcp_header.size, TcpHeader.VARIABLE_HEADER_SIZE_POSITION + 3)
+        self.assertEqual(om.message_bytes, b"\x01\x02\x03")
+        om.message_bytes = b"\x01\x02\x03\x04"
+        self.assertEqual(om.tcp_header.size, TcpHeader.VARIABLE_HEADER_SIZE_POSITION + 4)
+        self.assertEqual(om.message_bytes, b"\x01\x02\x03\x04")

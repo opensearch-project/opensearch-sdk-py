@@ -19,7 +19,7 @@ logging.basicConfig(encoding="utf-8", level=logging.INFO)
 extension = HelloExtension()
 logging.info(f"Starting {extension} that implements {extension.implemented_interfaces}.")
 
-host = AsyncExtensionHost()
+host = AsyncExtensionHost(port=1234)
 host.serve(extension)
 
 logging.info(f"Listening on {host.address}:{host.port}.")

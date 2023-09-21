@@ -10,10 +10,13 @@
 
 
 from abc import ABC, abstractmethod
+from typing import Optional
 
 
 class Host(ABC):
-    def __init__(self, address: str = "localhost", port: int = 1234) -> None:
+    port: Optional[int] = None
+
+    def __init__(self, address: str = "localhost", port: Optional[int] = None) -> None:
         self.address = address
         self.port = port
 

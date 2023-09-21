@@ -20,4 +20,4 @@ class TestHost(unittest.TestCase):
     def test_init(self) -> None:
         host = TestHost.MyHost()
         self.assertEqual(host.address, "localhost")
-        self.assertEqual(host.port, 1234)
+        self.assertIsNone(host.port)
