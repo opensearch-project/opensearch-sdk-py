@@ -9,6 +9,7 @@
 
 import unittest
 
+from opensearch_sdk_py.transport.initialize_extension_response import InitializeExtensionResponse
 from opensearch_sdk_py.transport.outbound_message_response import OutboundMessageResponse
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
@@ -60,6 +61,7 @@ class TestOutboundMessageResponse(unittest.TestCase):
         omr.read_from(input=StreamInput(out.getvalue()))
         self.assertEqual(omr.request_id, 2)
         self.assertTrue(omr.is_handshake)
+        # self.assertTrue(omr.features, ["foo", "bar"])
         self.assertEqual(
             omr.tcp_header.size,
             len(out.getvalue()) - TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE,
@@ -69,6 +71,24 @@ class TestOutboundMessageResponse(unittest.TestCase):
             omr.tcp_header.variable_header_size,
             +omr.tcp_header.size - 5 + TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE - TcpHeader.HEADER_SIZE,  # transport message (strlen + str) included in header size
         )  # base header size
+
+    def test_outbound_message_response_with_init(self) -> None:
+        omr_out = OutboundMessageResponse(
+            features=["foo", "bar"],
+            message=InitializeExtensionResponse("hello-world", ["Foo", "Bar"]),
+            request_id=2,
+            version=Version(3000099),
+            is_handshake=True,
+        )
+        stream_out = StreamOutput()
+        omr_out.write_to(stream_out)
+
+        omr_in = OutboundMessageResponse()
+        omr_in.read_from(StreamInput(stream_out.getvalue()))
+        self.assertEqual(omr_in.request_id, omr_out.request_id)
+        # self.assertEqual(omr_in.features, omr_out.features)
+        # self.assertEqual(omr_in.version, omr_out.version)
+        self.assertEqual(omr_in.is_handshake, omr_out.is_handshake)
 
 
 class FakeTransportResponse(TransportResponse):

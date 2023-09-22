@@ -8,6 +8,7 @@
 #
 
 import asyncio
+import logging
 import unittest
 from typing import Any
 from unittest.mock import patch
@@ -20,15 +21,22 @@ from opensearch_sdk_py.transport.stream_output import StreamOutput
 class TestAsyncHost(unittest.TestCase):
     class MyAsyncHost(AsyncHost):
         def on_input(self, input: StreamInput) -> StreamOutput:
-            command = input.read_string()
-            if command == "QUIT":
-                self.terminating = True
-            response = StreamOutput()
-            response.write_string("OK")
-            return response
+            while True:
+                command = input.read_string()
+                if command == "PASS":
+                    pass
+                elif command == "EXCEPTION":
+                    self.terminating = True
+                    raise Exception(command)
+                elif command == "QUIT":
+                    self.terminating = True
+                    response = StreamOutput()
+                    response.write_string("OK")
+                    return response
 
     def setUp(self) -> None:
         self.host = TestAsyncHost.MyAsyncHost()
+        self.loop = asyncio.get_event_loop()
 
     def test_init(self) -> None:
         self.assertEqual(self.host.address, "localhost")
@@ -39,22 +47,30 @@ class TestAsyncHost(unittest.TestCase):
         self.host.run()
         self.assertTrue(mock_async_run.called)
 
-    async def __client(self) -> Any:
+    async def __client(self, commands: list[str]) -> Any:
         reader, writer = await asyncio.open_connection(self.host.address, self.host.port)
-        output = StreamOutput()
-        output.write_string("QUIT")
-        writer.write(output.getvalue())
-        response = StreamInput(await reader.read())
-        return response.read_string()
+        responses = []
+        for command in commands:
+            output = StreamOutput()
+            output.write_string(command)
+            logging.info(f"> {command}")
+            writer.write(output.getvalue())
+        reply = await reader.read()
+        if len(reply) > 0:
+            response = StreamInput(reply)
+            responses.append(response.read_string())
+        return responses
 
     async def __server(self) -> None:
         await self.host.async_run()
 
-    async def __both(self) -> Any:
-        return await asyncio.gather(*[self.__server(), self.__client()])
+    async def __both(self, commands: list[str]) -> Any:
+        return await asyncio.gather(*[self.__server(), self.__client(commands)])
 
     def test_run(self) -> None:
-        loop = asyncio.get_event_loop()
-        results = loop.run_until_complete(self.__both())
-        self.assertEqual(results[1], "OK")
-        loop.close()
+        results = self.loop.run_until_complete(self.__both(["PASS", "QUIT"]))
+        self.assertEqual(results[1], ["OK"])
+
+    def test_handle_error(self) -> None:
+        results = self.loop.run_until_complete(self.__both(["EXCEPTION"]))
+        self.assertEqual(results[1], [])

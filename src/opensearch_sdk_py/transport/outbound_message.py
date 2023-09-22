@@ -39,6 +39,7 @@ class OutboundMessage(NetworkMessage):
             self.tcp_header.size += len(self._message_bytes)
         else:
             self._message_bytes = None
+        self._write_message_bytes()
         self.tcp_header.variable_header_size = self.thread_context_struct.size
         self._variable_bytes = None
         self._write_variable_bytes()
@@ -77,12 +78,22 @@ class OutboundMessage(NetworkMessage):
             self._variable_bytes = input.read_bytes(self.tcp_header.variable_header_size - self.thread_context_struct.size)
             self._read_variable_bytes()
         # TODO: read message
+        # message_size = self.tcp_header.size - TcpHeader.VARIABLE_HEADER_SIZE_POSITION - self.tcp_header.variable_header_size + self.thread_context_struct.size
+        # if message_size > 0:
+        #     self._message_bytes = input.read_bytes(message_size)
+        #     self._read_message_bytes()
         return self
 
     def _read_variable_bytes(self) -> None:
         pass
 
     def _write_variable_bytes(self) -> None:
+        pass
+
+    # def _read_message_bytes(self) -> None:
+    #     pass
+
+    def _write_message_bytes(self) -> None:
         pass
 
     def write_to(self, output: StreamOutput) -> "OutboundMessage":

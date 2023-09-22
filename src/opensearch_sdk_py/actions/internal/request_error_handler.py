@@ -30,7 +30,7 @@ class RequestErrorHandler(RequestHandler):
         self.content_type = content_type
         super().__init__("internal:error", extension)
 
-    def handle(self, request: OutboundMessageRequest, input: StreamInput) -> StreamOutput:
+    def handle(self, request: OutboundMessageRequest, input: StreamInput = None) -> StreamOutput:
         return self.send(
             OutboundMessageResponse(
                 request.thread_context_struct,

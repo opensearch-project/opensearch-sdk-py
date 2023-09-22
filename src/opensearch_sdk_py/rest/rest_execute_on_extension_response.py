@@ -53,3 +53,6 @@ class RestExecuteOnExtensionResponse(TransportResponse):
         output.write_string_array(self.consumed_params)
         output.write_boolean(self.content_consumed)
         return self
+
+    def __str__(self) -> str:
+        return f"status={self.status}, content_type={self.content_type}, headers={self.headers}, content={len(self.content)} byte(s)"

@@ -24,7 +24,7 @@ class RequestHandler(ABC):
         self.extension = extension
 
     @abstractmethod
-    def handle(self, request: OutboundMessageRequest, input: StreamInput) -> Optional[bytes]:
+    def handle(self, request: OutboundMessageRequest, input: StreamInput = None) -> Optional[bytes]:
         pass  # pragma: no cover
 
     def send(self, message: OutboundMessage) -> StreamOutput:
