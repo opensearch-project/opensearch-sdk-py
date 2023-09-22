@@ -45,13 +45,17 @@ class AsyncHost(Host):
         try:
             loop = asyncio.get_event_loop()
             while raw := await loop.sock_recv(conn, 1024 * 10):
-                input = StreamInput(raw)
-                logging.debug(f"< #{str(raw)}, size={len(raw)} byte(s)")
-                output = self.on_input(input)
-                if output:
-                    data = output.getvalue()
-                    logging.debug(f"> #{str(data)}, size={len(data)} byte(s)")
-                    await loop.sock_sendall(conn, data)
+                try:
+                    logging.info(raw)
+                    input = StreamInput(raw)
+                    logging.debug(f"< #{str(raw)}, size={len(raw)} byte(s)")
+                    output = self.on_input(input)
+                    if output:
+                        data = output.getvalue()
+                        logging.debug(f"> #{str(data)}, size={len(data)} byte(s)")
+                        await loop.sock_sendall(conn, data)
+                except Exception as ex:
+                    logging.warning(f"! #{ex}")
                 if self.terminating:
                     logging.debug("| terminating")
                     self.future.cancel()

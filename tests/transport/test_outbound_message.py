@@ -32,26 +32,29 @@ class TestOutboundMessage(unittest.TestCase):
         self.assertFalse(om.is_handshake)
 
     def test_outbound_message_stream(self) -> None:
-        om = OutboundMessage(request_id=2, version=Version(3000099), status=TransportStatus.STATUS_HANDSHAKE, message=TransportRequest())
+        om_out = OutboundMessage(request_id=2, version=Version(3000099), status=TransportStatus.STATUS_HANDSHAKE, message=TransportRequest())
         out = StreamOutput()
-        om.variable_bytes = b"\x01\x02\x03"
-        om.write_to(out)
+        om_out.variable_bytes = b"\x01\x02\x03"
+        om_out.message_bytes = b"\x04\x05\x06\x07"
+        om_out.write_to(out)
 
         self.assertEqual(
             len(out.getvalue()),
-            om.tcp_header.size + TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE,
+            om_out.tcp_header.size + TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE,
         )
 
         om = OutboundMessage()
         om.read_from(input=StreamInput(out.getvalue()))
         self.assertEqual(om.request_id, 2)
         self.assertTrue(om.is_handshake)
+        self.assertEqual(om.variable_bytes, om_out.variable_bytes)
+        # self.assertEqual(om.message_bytes, om_out.message_bytes)
         self.assertEqual(
             om.tcp_header.size,
             len(out.getvalue()) - TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE,
         )
         self.assertEqual(om.tcp_header.variable_header_size, 5)  # 2 for context, 3 for subclass
-        self.assertEqual(om.tcp_header.size + TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE - TcpHeader.HEADER_SIZE, om.tcp_header.variable_header_size + len(bytes(TransportRequest())))
+        self.assertEqual(om.tcp_header.size + TcpHeader.BYTES_REQUIRED_FOR_MESSAGE_SIZE - TcpHeader.HEADER_SIZE, om.tcp_header.variable_header_size + len(om_out.message_bytes))
 
     def test_outbound_message_variable_bytes(self) -> None:
         om = OutboundMessage()

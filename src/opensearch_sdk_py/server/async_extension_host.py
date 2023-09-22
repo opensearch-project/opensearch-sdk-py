@@ -10,15 +10,13 @@
 
 import logging
 
+from opensearch_sdk_py.actions.internal.action_not_found_request_error_handler import ActionNotFoundRequestErrorHandler
 from opensearch_sdk_py.actions.internal.discovery_extensions_request_handler import DiscoveryExtensionsRequestHandler
 from opensearch_sdk_py.actions.internal.extension_rest_request_handler import ExtensionRestRequestHandler
-from opensearch_sdk_py.actions.internal.request_error_handler import RequestErrorHandler
 from opensearch_sdk_py.actions.internal.tcp_handshake_request_handler import TcpHandshakeRequestHandler
 from opensearch_sdk_py.actions.internal.transport_handshake_request_handler import TransportHandshakeRequestHandler
 from opensearch_sdk_py.actions.request_handlers import RequestHandlers
 from opensearch_sdk_py.extension import Extension
-from opensearch_sdk_py.rest.extension_rest_response import ExtensionRestResponse
-from opensearch_sdk_py.rest.rest_status import RestStatus
 from opensearch_sdk_py.server.async_host import AsyncHost
 from opensearch_sdk_py.transport.acknowledged_response import AcknowledgedResponse
 from opensearch_sdk_py.transport.initialize_extension_response import InitializeExtensionResponse
@@ -53,15 +51,14 @@ class AsyncExtensionHost(AsyncHost):
             if request.action in self.request_handlers:
                 output = self.request_handlers.handle(request, input)
             else:
-                output = RequestErrorHandler(status=RestStatus.NOT_FOUND, content_type=ExtensionRestResponse.JSON_CONTENT_TYPE, content=bytes(f'{{"error": "No handler found for {request.method.name} {request.path}"}}', "utf-8")).handle(
-                    request, input
-                )
+                error_handler = ActionNotFoundRequestErrorHandler(self.extension, request)
+                output = error_handler.handle(request, input)
         else:
             response = OutboundMessageResponse().read_from(input, header)
             # TODO: Error handling
             if response.is_error:
                 output = None
-                logging.warn(f"< error {header}")
+                logging.warning(f"< error {header}")
             else:
                 ack_response = AcknowledgedResponse().read_from(input)
                 logging.debug(f"< response {response}, {ack_response}")
