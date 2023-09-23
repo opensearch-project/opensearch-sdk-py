@@ -25,5 +25,7 @@ class RegisterRestActionsResponseHandler(ResponseHandler):
         ack_response = AcknowledgedResponse().read_from(input)
         logging.debug(f"< {ack_response}")
         if ack_response.status:
-            self.next_handler.send()
-        # TODO error handling
+            return self.next_handler.send()
+        else:
+            # TODO error handling
+            return None

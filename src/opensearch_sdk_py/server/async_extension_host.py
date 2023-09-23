@@ -67,7 +67,7 @@ class AsyncExtensionHost(AsyncHost):
                 logging.info(f"< response {response}")
                 if response.request_id in self.response_handlers:
                     output = self.response_handlers.handle(response, input)
-                else:
+                else:  # pragma: no cover
                     # TODO: Error handling
                     output = None
                     logging.warning(f"< response id {response.request_id} not registered")

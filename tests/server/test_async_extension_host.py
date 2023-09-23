@@ -12,6 +12,7 @@ import logging
 import unittest
 from typing import Optional
 
+from opensearch_sdk_py.actions.internal.discovery_extensions_request_handler import DiscoveryExtensionsRequestHandler
 from opensearch_sdk_py.api.action_extension import ActionExtension
 from opensearch_sdk_py.extension import Extension
 from opensearch_sdk_py.rest.extension_rest_handler import ExtensionRestHandler
@@ -20,6 +21,7 @@ from opensearch_sdk_py.rest.rest_execute_on_extension_response import RestExecut
 from opensearch_sdk_py.rest.rest_status import RestStatus
 from opensearch_sdk_py.server.async_extension_host import AsyncExtensionHost
 from opensearch_sdk_py.transport.acknowledged_response import AcknowledgedResponse
+from opensearch_sdk_py.transport.initialize_extension_response import InitializeExtensionResponse
 from opensearch_sdk_py.transport.outbound_message_request import OutboundMessageRequest
 from opensearch_sdk_py.transport.outbound_message_response import OutboundMessageResponse
 from opensearch_sdk_py.transport.register_rest_actions_request import RegisterRestActionsRequest
@@ -119,17 +121,21 @@ class TestAsyncExtensionHost(unittest.TestCase):
         self.assertEqual(extension_initialization_response_error.headers, {})
         self.assertEqual(extension_initialization_response_error.content, b'{"error": "No handler found for internal:invalid"}')
 
-    # TODO: Fix or remove this test
     def test_acknowledged_response(self) -> None:
+        input = StreamInput(NettyTraceData.load("tests/transport/data/initialize_extension_request.txt").data)
+        discovery_request = OutboundMessageRequest().read_from(input)
+        discovery_handler = DiscoveryExtensionsRequestHandler(self.host.extension, self.host.response_handlers)
+        discovery_output = discovery_handler.handle(discovery_request, input)
+        register_request_id = TcpHeader().read_from(StreamInput(discovery_output.getvalue())).request_id
+
         request1 = NettyTraceData.load("tests/transport/data/transport_service_handshake_request.txt").data
-        request2 = bytes(OutboundMessageResponse(version=Version(2100099), message=AcknowledgedResponse(True)))
+        request2 = bytes(OutboundMessageResponse(request_id=register_request_id, version=Version(2100099), message=AcknowledgedResponse(True)))
         responses = self.loop.run_until_complete(self.__both([request1, request2]))
         self.assertEqual(len(responses), 2)
-        # FIXME: reply is returning None here because ID is unhandled
-        # reply: TestAsyncExtensionHost.Response = responses[1]
-        # self.assertEqual(reply.response.thread_context_struct.request_headers, {})
-        # init_response = InitializeExtensionResponse().read_from(reply.remaining_input)
-        # self.assertEqual(init_response.name, "hello-world")
+        reply: TestAsyncExtensionHost.Response = responses[1]
+        self.assertEqual(reply.response.thread_context_struct.request_headers, {"_system_index_access_allowed": "false"})
+        init_response = InitializeExtensionResponse().read_from(reply.remaining_input)
+        self.assertEqual(init_response.name, "hello-world")
 
     def test_error_response(self) -> None:
         request1 = NettyTraceData.load("tests/transport/data/transport_service_handshake_request.txt").data
