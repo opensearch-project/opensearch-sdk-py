@@ -41,6 +41,7 @@ class TestResponseHandlers(unittest.TestCase):
         response = OutboundMessageResponse(request_id=123)
         input = StreamInput(bytes(AcknowledgedResponse(status=True)))
         output = self.response_handlers.handle(response, input)
+        self.assertEqual(len(self.response_handlers), 0)
         self.assertEqual(output, None)
         self.assertEqual(self.extension.test, "modified")
 

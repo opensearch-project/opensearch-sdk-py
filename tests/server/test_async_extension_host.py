@@ -50,7 +50,8 @@ class TestAsyncExtensionHost(unittest.TestCase):
         self.host = AsyncExtensionHost()
         self.extension = TestAsyncExtensionHost.MyActionExtension()
         self.host.serve(self.extension)
-        self.loop = asyncio.get_event_loop()
+        self.loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(self.loop)
 
     def test_init(self) -> None:
         self.assertEqual(self.host.extension, self.extension)
@@ -122,12 +123,13 @@ class TestAsyncExtensionHost(unittest.TestCase):
         self.assertEqual(extension_initialization_response_error.content, b'{"error": "No handler found for internal:invalid"}')
 
     def test_acknowledged_response(self) -> None:
+        # we need response request_id to be registered for handling
+        discovery_handler = DiscoveryExtensionsRequestHandler(self.host.extension, self.host.response_handlers)
         input = StreamInput(NettyTraceData.load("tests/transport/data/initialize_extension_request.txt").data)
         discovery_request = OutboundMessageRequest().read_from(input)
-        discovery_handler = DiscoveryExtensionsRequestHandler(self.host.extension, self.host.response_handlers)
         discovery_output = discovery_handler.handle(discovery_request, input)
         register_request_id = TcpHeader().read_from(StreamInput(discovery_output.getvalue())).request_id
-
+        # now test with the handled request id
         request1 = NettyTraceData.load("tests/transport/data/transport_service_handshake_request.txt").data
         request2 = bytes(OutboundMessageResponse(request_id=register_request_id, version=Version(2100099), message=AcknowledgedResponse(True)))
         responses = self.loop.run_until_complete(self.__both([request1, request2]))
