@@ -10,6 +10,7 @@
 import unittest
 
 from opensearch_sdk_py.actions.internal.discovery_extensions_request_handler import DiscoveryExtensionsRequestHandler
+from opensearch_sdk_py.actions.response_handlers import ResponseHandlers
 from opensearch_sdk_py.api.action_extension import ActionExtension
 from opensearch_sdk_py.extension import Extension
 from opensearch_sdk_py.rest.extension_rest_handler import ExtensionRestHandler
@@ -31,7 +32,8 @@ class TestDiscoveryExtensionsRequestHandler(unittest.TestCase):
 
     def setUp(self) -> None:
         self.extension = TestDiscoveryExtensionsRequestHandler.MyExtension()
-        self.handler = DiscoveryExtensionsRequestHandler(self.extension)
+        self.response_handlers = ResponseHandlers(self.extension)
+        self.handler = DiscoveryExtensionsRequestHandler(self.extension, self.response_handlers)
 
     def test_init(self) -> None:
         self.assertEqual(self.handler.action, "internal:discovery/extensions")
@@ -43,4 +45,4 @@ class TestDiscoveryExtensionsRequestHandler(unittest.TestCase):
         request = OutboundMessageRequest().read_from(input)
         output = self.handler.handle(request, input)
         self.assertIsInstance(output, StreamOutput)
-        self.assertEqual(self.extension.init_response_request_id, 10)
+        self.assertEqual(self.handler.response.request_id, 10)
