@@ -30,6 +30,7 @@ jobs:
           poetry install
           protoc -I=$PROTOBUF_SRC_DIR --python_out=$PROTOBUF_SRC_DIR $PROTOBUF_SRC_DIR/*.proto
           2to3 --no-diff -n -w $PROTOBUF_SRC_DIR
+          find $PROTOBUF_SRC_DIR -type f -name "*_pb2.py" | xargs sed -i.bak -E 's/(USE_C_DESCRIPTORS == False:)/\1  # pragma: no cover/g'
           poetry run coverage run --source=src -m pytest -v
           poetry run coverage xml
       - name: Upload Coverage Report

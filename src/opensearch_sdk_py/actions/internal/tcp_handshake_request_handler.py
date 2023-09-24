@@ -26,14 +26,13 @@ class TcpHandshakeRequestHandler(RequestHandler):
     def handle(self, request: OutboundMessageRequest, input: StreamInput) -> StreamOutput:
         tcp_handshake = TransportHandshakerHandshakeRequest().read_from(input)
         logging.debug(f"< {tcp_handshake}")
-        return self.send(
-            OutboundMessageResponse(
-                request.thread_context_struct,
-                request.features,
-                TransportHandshakerHandshakeResponse(request.version),
-                request.version,
-                request.request_id,
-                request.is_handshake,
-                request.is_compress,
-            )
+        self.response = OutboundMessageResponse(
+            request.thread_context_struct,
+            request.features,
+            TransportHandshakerHandshakeResponse(request.version),
+            request.version,
+            request.request_id,
+            request.is_handshake,
+            request.is_compress,
         )
+        return self.send()

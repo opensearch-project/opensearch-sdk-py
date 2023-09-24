@@ -16,10 +16,9 @@ from opensearch_sdk_py.actions.internal.extension_rest_request_handler import Ex
 from opensearch_sdk_py.actions.internal.tcp_handshake_request_handler import TcpHandshakeRequestHandler
 from opensearch_sdk_py.actions.internal.transport_handshake_request_handler import TransportHandshakeRequestHandler
 from opensearch_sdk_py.actions.request_handlers import RequestHandlers
+from opensearch_sdk_py.actions.response_handlers import ResponseHandlers
 from opensearch_sdk_py.extension import Extension
 from opensearch_sdk_py.server.async_host import AsyncHost
-from opensearch_sdk_py.transport.acknowledged_response import AcknowledgedResponse
-from opensearch_sdk_py.transport.initialize_extension_response import InitializeExtensionResponse
 from opensearch_sdk_py.transport.outbound_message_request import OutboundMessageRequest
 from opensearch_sdk_py.transport.outbound_message_response import OutboundMessageResponse
 from opensearch_sdk_py.transport.stream_input import StreamInput
@@ -28,17 +27,22 @@ from opensearch_sdk_py.transport.tcp_header import TcpHeader
 
 
 class AsyncExtensionHost(AsyncHost):
+    response_handlers: ResponseHandlers
     request_handlers: RequestHandlers
+
+    def __init_response_handlers(self) -> None:
+        self.response_handlers = ResponseHandlers(self.extension)
 
     def __init_request_handlers(self) -> None:
         self.request_handlers = RequestHandlers(self.extension)
-        self.request_handlers.register(DiscoveryExtensionsRequestHandler(self.extension))
+        self.request_handlers.register(DiscoveryExtensionsRequestHandler(self.extension, self.response_handlers))
         self.request_handlers.register(ExtensionRestRequestHandler(self.extension))
         self.request_handlers.register(TcpHandshakeRequestHandler(self.extension))
         self.request_handlers.register(TransportHandshakeRequestHandler(self.extension))
 
     def serve(self, extension: Extension) -> None:
         self.extension = extension
+        self.__init_response_handlers()
         self.__init_request_handlers()
 
     def on_input(self, input: StreamInput) -> StreamOutput:
@@ -54,24 +58,17 @@ class AsyncExtensionHost(AsyncHost):
                 error_handler = ActionNotFoundRequestErrorHandler(self.extension, request)
                 output = error_handler.handle(request, input)
         else:
-            response = OutboundMessageResponse().read_from(input, header)
-            # TODO: Error handling
+            response: OutboundMessageResponse = OutboundMessageResponse().read_from(input, header)
             if response.is_error:
+                # TODO: Error handling
                 output = None
                 logging.warning(f"< error {header}")
             else:
-                ack_response = AcknowledgedResponse().read_from(input)
-                logging.debug(f"< response {response}, {ack_response}")
-                output = StreamOutput()
-                response = OutboundMessageResponse(
-                    response.thread_context_struct,
-                    response.features,
-                    InitializeExtensionResponse(self.extension.name, self.extension.implemented_interfaces),
-                    response.version,
-                    self.extension.init_response_request_id,
-                    response.is_handshake,
-                    response.is_compress,
-                )
-                response.write_to(output)
-                logging.info(f"> {response}")
+                logging.info(f"< response {response}")
+                if response.request_id in self.response_handlers:
+                    output = self.response_handlers.handle(response, input)
+                else:  # pragma: no cover
+                    # TODO: Error handling
+                    output = None
+                    logging.warning(f"< response id {response.request_id} not registered")
         return output

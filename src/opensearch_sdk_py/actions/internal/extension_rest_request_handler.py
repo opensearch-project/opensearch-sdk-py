@@ -30,21 +30,20 @@ class ExtensionRestRequestHandler(RequestHandler):
         route = f"{extension_rest_request.method.name} {extension_rest_request.path}"
         response = self.extension.handle(route, extension_rest_request)
 
-        return self.send(
-            OutboundMessageResponse(
-                request.thread_context_struct,
-                request.features,
-                RestExecuteOnExtensionResponse(
-                    status=response.status,
-                    content_type=response.content_type,
-                    content=response.content,
-                    headers=response.headers,
-                    consumed_params=response.consumed_params,
-                    content_consumed=response.content_consumed,
-                ),
-                request.version,
-                request.request_id,
-                request.is_handshake,
-                request.is_compress,
-            )
+        self.response = OutboundMessageResponse(
+            request.thread_context_struct,
+            request.features,
+            RestExecuteOnExtensionResponse(
+                status=response.status,
+                content_type=response.content_type,
+                content=response.content,
+                headers=response.headers,
+                consumed_params=response.consumed_params,
+                content_consumed=response.content_consumed,
+            ),
+            request.version,
+            request.request_id,
+            request.is_handshake,
+            request.is_compress,
         )
+        return self.send()

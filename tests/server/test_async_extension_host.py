@@ -12,6 +12,7 @@ import logging
 import unittest
 from typing import Optional
 
+from opensearch_sdk_py.actions.internal.discovery_extensions_request_handler import DiscoveryExtensionsRequestHandler
 from opensearch_sdk_py.api.action_extension import ActionExtension
 from opensearch_sdk_py.extension import Extension
 from opensearch_sdk_py.rest.extension_rest_handler import ExtensionRestHandler
@@ -48,12 +49,14 @@ class TestAsyncExtensionHost(unittest.TestCase):
     def setUp(self) -> None:
         self.host = AsyncExtensionHost()
         self.extension = TestAsyncExtensionHost.MyActionExtension()
-        self.extension.init_response_request_id = 42
         self.host.serve(self.extension)
-        self.loop = asyncio.get_event_loop()
+        self.loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(self.loop)
 
     def test_init(self) -> None:
         self.assertEqual(self.host.extension, self.extension)
+        self.assertIsNotNone(self.host.response_handlers)
+        self.assertEqual(len(self.host.response_handlers), 0)
         self.assertIsNotNone(self.host.request_handlers)
         self.assertEqual(len(self.host.request_handlers), 4)
 
@@ -120,12 +123,19 @@ class TestAsyncExtensionHost(unittest.TestCase):
         self.assertEqual(extension_initialization_response_error.content, b'{"error": "No handler found for internal:invalid"}')
 
     def test_acknowledged_response(self) -> None:
+        # we need response request_id to be registered for handling
+        discovery_handler = DiscoveryExtensionsRequestHandler(self.host.extension, self.host.response_handlers)
+        input = StreamInput(NettyTraceData.load("tests/transport/data/initialize_extension_request.txt").data)
+        discovery_request = OutboundMessageRequest().read_from(input)
+        discovery_output = discovery_handler.handle(discovery_request, input)
+        register_request_id = TcpHeader().read_from(StreamInput(discovery_output.getvalue())).request_id
+        # now test with the handled request id
         request1 = NettyTraceData.load("tests/transport/data/transport_service_handshake_request.txt").data
-        request2 = bytes(OutboundMessageResponse(version=Version(2100099), message=AcknowledgedResponse(True)))
+        request2 = bytes(OutboundMessageResponse(request_id=register_request_id, version=Version(2100099), message=AcknowledgedResponse(True)))
         responses = self.loop.run_until_complete(self.__both([request1, request2]))
         self.assertEqual(len(responses), 2)
         reply: TestAsyncExtensionHost.Response = responses[1]
-        self.assertEqual(reply.response.thread_context_struct.request_headers, {})
+        self.assertEqual(reply.response.thread_context_struct.request_headers, {"_system_index_access_allowed": "false"})
         init_response = InitializeExtensionResponse().read_from(reply.remaining_input)
         self.assertEqual(init_response.name, "hello-world")
 

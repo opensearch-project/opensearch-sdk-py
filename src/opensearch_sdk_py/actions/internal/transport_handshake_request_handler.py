@@ -30,26 +30,25 @@ class TransportHandshakeRequestHandler(RequestHandler):
         transport_handshake = TransportServiceHandshakeRequest().read_from(input)
         logging.debug(f"< {transport_handshake}")
 
-        return self.send(
-            OutboundMessageResponse(
-                request.thread_context_struct,
-                request.features,
-                TransportServiceHandshakeResponse(
-                    DiscoveryNode(
-                        node_name="hello-world",
-                        node_id="hello-world",
-                        address=TransportAddress("127.0.0.1", 1234),
-                        roles={
-                            DiscoveryNodeRole.CLUSTER_MANAGER_ROLE,
-                            DiscoveryNodeRole.DATA_ROLE,
-                            DiscoveryNodeRole.INGEST_ROLE,
-                            DiscoveryNodeRole.REMOTE_CLUSTER_CLIENT_ROLE,
-                        },
-                    )
-                ),
-                request.version,
-                request.request_id,
-                request.is_handshake,
-                request.is_compress,
-            )
+        self.response = OutboundMessageResponse(
+            request.thread_context_struct,
+            request.features,
+            TransportServiceHandshakeResponse(
+                DiscoveryNode(
+                    node_name="hello-world",
+                    node_id="hello-world",
+                    address=TransportAddress("127.0.0.1", 1234),
+                    roles={
+                        DiscoveryNodeRole.CLUSTER_MANAGER_ROLE,
+                        DiscoveryNodeRole.DATA_ROLE,
+                        DiscoveryNodeRole.INGEST_ROLE,
+                        DiscoveryNodeRole.REMOTE_CLUSTER_CLIENT_ROLE,
+                    },
+                )
+            ),
+            request.version,
+            request.request_id,
+            request.is_handshake,
+            request.is_compress,
         )
+        return self.send()

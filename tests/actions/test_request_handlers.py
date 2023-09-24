@@ -29,12 +29,12 @@ class TestRequestHandlers(unittest.TestCase):
     def setUp(self) -> None:
         self.extension = TestRequestHandlers.MyExtension()
         self.request_handlers = RequestHandlers(self.extension)
-        self.request_handlers.register(DiscoveryExtensionsRequestHandler(self.extension))
+        self.request_handlers.register(DiscoveryExtensionsRequestHandler(self.extension, None))
         self.request_handlers.register(ExtensionRestRequestHandler(self.extension))
         self.request_handlers.register(TcpHandshakeRequestHandler(self.extension))
         self.request_handlers.register(TransportHandshakeRequestHandler(self.extension))
 
-    def test_registers_handler(self) -> None:
+    def test_register_handlers(self) -> None:
         self.assertEqual(len(self.request_handlers), 4)
         self.assertIsInstance(self.request_handlers["internal:tcp/handshake"], TcpHandshakeRequestHandler)
 

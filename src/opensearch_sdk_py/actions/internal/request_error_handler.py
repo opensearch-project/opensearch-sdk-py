@@ -31,18 +31,17 @@ class RequestErrorHandler(RequestHandler):
         super().__init__("internal:error", extension)
 
     def handle(self, request: OutboundMessageRequest, input: StreamInput = None) -> StreamOutput:
-        return self.send(
-            OutboundMessageResponse(
-                request.thread_context_struct,
-                request.features,
-                RestExecuteOnExtensionResponse(
-                    status=self.status,
-                    content_type=self.content_type,
-                    content=self.content,
-                ),
-                request.version,
-                request.request_id,
-                request.is_handshake,
-                request.is_compress,
-            )
+        self.response = OutboundMessageResponse(
+            request.thread_context_struct,
+            request.features,
+            RestExecuteOnExtensionResponse(
+                status=self.status,
+                content_type=self.content_type,
+                content=self.content,
+            ),
+            request.version,
+            request.request_id,
+            request.is_handshake,
+            request.is_compress,
         )
+        return self.send()
