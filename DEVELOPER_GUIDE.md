@@ -173,7 +173,7 @@ You can run a combination of these by installing [poetry-exec-plugin](https://gi
 
 ### Protobuf Class Generation
 
-Some Transport Requests use [Protobuf](https://protobuf.dev/) messages. These offer benefits including better reverse compatibility and easier cross-platform class generation. When using a new or updated proto definition (`.proto` file extension) you will need to compile it for use with python.
+Some Transport Requests use [Protobuf](https://protobuf.dev/) messages. These offer benefits including better reverse compatibility and easier cross-platform class generation. When using a new or updated proto definition (such as [these on OpenSearch](https://github.com/opensearch-project/OpenSearch/tree/main/server/src/main/proto/extensions)) you will need to compile it for use with python.
 1. Install [the Python compiler](https://github.com/protocolbuffers/protobuf/tree/main/python), usually with `pip install protobuf`.
 2. Define the source directory: `export PROTOBUF_SRC_DIR=./src/opensearch_sdk_py/protobuf`
 3. Compile: `protoc -I=$PROTOBUF_SRC_DIR --python_out=$PROTOBUF_SRC_DIR $PROTOBUF_SRC_DIR/*.proto`
