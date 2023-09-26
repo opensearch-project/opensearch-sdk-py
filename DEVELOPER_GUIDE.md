@@ -12,6 +12,7 @@
   - [Code Linting](#code-linting)
   - [Type Checking](#type-checking)
   - [Code Coverage](#code-coverage)
+  - [Protobuf Class Generation](#protobuf-class-generation)
 - [License Headers](#license-headers)
   - [Visual Studio Code](#visual-studio-code)
 - [Transport Protocol](#transport-protocol)
@@ -169,6 +170,15 @@ TOTAL 1207 79 93%
 ```
 
 You can run a combination of these by installing [poetry-exec-plugin](https://github.com/keattang/poetry-exec-plugin) once and using the `poetry exec coverage` shortcut.
+
+### Protobuf Class Generation
+
+Some Transport Requests use [Protobuf](https://protobuf.dev/) messages. These offer benefits including better reverse compatibility and easier cross-platform class generation. When using a new or updated proto definition (such as [these on OpenSearch](https://github.com/opensearch-project/OpenSearch/tree/main/server/src/main/proto/extensions)) you will need to compile it for use with python.
+1. Install [the Python compiler](https://github.com/protocolbuffers/protobuf/tree/main/python), usually with `pip install protobuf`.
+2. Define the source directory: `export PROTOBUF_SRC_DIR=./src/opensearch_sdk_py/protobuf`
+3. Compile: `protoc -I=$PROTOBUF_SRC_DIR --python_out=$PROTOBUF_SRC_DIR $PROTOBUF_SRC_DIR/*.proto`
+4. The generated files need `from .` prepended to imports. Use `2to3 --no-diff -n -w $PROTOBUF_SRC_DIR` to do this
+5. Add `# pragma: no cover` to the conditional testing `_USE_C_DESCRIPTORS` to exclude that branch from coverage
 
 ## License Headers
 
