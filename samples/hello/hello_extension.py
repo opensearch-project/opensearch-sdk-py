@@ -18,7 +18,7 @@ from opensearch_sdk_py.rest.extension_rest_handler import ExtensionRestHandler
 
 class HelloExtension(Extension, ActionExtension):
     def __init__(self) -> None:
-        Extension.__init__(self, "hello-world")
+        Extension.__init__(self, "hello-world-py")
         ActionExtension.__init__(self)
 
     @property

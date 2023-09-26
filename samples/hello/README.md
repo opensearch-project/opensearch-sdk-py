@@ -93,7 +93,7 @@ INFO:root:> prefix=b'ES', version=2.10.0.99, type=['response'], message=167 byte
 ### Call an Extension API
 
 ```bash
-curl -XGET "localhost:9200/_extensions/_hello-world/hello"
+curl -XGET "localhost:9200/_extensions/_hello-world-py/hello"
 Hello from Python! 👋
 ```
 
