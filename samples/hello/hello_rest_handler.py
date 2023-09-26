@@ -22,7 +22,7 @@ class HelloRestHandler(ExtensionRestHandler):
     def handle_request(self, rest_request: ExtensionRestRequest) -> ExtensionRestResponse:
         logging.debug(f"handling {rest_request}")
 
-        response_bytes = bytes("Hello from Python!", "utf-8") + b"\x20\xf0\x9f\x91\x8b"
+        response_bytes = bytes("Hello from Python! 👋\n", "utf-8")
         return ExtensionRestResponse(RestStatus.OK, response_bytes, ExtensionRestResponse.TEXT_CONTENT_TYPE)
 
     @property

@@ -52,7 +52,7 @@ def install_hello_extension() -> None:
 @pytest.mark.usefixtures("start_hello_extension", "install_hello_extension")
 class TestHello(unittest.TestCase):
     def test_hello_from_python(self) -> Any:
-        response = httpx.get("http://localhost:9200/_extensions/_hello-world/hello")
+        response = httpx.get("http://localhost:9200/_extensions/_hello-world-py/hello")
         logging.debug(response.text)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.text, "Hello from Python! 👋")
+        self.assertEqual(response.text, "Hello from Python! 👋\n")

@@ -1,6 +1,6 @@
 {
-    "name":"hello-world",
-    "uniqueId":"hello-world",
+    "name":"Hello World",
+    "uniqueId":"hello-world-py",
     "hostAddress":"127.0.0.1",
     "port":"1234",
     "version":"0.1.0",
