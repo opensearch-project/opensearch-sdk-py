@@ -8,6 +8,7 @@
 #
 
 import logging
+import re
 from typing import Dict
 
 from opensearch_sdk_py.rest.extension_rest_handler import ExtensionRestHandler
@@ -25,10 +26,22 @@ class ExtensionRestHandlers(Dict[str, ExtensionRestHandler]):
     def register(self, klass: ExtensionRestHandler) -> None:
         logging.info(f"Registering {klass}")
         for route in klass.routes:
-            # for matching the handler on the extension side only method and path matter
-            self[route.key] = klass
+            # The route path (part of route.key) may contain a named wildcard such as /foo/{bar}
+            # which will assign a user value to the param bar. In this class we'll save thie wildcard
+            key = re.sub(r"\{(.+?)\}", "*", route.key)
+            if key in self:
+                raise Exception(f"Can not register {route.key}, {key} is already registered.")
+
+            # for matching the handler on the extension side only method and wildcard path matter
+            self[key] = klass
             # but we have to send the full named route to OpenSearch
             self.named_routes.append(str(route))
 
     def handle(self, route: str, request: ExtensionRestRequest) -> ExtensionRestResponse:
-        return self[route].handle_request(request)
+        # first attempt exact match without substitution
+        if route in self:
+            return self[route].handle_request(request)
+        # if no match try wildcard match
+        # TODO: iterate self.keys() and match wildcard *
+        # glob match would work but this is strings not files
+        # changing * to .* or .+ to use re.match seems awkward
