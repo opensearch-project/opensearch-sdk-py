@@ -25,15 +25,31 @@ class TestExtensionRestHandlers(unittest.TestCase):
 
         @property
         def routes(self) -> list[NamedRoute]:
-            return [NamedRoute(RestMethod.GET, "/foo", "get_foo"), NamedRoute(RestMethod.GET, "/bar", "get_bar")]
+            return [NamedRoute(RestMethod.GET, "/foo", "get_foo"), NamedRoute(RestMethod.GET, "/bar/{foo}", "get_bar")]
+
+    class DoubleFakeRestHandler(ExtensionRestHandler):
+        def handle_request(self, rest_request: ExtensionRestRequest) -> ExtensionRestResponse:
+            return ExtensionRestResponse(status=RestStatus.NOT_IMPLEMENTED)
+
+        @property
+        def routes(self) -> list[NamedRoute]:
+            return [NamedRoute(RestMethod.GET, "/bar/{baz}", "get_baz")]
 
     def test_registers_handler(self) -> None:
         handlers = ExtensionRestHandlers()
         handlers.register(TestExtensionRestHandlers.FakeRestHandler())
         self.assertEqual(len(handlers), 2)
         self.assertIsInstance(handlers["GET /foo"], TestExtensionRestHandlers.FakeRestHandler)
-        self.assertIsInstance(handlers["GET /bar"], TestExtensionRestHandlers.FakeRestHandler)
-        self.assertListEqual(handlers.named_routes, ["GET /foo get_foo", "GET /bar get_bar"])
+        self.assertIsInstance(handlers["GET /bar/*"], TestExtensionRestHandlers.FakeRestHandler)
+        self.assertListEqual(handlers.named_routes, ["GET /foo get_foo", "GET /bar/{foo} get_bar"])
 
         response = handlers.handle("GET /foo", ExtensionRestRequest())
         self.assertEqual(response.status, RestStatus.NOT_IMPLEMENTED)
+
+        response = handlers.handle("GET /bar/anything", ExtensionRestRequest())
+        self.assertEqual(response.status, RestStatus.NOT_IMPLEMENTED)
+
+        error = r"Can not find a matching route for GET /baz."
+        self.assertRaisesRegex(Exception, error, handlers.handle, "GET /baz", ExtensionRestRequest)
+        error = r"Can not register GET /bar/{baz}, GET /bar/\* is already registered."
+        self.assertRaisesRegex(Exception, error, handlers.register, TestExtensionRestHandlers.DoubleFakeRestHandler())

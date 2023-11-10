@@ -7,6 +7,7 @@
 # compatible open source license.
 #
 
+import fnmatch
 import logging
 import re
 from typing import Dict
@@ -42,6 +43,8 @@ class ExtensionRestHandlers(Dict[str, ExtensionRestHandler]):
         if route in self:
             return self[route].handle_request(request)
         # if no match try wildcard match
-        # TODO: iterate self.keys() and match wildcard *
-        # glob match would work but this is strings not files
-        # changing * to .* or .+ to use re.match seems awkward
+        for key in self.keys():
+            if fnmatch.fnmatch(route, key):
+                return self[key].handle_request(request)
+        # no match, we shouldn't get here if registration worked
+        raise Exception(f"Can not find a matching route for {route}.")
