@@ -66,8 +66,7 @@ class TestExtensionRestRequest(unittest.TestCase):
         self.assertFalse(err.has_param("bar"))
         self.assertSetEqual(err.consumed_params, {"foo"})
         self.assertIsNone(err.param("bar"))
-        self.assertTrue("foo" in err.consumed_params)
-        self.assertTrue("bar" in err.consumed_params)
+        self.assertSetEqual(err.consumed_params, {"foo", "bar"})
 
         self.assertTrue(err.has_content())
         self.assertFalse(err.content_consumed)

@@ -9,6 +9,7 @@
 
 import unittest
 
+from opensearch_sdk_py.rest.extension_rest_request import ExtensionRestRequest
 from opensearch_sdk_py.rest.extension_rest_response import ExtensionRestResponse
 from opensearch_sdk_py.rest.rest_status import RestStatus
 from opensearch_sdk_py.transport.stream_input import StreamInput
@@ -24,12 +25,16 @@ class TestExtensionRestResponse(unittest.TestCase):
         self.assertListEqual(err.consumed_params, [])
         self.assertFalse(err.content_consumed)
 
-        err = ExtensionRestResponse(status=RestStatus.OK, content=b"test", content_type=ExtensionRestResponse.JSON_CONTENT_TYPE, headers={"foo": ["bar", "baz"]}, consumed_params=["foo", "bar"], content_consumed=True)
+        req = ExtensionRestRequest()
+        req.param("foo")
+        req.param("bar")
+        req.content()
+        err = ExtensionRestResponse(request=req, status=RestStatus.OK, content=b"test", content_type=ExtensionRestResponse.JSON_CONTENT_TYPE, headers={"foo": ["bar", "baz"]})
         self.assertEqual(err.status, RestStatus.OK)
         self.assertEqual(err.content, b"test")
         self.assertEqual(err.content_type, ExtensionRestResponse.JSON_CONTENT_TYPE)
         self.assertDictEqual(err.headers, {"foo": ["bar", "baz"]})
-        self.assertListEqual(err.consumed_params, ["foo", "bar"])
+        self.assertSetEqual(err.consumed_params, {"foo", "bar"})
         self.assertTrue(err.content_consumed)
 
         output = StreamOutput()
