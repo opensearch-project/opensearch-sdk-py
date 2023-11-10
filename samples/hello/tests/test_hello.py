@@ -56,3 +56,8 @@ class TestHello(unittest.TestCase):
         logging.debug(response.text)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.text, "Hello from Python! 👋\n")
+
+        response = httpx.get("http://localhost:9200/_extensions/_hello-world-py/hello/Tester")
+        logging.debug(response.text)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.text, "Hello Tester! 👋\n")
