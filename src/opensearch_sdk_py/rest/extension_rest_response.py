@@ -34,12 +34,11 @@ class ExtensionRestResponse(TransportResponse):
         self.content = content
         self.content_type = content_type
         self.headers = headers
+        self.consumed_params: set[str] = set()
+        self.content_consumed = False
         if request is not None:
             self.consumed_params = request.consumed_params
             self.content_consumed = request.content_consumed
-        else:
-            self.consumed_params = []
-            self.content_consumed = False
 
     def read_from(self, input: StreamInput) -> "ExtensionRestResponse":
         super().read_from(input)
@@ -47,7 +46,7 @@ class ExtensionRestResponse(TransportResponse):
         self.content = input.read_bytes(input.read_array_size())
         self.content_type = input.read_string()
         self.headers = input.read_string_to_string_array_dict()
-        self.consumed_params = input.read_string_array()
+        self.consumed_params = set(input.read_string_array())
         self.content_consumed = input.read_boolean()
         return self
 
@@ -58,6 +57,6 @@ class ExtensionRestResponse(TransportResponse):
         output.write(self.content)
         output.write_string(self.content_type)
         output.write_string_to_string_array_dict(self.headers)
-        output.write_string_array(self.consumed_params)
+        output.write_string_array(sorted(self.consumed_params))
         output.write_boolean(self.content_consumed)
         return self

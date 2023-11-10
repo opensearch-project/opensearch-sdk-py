@@ -22,7 +22,7 @@ class TestExtensionRestResponse(unittest.TestCase):
         self.assertEqual(err.content, b"")
         self.assertEqual(err.content_type, ExtensionRestResponse.TEXT_CONTENT_TYPE)
         self.assertDictEqual(err.headers, {})
-        self.assertListEqual(err.consumed_params, [])
+        self.assertSetEqual(err.consumed_params, set())
         self.assertFalse(err.content_consumed)
 
         req = ExtensionRestRequest()
@@ -46,5 +46,5 @@ class TestExtensionRestResponse(unittest.TestCase):
         self.assertEqual(err.content, b"test")
         self.assertEqual(err.content_type, ExtensionRestResponse.JSON_CONTENT_TYPE)
         self.assertDictEqual(err.headers, {"foo": ["bar", "baz"]})
-        self.assertListEqual(err.consumed_params, ["foo", "bar"])
+        self.assertSetEqual(err.consumed_params, {"foo", "bar"})
         self.assertTrue(err.content_consumed)
