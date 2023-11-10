@@ -10,6 +10,8 @@
 # https://github.com/opensearch-project/OpenSearch/blob/main/server/src/main/java/org/opensearch/extensions/rest/ExtensionRestRequest.java
 
 
+from typing import Optional
+
 from opensearch_sdk_py.rest.http_version import HttpVersion
 from opensearch_sdk_py.rest.rest_method import RestMethod
 from opensearch_sdk_py.transport.stream_input import StreamInput
@@ -37,9 +39,11 @@ class ExtensionRestRequest(TransportRequest):
         self.params = params
         self.headers = headers
         self.media_type = media_type
-        self.content = content
+        self._content = content
         self.principal_identifier_token = principal_identifier_token
         self.http_version = http_version
+        self.consumed_params: set[str] = set()
+        self.content_consumed: bool = False
 
     def read_from(self, input: StreamInput) -> "ExtensionRestRequest":
         super().read_from(input)
@@ -50,7 +54,7 @@ class ExtensionRestRequest(TransportRequest):
         self.headers = input.read_string_to_string_array_dict()
         if input.read_boolean():
             self.media_type = input.read_string()
-        self.content = input.read_bytes(input.read_array_size())
+        self._content = input.read_bytes(input.read_array_size())
         self.principal_identifier_token = input.read_string()
         self.http_version = input.read_enum(HttpVersion)
         return self
@@ -65,11 +69,27 @@ class ExtensionRestRequest(TransportRequest):
         output.write_boolean(len(self.media_type) > 0)
         if self.media_type:
             output.write_string(self.media_type)
-        output.write_v_int(len(self.content))
-        output.write(self.content)
+        output.write_v_int(len(self._content))
+        output.write(self._content)
         output.write_string(self.principal_identifier_token)
         output.write_enum(self.http_version)
         return self
+
+    def param(self, key: str) -> Optional[str]:
+        self.consumed_params.add(key)
+        if key in self.params:
+            return self.params[key]
+        return None
+
+    def has_param(self, key: str) -> bool:
+        return key in self.params
+
+    def content(self, content_consumed: bool = True) -> bytes:
+        self.content_consumed |= content_consumed
+        return self._content
+
+    def has_content(self) -> bool:
+        return self._content is not None and len(self._content) > 0
 
     def __str__(self) -> str:
         return (

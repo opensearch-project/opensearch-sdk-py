@@ -35,7 +35,7 @@ class TestExtensionRestRequest(unittest.TestCase):
         self.assertDictEqual(err.params, {"foo": "bar"})
         self.assertDictEqual(err.headers, {"foo": ["bar", "baz"]})
         self.assertEqual(err.media_type, "application/json; charset=utf-8")
-        self.assertEqual(err.content, bytes("{}", "ascii"))
+        self.assertEqual(err.content(), bytes("{}", "ascii"))
         self.assertEqual(err.principal_identifier_token, "token")
         self.assertEqual(err.http_version, HttpVersion.HTTP_1_1)
         self.assertIn("method=RestMethod.GET, uri=/hello?v, path=/hello", str(err))
@@ -51,6 +51,27 @@ class TestExtensionRestRequest(unittest.TestCase):
         self.assertDictEqual(err.params, {"foo": "bar"})
         self.assertDictEqual(err.headers, {"foo": ["bar", "baz"]})
         self.assertEqual(err.media_type, "application/json; charset=utf-8")
-        self.assertEqual(err.content, bytes("{}", "ascii"))
+        self.assertEqual(err.content(), bytes("{}", "ascii"))
         self.assertEqual(err.principal_identifier_token, "token")
         self.assertEqual(err.http_version, HttpVersion.HTTP_1_1)
+
+    def test_consuming(self) -> None:
+        err = ExtensionRestRequest(
+            params={"foo": "bar"},
+            content=bytes("{}", "ascii"),
+        )
+        self.assertTrue(err.has_param("foo"))
+        self.assertSetEqual(err.consumed_params, set())
+        self.assertEqual(err.param("foo"), "bar")
+        self.assertFalse(err.has_param("bar"))
+        self.assertSetEqual(err.consumed_params, {"foo"})
+        self.assertIsNone(err.param("bar"))
+        self.assertTrue("foo" in err.consumed_params)
+        self.assertTrue("bar" in err.consumed_params)
+
+        self.assertTrue(err.has_content())
+        self.assertFalse(err.content_consumed)
+        err.content(False)
+        self.assertFalse(err.content_consumed)
+        err.content()
+        self.assertTrue(err.content_consumed)
