@@ -45,6 +45,12 @@ class TestResponseHandlers(unittest.TestCase):
         self.assertEqual(output, None)
         self.assertEqual(self.extension.test, "modified")
 
+    def test_handle_unregistered(self) -> None:
+        response = OutboundMessageResponse(request_id=1234)
+        input = StreamInput(bytes(AcknowledgedResponse(status=True)))
+        output = self.response_handlers.handle(response, input)
+        self.assertIsNone(output)
+
 
 class FakeRequestHandler(RequestHandler):
     def __init__(self, extension: Extension) -> None:
