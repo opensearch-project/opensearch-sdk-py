@@ -1,7 +1,12 @@
 ---
 name: lint
 
-on: [push, pull_request]
+on:
+  push:
+    branches-ignore:
+      - 'whitesource-remediate/**'
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
   lint:
