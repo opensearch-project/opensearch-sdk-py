@@ -88,9 +88,10 @@ class TestAsyncExtensionHost(unittest.TestCase):
     async def __server(self) -> None:
         await self.host.async_run()
 
-    async def __both(self, datas: list[Optional[bytes]]) -> list["TestAsyncExtensionHost.Response"]:
+    async def __both(self, datas: list[Optional[bytes]]) -> list[Optional["TestAsyncExtensionHost.Response"]]:
         results = await asyncio.gather(*[self.__server(), self.__client(datas)])
-        client_result: list[TestAsyncExtensionHost.Response] = results[1]
+        assert results[1] is not None
+        client_result: list[Optional[TestAsyncExtensionHost.Response]] = results[1]
         return client_result
 
     def test_assigns_port(self) -> None:
@@ -104,6 +105,7 @@ class TestAsyncExtensionHost(unittest.TestCase):
         request2 = NettyTraceData.load("tests/transport/data/initialize_extension_request.txt").data
         responses = self.loop.run_until_complete(self.__both([request1, request2]))
         self.assertEqual(len(responses), 2)
+        assert responses[1] is not None
         reply: TestAsyncExtensionHost.Response = responses[1]
         self.assertEqual(reply.response.thread_context_struct.request_headers, {"_system_index_access_allowed": "false"})
         discovery_extensions_response = RegisterRestActionsRequest().read_from(reply.remaining_input)
@@ -114,6 +116,7 @@ class TestAsyncExtensionHost(unittest.TestCase):
         request2 = bytes(OutboundMessageRequest(version=Version(2100099), action="internal:invalid"))
         responses = self.loop.run_until_complete(self.__both([request1, request2]))
         self.assertEqual(len(responses), 2)
+        assert responses[1] is not None
         reply: TestAsyncExtensionHost.Response = responses[1]
         self.assertEqual(reply.response.thread_context_struct.request_headers, {})
         extension_initialization_response_error = RestExecuteOnExtensionResponse().read_from(reply.remaining_input)
@@ -134,6 +137,7 @@ class TestAsyncExtensionHost(unittest.TestCase):
         request2 = bytes(OutboundMessageResponse(request_id=register_request_id, version=Version(2100099), message=AcknowledgedResponse(True)))
         responses = self.loop.run_until_complete(self.__both([request1, request2]))
         self.assertEqual(len(responses), 2)
+        assert responses[1] is not None
         reply: TestAsyncExtensionHost.Response = responses[1]
         self.assertEqual(reply.response.thread_context_struct.request_headers, {"_system_index_access_allowed": "false"})
         init_response = InitializeExtensionResponse().read_from(reply.remaining_input)
