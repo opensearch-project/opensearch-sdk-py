@@ -32,7 +32,6 @@ class ExtensionRestHandlers(Dict[str, ExtensionRestHandler]):
             key = re.sub(r"\{(.+?)\}", "*", route.key)
             if key in self:
                 raise Exception(f"Can not register {route.key}, {key} is already registered.")
-
             # for matching the handler on the extension side only method and wildcard path matter
             self[key] = klass
             # but we have to send the full named route to OpenSearch
@@ -43,8 +42,8 @@ class ExtensionRestHandlers(Dict[str, ExtensionRestHandler]):
         if route in self:
             return self[route].handle_request(request)
         # if no match try wildcard match
-        for key in self.keys():
+        for key, handler in self.items():
             if fnmatch.fnmatch(route, key):
-                return self[key].handle_request(request)
+                return handler.handle_request(request)
         # no match, we shouldn't get here if registration worked
         raise Exception(f"Can not find a matching route for {route}.")
