@@ -52,11 +52,9 @@ class AsyncExtensionHost(AsyncHost):
         if header.is_request:
             request: OutboundMessageRequest = OutboundMessageRequest().read_from(input, header)
             logging.info(f"< {request}")
-            if request.action in self.request_handlers:
-                output = self.request_handlers.handle(request, input)
-            else:
-                error_handler = ActionNotFoundRequestErrorHandler(self.extension, request)
-                output = error_handler.handle(request, input)
+            output = self.request_handlers.handle(request, input)
+            if output is None:
+                output = ActionNotFoundRequestErrorHandler(self.extension, request).handle(request, input)
         else:
             response: OutboundMessageResponse = OutboundMessageResponse().read_from(input, header)
             if response.is_error:
@@ -65,10 +63,8 @@ class AsyncExtensionHost(AsyncHost):
                 logging.warning(f"< error {header}")
             else:
                 logging.info(f"< response {response}")
-                if response.request_id in self.response_handlers:
-                    output = self.response_handlers.handle(response, input)
-                else:  # pragma: no cover
+                output = self.response_handlers.handle(response, input)
+                if output is None:  # pragma: no cover
                     # TODO: Error handling
-                    output = None
                     logging.warning(f"< response id {response.request_id} not registered")
         return output
