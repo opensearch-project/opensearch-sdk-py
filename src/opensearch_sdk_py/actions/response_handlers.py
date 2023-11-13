@@ -23,8 +23,5 @@ class ResponseHandlers(Dict[int, ResponseHandler]):
         self[request_id] = handler
 
     def handle(self, response: OutboundMessageResponse, input: StreamInput = None) -> Optional[bytes]:
-        if response.request_id in self:
-            handler = self[response.request_id]
-            del self[response.request_id]
-            return handler.handle(response, input) if handler else None
-        return None
+        handler = self.pop(response.request_id, None)
+        return handler.handle(response, input) if handler else None

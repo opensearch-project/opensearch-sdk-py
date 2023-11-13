@@ -23,7 +23,5 @@ class RequestHandlers(Dict[str, RequestHandler]):
         self[handler.action] = handler
 
     def handle(self, request: OutboundMessageRequest, input: StreamInput = None) -> Optional[bytes]:
-        if request.action in self:
-            handler = self[request.action]
-            return handler.handle(request, input) if handler else None
-        return None
+        handler = self.get(request.action, None)
+        return handler.handle(request, input) if handler else None
