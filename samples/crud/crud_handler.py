@@ -34,41 +34,41 @@ class CRUDRestHandler(ExtensionRestHandler):
         if request.method == RestMethod.POST:
             # Create a document
             index_name = "test-index"
-            document = request.content
+            document = request.content()
             response = self.client.index(index=index_name, body=document, refresh=True)
             response_bytes = bytes(json.dumps(response).encode("utf-8"))
-            return ExtensionRestResponse(RestStatus.OK, response_bytes, ExtensionRestResponse.JSON_CONTENT_TYPE)
+            return ExtensionRestResponse(request, RestStatus.OK, response_bytes, ExtensionRestResponse.JSON_CONTENT_TYPE)
 
         elif request.method == RestMethod.GET:
             # Search for documents
             index_name = "test-index"
-            q = request.params.get("q")
+            q = request.param("q")
 
             query = {"size": 5, "query": {"multi_match": {"query": q, "fields": ["title^2", "director"]}}}
             response = self.client.search(body=query, index=index_name)
             response_bytes = bytes(json.dumps(response).encode("utf-8"))
-            return ExtensionRestResponse(RestStatus.OK, response_bytes, ExtensionRestResponse.JSON_CONTENT_TYPE, consumed_params=["q"])
+            return ExtensionRestResponse(request, RestStatus.OK, response_bytes, ExtensionRestResponse.JSON_CONTENT_TYPE)
 
         elif request.method == RestMethod.PUT:
             # Update a document
             index_name = "test-index"
-            id = request.params.get("id")
-            document = request.content
+            id = request.param("id")
+            document = request.content()
             response = self.client.index(index=index_name, body=document, id=id, refresh=True)
             response_bytes = bytes(json.dumps(response), "utf-8")
-            return ExtensionRestResponse(RestStatus.OK, response_bytes, ExtensionRestResponse.JSON_CONTENT_TYPE, consumed_params=["id"])
+            return ExtensionRestResponse(request, RestStatus.OK, response_bytes, ExtensionRestResponse.JSON_CONTENT_TYPE)
 
         elif request.method == RestMethod.DELETE:
             # Delete a document
             index_name = "test-index"
-            id = request.params.get("id")
+            id = request.param("id")
             response = self.client.delete(index=index_name, id=id)
             response_bytes = bytes(json.dumps(response), "utf-8")
             logging.info(f"response: {response}")
-            return ExtensionRestResponse(RestStatus.OK, response_bytes, ExtensionRestResponse.JSON_CONTENT_TYPE, consumed_params=["id"])
+            return ExtensionRestResponse(request, RestStatus.OK, response_bytes, ExtensionRestResponse.JSON_CONTENT_TYPE)
 
         else:
-            return ExtensionRestResponse(RestStatus.METHOD_NOT_ALLOWED, bytes("Not found", "utf-8"), ExtensionRestResponse.TEXT_CONTENT_TYPE)
+            return ExtensionRestResponse(RestStatus.NOT_FOUND, bytes("Not found", "utf-8"), ExtensionRestResponse.TEXT_CONTENT_TYPE)
 
     @property
     def routes(self) -> list[NamedRoute]:

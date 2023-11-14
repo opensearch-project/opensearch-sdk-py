@@ -21,14 +21,12 @@ from opensearch_sdk_py.rest.rest_status import RestStatus
 class HelloRestHandler(ExtensionRestHandler):
     def handle_request(self, rest_request: ExtensionRestRequest) -> ExtensionRestResponse:
         logging.debug(f"handling {rest_request}")
-        consumed_params = list[str]()
-        if "name" in rest_request.params:
-            name = rest_request.params["name"]
-            consumed_params.append("name")
+        name = rest_request.param("name")
+        if name is not None:
             response_bytes = bytes(f"Hello {name}! 👋\n", "utf-8")
         else:
             response_bytes = bytes("Hello from Python! 👋\n", "utf-8")
-        return ExtensionRestResponse(RestStatus.OK, response_bytes, ExtensionRestResponse.TEXT_CONTENT_TYPE, consumed_params=consumed_params)
+        return ExtensionRestResponse(rest_request, RestStatus.OK, response_bytes, ExtensionRestResponse.TEXT_CONTENT_TYPE)
 
     @property
     def routes(self) -> list[NamedRoute]:

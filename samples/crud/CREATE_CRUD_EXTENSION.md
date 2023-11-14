@@ -88,13 +88,13 @@ class CRUDRestHandler(ExtensionRestHandler):
                 refresh=True
             ) 
             response_bytes = bytes(json.dumps(response).encode("utf-8"))
-            return ExtensionRestResponse(RestStatus.OK, response_bytes, ExtensionRestResponse.JSON_CONTENT_TYPE)
+            return ExtensionRestResponse(request, RestStatus.OK, response_bytes, ExtensionRestResponse.JSON_CONTENT_TYPE)
         
         elif request.method == RestMethod.GET:
             # Search for documents
-            index_name = 'test-index'
-            q = request.params.get('q')
-            
+            index_name = "test-index"
+            q = request.param("q")
+
             logging.info(f"inside get {q}")
 
             query = {
@@ -111,36 +111,31 @@ class CRUDRestHandler(ExtensionRestHandler):
                 index=index_name
             )
             response_bytes = bytes(json.dumps(response).encode("utf-8"))
-            return ExtensionRestResponse(RestStatus.OK, response_bytes, ExtensionRestResponse.JSON_CONTENT_TYPE, consumed_params=['q'])
-        
+            return ExtensionRestResponse(request, RestStatus.OK, response_bytes, ExtensionRestResponse.JSON_CONTENT_TYPE)
+
         elif request.method == RestMethod.PUT:
             # Update a document
-            index_name = 'test-index'
-            id = request.params.get('id')
+            index_name = "test-index"            
+            id = request.param("id")
             document = request.content
-            response = self.client.index(
-                index=index_name,
-                body=document,
-                id=id,
-                refresh=True
-            )
+            response = self.client.index(index=index_name, body=document, id=id, refresh=True)
             response_bytes = bytes(json.dumps(response), "utf-8")
-            return ExtensionRestResponse(RestStatus.OK, response_bytes, ExtensionRestResponse.JSON_CONTENT_TYPE, consumed_params=['id'])
-        
+            return ExtensionRestResponse(request, RestStatus.OK, response_bytes, ExtensionRestResponse.JSON_CONTENT_TYPE)
+
         elif request.method == RestMethod.DELETE:
             # Delete a document
-            index_name = 'test-index'
-            id = request.params.get('id')
+            index_name = "test-index"
+            id = request.param("id")
             response = self.client.delete(
                 index=index_name,
                 id=id
             )
             response_bytes = bytes(json.dumps(response), "utf-8")
             logging.info(f"response: {response}")
-            return ExtensionRestResponse(RestStatus.OK, response_bytes, ExtensionRestResponse.JSON_CONTENT_TYPE, consumed_params=['id'])
-        
+            return ExtensionRestResponse(request, RestStatus.OK, response_bytes, ExtensionRestResponse.JSON_CONTENT_TYPE)
+
         else:
-            return ExtensionRestResponse(RestStatus.METHOD_NOT_ALLOWED, bytes("Not found", "utf-8"), ExtensionRestResponse.TEXT_CONTENT_TYPE)
+            return ExtensionRestResponse(RestStatus.NOT_FOUND, bytes("Not found", "utf-8"), ExtensionRestResponse.TEXT_CONTENT_TYPE)
         
     @property
     def routes(self) -> list[NamedRoute]:
@@ -174,7 +169,7 @@ The CRUD extension will handle the following methods:
 - GET /crud: Search for documents
     ```
     index_name = 'test-index'
-    q = request.params.get('q')
+    q = request.param("q")
     
     logging.info(f"inside get {q}")
 
@@ -192,14 +187,14 @@ The CRUD extension will handle the following methods:
         index=index_name
     )
     response_bytes = bytes(json.dumps(response).encode("utf-8"))
-    return ExtensionRestResponse(RestStatus.OK, response_bytes, ExtensionRestResponse.JSON_CONTENT_TYPE, consumed_params=['q'])
+    return ExtensionRestResponse(RestStatus.OK, response_bytes, ExtensionRestResponse.JSON_CONTENT_TYPE, consumed_params=["q"])
     ```
-    get method takes a query parameter `q` and searches for documents in the index with the given query. We have mentioned `consumed_params=['q']` to indicate that the extension has consumed the `q` parameter.
+    get method takes a query parameter `q` and searches for documents in the index with the given query. We have mentioned `consumed_params=["q"]` to indicate that the extension has consumed the `q` parameter.
 
 - PUT /crud: Update a document
     ```
     index_name = 'test-index'
-    id = request.params.get('id')
+    id = request.param("id")
     document = request.content
     response = self.client.index(
         index=index_name,
@@ -208,30 +203,30 @@ The CRUD extension will handle the following methods:
         refresh=True
     )
     response_bytes = bytes(json.dumps(response), "utf-8")
-    return ExtensionRestResponse(RestStatus.OK, response_bytes, ExtensionRestResponse.JSON_CONTENT_TYPE, consumed_params=['id'])
+    return ExtensionRestResponse(RestStatus.OK, response_bytes, ExtensionRestResponse.JSON_CONTENT_TYPE, consumed_params=["id"])
     ```
-    put method takes an id parameter and updates the document with the given id in the index. The document is passed as the request content. We have mentioned `consumed_params=['id']` to indicate that the extension has consumed the `id` parameter.
+    put method takes an id parameter and updates the document with the given id in the index. The document is passed as the request content. We have mentioned `consumed_params=["id"]` to indicate that the extension has consumed the `id` parameter.
 
 - DELETE /crud: Delete a document
     ```
     index_name = 'test-index'
-    id = request.params.get('id')
+    id = request.param("id")
     response = self.client.delete(
         index=index_name,
         id=id
     )
     response_bytes = bytes(json.dumps(response), "utf-8")
     logging.info(f"response: {response}")
-    return ExtensionRestResponse(RestStatus.OK, response_bytes, ExtensionRestResponse.JSON_CONTENT_TYPE, consumed_params=['id'])
+    return ExtensionRestResponse(RestStatus.OK, response_bytes, ExtensionRestResponse.JSON_CONTENT_TYPE, consumed_params=["id"])
     ```
-    delete method takes an id parameter and deletes the document with the given id from the index. We have mentioned `consumed_params=['id']` to indicate that the extension has consumed the `id` parameter.
+    delete method takes an id parameter and deletes the document with the given id from the index. We have mentioned `consumed_params=["id"]` to indicate that the extension has consumed the `id` parameter.
 
 ## Register the Extension
 
 Register the extension with OpenSearch by sending a POST request to the _extension/initialize endpoint. The request body should contain the extension name and the path to the extension.json file.
 
 ```bash
-curl -XPOST "localhost:9200/_extensions/initialize" -H "Content-Type:application/json" --data @samples/crud_extension/crud.json
+curl -XPOST "localhost:9200/_extensions/initialize" -H "Content-Type:application/json" --data @samples/crud/crud.json
 
 {"success":"A request to initialize an extension has been sent."}
 ```
