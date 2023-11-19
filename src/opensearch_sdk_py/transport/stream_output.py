@@ -9,7 +9,7 @@
 
 from enum import Enum
 from io import BytesIO
-from typing import Union
+from typing import Any, Union
 
 from opensearch_sdk_py.transport.version import Version
 
@@ -658,11 +658,11 @@ class StreamOutput(BytesIO):
     #  If want to keep stream out map and stream in map have the same stream order when stream,
     #  can use {@code writeMapWithConsistentOrder}
     #
-    # def writeGenericValue(@Nullable Object value) throws IOException {
-    #     if (value == null) {
-    #         write_byte((byte) -1);
-    #         return;
-    #     }
+    def write_generic_value(self, value: Any) -> None:
+        if value is None:
+            self.write_byte(-1)
+
+    # TODO: Continue porting
     #     final Class<?> type = getGenericType(value);
     #     Writer<Object> writer = WriteableRegistry.getWriter(type);
     #     if (writer == null) {

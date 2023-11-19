@@ -8,7 +8,10 @@
 #
 
 
-from typing import Dict, Optional, Union
+from typing import Any, Dict, Optional, Union
+
+from opensearch_sdk_py.transport.stream_input import StreamInput
+from opensearch_sdk_py.transport.stream_output import StreamOutput
 
 
 class Settings:
@@ -58,3 +61,21 @@ class Settings:
         raise Exception("value is not a string")
 
     # TODO: get_as_time, get_as_bytes_size
+
+    @staticmethod
+    def read_settings_from_stream(input: StreamInput) -> "Settings":
+        settings: dict[str, Union[str, Dict]] = {}
+        num_settings: int = input.read_v_int
+        for i in range(num_settings):
+            key: str = input.read_string
+            value: Any = input.read_generic_value
+            settings[key] = value
+        return Settings(settings)
+
+    @staticmethod
+    def write_settings_to_stream(settings: "Settings", out: StreamOutput) -> None:
+        out.write_v_int(len(settings.settings))
+        for key, value in settings.settings.items():
+            out.write_string(key)
+            out.write_generic_value(value)
+        return

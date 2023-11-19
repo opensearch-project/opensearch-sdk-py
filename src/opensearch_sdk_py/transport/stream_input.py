@@ -9,7 +9,7 @@
 
 import io
 from enum import Enum
-from typing import Any, Optional, Union
+from typing import Any, Callable, Optional, Union
 
 from opensearch_sdk_py.transport.version import Version
 
@@ -229,6 +229,44 @@ class StreamInput:
             result[key] = value
 
         return result
+
+    def read_generic_value(self) -> Any:
+        type: int = self.read_byte()
+        if type == -1:
+            return None
+        reader: dict[int, Callable] = {
+            0: self.read_string,
+            1: self.read_int,
+            2: self.read_long,
+            # 3: self.read_float,
+            # 4: self.read_double,
+            5: self.read_boolean,
+            6: self.read_bytes,
+            # 7: self.read_array_list,
+            # 8: self.read_array,
+            # 9: self.read_linked_hash_map,
+            # 10: self.read_hash_map,
+            11: self.read_byte,
+            # 12: self.read_date,
+            # 13: self.read_zoned_date_time,
+            # 14: self.read_bytes_reference,
+            # 15: self.read_text,
+            16: self.read_short,
+            # 17: self.read_int_array,
+            # 18: self.read_long_array,
+            # 19: self.read_float_array,
+            # 20: self.read_double_array,
+            # 21: self.read_bytes_ref,
+            # no 22
+            # 23: self.read_zoned_date_time,
+            # 24: self.read_collection,
+            # 25: self.read_collection,
+            # 26: self.read_big_integer,
+        }
+        try:
+            return reader[type]()
+        except KeyError:
+            raise Exception(f"Type {type} is not implemented")
 
     def read_enum(self, enum: Enum) -> Any:
         return enum(self.read_v_int())  # type:ignore
