@@ -167,6 +167,42 @@ class TestStreamInput(unittest.TestCase):
         self.assertSetEqual(dict["foo"], {"bar", "baz"})
         self.assertSetEqual(dict["qux"], set())
 
+    def test_read_generic_value(self) -> None:
+        # -1
+        input = StreamInput(b"\xff")
+        self.assertIsNone(input.read_generic_value())
+        # 0
+        input = StreamInput(b"\x00\x04test")
+        self.assertEqual(input.read_generic_value(), "test")
+        # 1
+        input = StreamInput(b"\x01\x00\x00\x00\x2a")
+        self.assertEqual(input.read_generic_value(), 42)
+        # 2
+        input = StreamInput(b"\x02\x00\x00\x00\x01\x02\x03\x04\x05")
+        self.assertEqual(input.read_generic_value(), 4328719365)
+        # 5
+        input = StreamInput(b"\x05\x01")
+        self.assertEqual(input.read_generic_value(), True)
+        # 6
+        input = StreamInput(b"\x06\x00")
+        self.assertEqual(input.read_generic_value(), b"")
+        input = StreamInput(b"\x06\x03\x27\x10\x42")
+        self.assertEqual(input.read_generic_value(), b"\x27\x10\x42")
+        # 7
+        input = StreamInput(b"\x07\x00")
+        self.assertEqual(input.read_generic_value(), [])
+        input = StreamInput(b"\x07\x02\x00\x03foo\x00\x03bar")
+        self.assertEqual(input.read_generic_value(), ["foo", "bar"])
+        # 11
+        input = StreamInput(b"\x0b\x2a")
+        self.assertEqual(input.read_generic_value(), 42)
+        # 16
+        input = StreamInput(b"\x10\x00\x2a")
+        self.assertEqual(input.read_generic_value(), 42)
+        # not implemented
+        input = StreamInput(b"\xfe")
+        self.assertRaises(Exception, input.read_generic_value)
+
     def test_read_enum(self) -> None:
         TestEnum = Enum("TestEnum", ["FOO", "BAR", "BAZ"], start=0)
         input = StreamInput(b"\x01")

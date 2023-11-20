@@ -232,7 +232,9 @@ class StreamInput:
 
     def read_generic_value(self) -> Any:
         type: int = self.read_byte()
-        if type == -1:
+        # TODO: Handle negatives and make this -1
+        # https://github.com/opensearch-project/opensearch-sdk-py/issues/88
+        if type & 0xff == 0xff:
             return None
         reader: dict[int, Callable] = {
             0: self.read_string,
@@ -241,7 +243,7 @@ class StreamInput:
             # 3: self.read_float,
             # 4: self.read_double,
             5: self.read_boolean,
-            6: self.read_bytes,
+            6: self.read_byte_array,
             7: self.read_array_list,
             # 8: self.read_array,
             # 9: self.read_linked_hash_map,
@@ -273,6 +275,12 @@ class StreamInput:
         for i in range(self.read_v_int()):
             result.append(self.read_generic_value())
         return result
+
+    def read_byte_array(self) -> bytes:
+        size: int = self.read_v_int()
+        if size == 0:
+            return b""
+        return self.read_bytes(size)
 
     def read_enum(self, enum: Enum) -> Any:
         return enum(self.read_v_int())  # type:ignore
