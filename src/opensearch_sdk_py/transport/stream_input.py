@@ -242,7 +242,7 @@ class StreamInput:
             # 4: self.read_double,
             5: self.read_boolean,
             6: self.read_bytes,
-            # 7: self.read_array_list,
+            7: self.read_array_list,
             # 8: self.read_array,
             # 9: self.read_linked_hash_map,
             # 10: self.read_hash_map,
@@ -267,6 +267,12 @@ class StreamInput:
             return reader[type]()
         except KeyError:
             raise Exception(f"Type {type} is not implemented")
+
+    def read_array_list(self) -> list[Any]:
+        result: list[Any] = list()
+        for i in range(self.read_v_int()):
+            result.append(self.read_generic_value())
+        return result
 
     def read_enum(self, enum: Enum) -> Any:
         return enum(self.read_v_int())  # type:ignore

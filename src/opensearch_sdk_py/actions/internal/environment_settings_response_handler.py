@@ -24,8 +24,5 @@ class EnvironmentSettingsResponseHandler(ResponseHandler):
     def handle(self, request: OutboundMessageRequest, input: StreamInput) -> StreamOutput:
         env_response = EnvironmentSettingsResponse().read_from(input)
         logging.debug(f"< {env_response}")
-        if env_response.status:
-            return self.next_handler.send()
-        else:
-            # TODO error handling
-            return None
+        # TODO save the settings somewhere
+        return self.next_handler.send()
