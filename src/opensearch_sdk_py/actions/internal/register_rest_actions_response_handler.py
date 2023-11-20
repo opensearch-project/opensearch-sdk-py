@@ -18,14 +18,15 @@ from opensearch_sdk_py.transport.stream_output import StreamOutput
 
 
 class RegisterRestActionsResponseHandler(ResponseHandler):
-    def __init__(self, next_handler: RequestResponseHandler) -> None:
+    def __init__(self, next_handler: RequestResponseHandler, request: OutboundMessageRequest) -> None:
         self.next_handler = next_handler
+        self.request = request
 
     def handle(self, request: OutboundMessageRequest, input: StreamInput) -> StreamOutput:
         ack_response = AcknowledgedResponse().read_from(input)
         logging.debug(f"< {ack_response}")
         if ack_response.status:
-            return self.next_handler.send()
+            return self.next_handler.send(self.request)
         else:
             # TODO error handling
             return None

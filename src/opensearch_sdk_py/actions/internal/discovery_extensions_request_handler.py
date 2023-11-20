@@ -68,7 +68,7 @@ class DiscoveryExtensionsRequestHandler(RequestHandler):
             version=request.version,
             action="internal:discovery/registerrestactions",
         )
-        register_response_handler = RegisterRestActionsResponseHandler(self)  # TODO: change this self to settings handler
+        register_response_handler = RegisterRestActionsResponseHandler(settings_response_handler, settings_request)
         self.response_handlers.register(register_request.request_id, register_response_handler)
 
         # Now send the request at top of stack

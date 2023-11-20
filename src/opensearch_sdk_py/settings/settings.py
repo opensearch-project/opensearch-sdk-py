@@ -8,6 +8,7 @@
 #
 
 
+import logging
 from typing import Any, Dict, Optional, Union
 
 from opensearch_sdk_py.transport.stream_input import StreamInput
@@ -65,10 +66,13 @@ class Settings:
     @staticmethod
     def read_settings_from_stream(input: StreamInput) -> "Settings":
         settings: dict[str, Union[str, Dict]] = {}
-        num_settings: int = input.read_v_int
+        num_settings: int = input.read_v_int()
+        logging.info(f">>>>> Reading {num_settings} settings")
         for i in range(num_settings):
-            key: str = input.read_string
-            value: Any = input.read_generic_value
+            key: str = input.read_string()
+            logging.info(f">>>>> Setting {i}: Reading key {key}")
+            value: Any = input.read_generic_value()
+            logging.info(f">>>>> Setting {i}: Value is {value}")
             settings[key] = value
         return Settings(settings)
 
