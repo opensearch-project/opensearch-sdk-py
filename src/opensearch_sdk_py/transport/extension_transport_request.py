@@ -9,7 +9,6 @@
 
 # https://github.com/opensearch-project/OpenSearch/blob/main/server/src/main/java/org/opensearch/extensions/ExtensionRequest.java
 
-from typing import Optional
 
 from opensearch_sdk_py.protobuf.ExtensionRequestProto_pb2 import ExtensionRequest
 from opensearch_sdk_py.transport.request_type import RequestType
@@ -22,13 +21,12 @@ class ExtensionTransportRequest(TransportRequest):
     def __init__(
         self,
         request_type: "RequestType",
-        unique_id: Optional[str] = None,
+        unique_id: str = "",
     ) -> None:
         super().__init__()
         self.er = ExtensionRequest()
         self.er.requestType = request_type.value
-        if unique_id is not None:
-            self.er.identity.uniqueId = unique_id
+        self.er.identity.uniqueId = unique_id
 
     def read_from(self, input: StreamInput) -> "ExtensionTransportRequest":
         super().read_from(input)
