@@ -16,16 +16,16 @@ from opensearch_sdk_py.transport.transport_response import TransportResponse
 
 
 class EnvironmentSettingsResponse(TransportResponse):
-    def __init__(self, environmentSettings: Settings = None):
+    def __init__(self, environment_settings: Settings = None):
         super().__init__()
-        self.environmentSettings = environmentSettings
+        self.environment_settings = environment_settings
 
     def read_from(self, input: StreamInput) -> "EnvironmentSettingsResponse":
         super().read_from(input)
-        self.environmentSettings = Settings.read_settings_from_stream(input)
+        self.environment_settings = Settings.read_settings_from_stream(input)
         return self
 
     def write_to(self, output: StreamOutput) -> "EnvironmentSettingsResponse":
         super().write_to(output)
-        Settings.write_settings_to_stream(self.environmentSettings, output)
+        Settings.write_settings_to_stream(self.environment_settings, output)
         return self

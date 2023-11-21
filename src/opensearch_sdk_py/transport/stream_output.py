@@ -61,15 +61,9 @@ class StreamOutput(BytesIO):
     def write_long(self, i: int) -> int:
         return self.write(i.to_bytes(8, byteorder="big"))
 
-    # }
-    # /**
-    #  Writes an array of bytes.
-    #      #  @param b the bytes to write
-    #
-    # def write_byteArray(byte[] b) throws IOException {
-    #     writeVInt(b.length);
-    #     write_bytes(b, 0, b.length);
-    # }
+    def write_byte_array(self, b: bytes) -> int:
+        self.write_v_int(len(b))
+        return self.write(b)
 
     # /**
     #  Writes the bytes reference, including a length header.
@@ -540,15 +534,12 @@ class StreamOutput(BytesIO):
     #         o.writeVInt(bytes.length);
     #         o.write_bytes(bytes);
     #     });
-    #     writers.put(List.class, (o, v) -> {
-    #         o.write_byte((byte) 7);
-    #         @SuppressWarnings("rawtypes")
-    #         final List list = (List) v;
-    #         o.writeVInt(list.size());
-    #         for (Object item : list) {
-    #             o.writeGenericValue(item);
-    #         }
-    #     });
+
+    def write_array_list(self, li: list[Any]) -> None:
+        self.write_v_int(len(li))
+        for i in li:
+            self.write_generic_value(i)
+
     #     writers.put(Object[].class, (o, v) -> {
     #         o.write_byte((byte) 8);
     #         final Object[] list = (Object[]) v;
@@ -652,17 +643,27 @@ class StreamOutput(BytesIO):
     #     }
     # }
 
-    # /**
-    #  Notice: when serialization a map, the stream out map with the stream in map maybe have the
-    #  different key-value orders, they will maybe have different stream order.
-    #  If want to keep stream out map and stream in map have the same stream order when stream,
-    #  can use {@code writeMapWithConsistentOrder}
-    #
     def write_generic_value(self, value: Any) -> None:
         if value is None:
-            self.write_byte(-1)
+            # TODO: Handle negatives and make this -1
+            # https://github.com/opensearch-project/opensearch-sdk-py/issues/88
+            self.write_byte(0xFF)
+        elif isinstance(value, str):
+            self.write_byte(0)
+            self.write_string(value)
+        elif isinstance(value, int):
+            self.write_byte(2)
+            self.write(value.to_bytes(8, "big", signed=True))
+        elif isinstance(value, bool):
+            self.write_byte(5)
+            self.write_boolean(value)
+        elif isinstance(value, bytes):
+            self.write_byte(6)
+            self.write_byte_array(value)
+        elif isinstance(value, list):
+            self.write_byte(7)
+            self.write_array_list(value)
 
-    # TODO: Continue porting
     #     final Class<?> type = getGenericType(value);
     #     Writer<Object> writer = WriteableRegistry.getWriter(type);
     #     if (writer == null) {

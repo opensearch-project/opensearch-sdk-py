@@ -234,7 +234,7 @@ class StreamInput:
         type: int = self.read_byte()
         # TODO: Handle negatives and make this -1
         # https://github.com/opensearch-project/opensearch-sdk-py/issues/88
-        if type & 0xff == 0xff:
+        if type == 0xFF:
             return None
         reader: dict[int, Callable] = {
             0: self.read_string,
@@ -277,10 +277,8 @@ class StreamInput:
         return result
 
     def read_byte_array(self) -> bytes:
-        size: int = self.read_v_int()
-        if size == 0:
-            return b""
-        return self.read_bytes(size)
+        size: int = self.read_array_size()
+        return self.read_bytes(size) if size > 0 else b""
 
     def read_enum(self, enum: Enum) -> Any:
         return enum(self.read_v_int())  # type:ignore

@@ -22,46 +22,11 @@ class Settings:
     ) -> None:
         self.settings = settings
 
-    def get(self, setting: str, default: Optional[str] = None) -> str:
+    def get(self, setting: str, default: Optional[str] = None) -> Optional[str]:
         s_value = self.settings.get(setting)
-        if s_value is None:
-            return default if default else str(None)
-        return str(s_value)
+        return str(s_value) if s_value else default
 
-    def get_as_int(self, setting: str, default: int) -> int:
-        s_value = self.settings.get(setting)
-        if s_value is None:
-            return default
-        if isinstance(s_value, str):
-            return int(s_value)
-        raise Exception("value is not a string")
-
-    def get_as_float(self, setting: str, default: float) -> float:
-        s_value = self.settings.get(setting)
-        if s_value is None:
-            return default
-        if isinstance(s_value, str):
-            return float(s_value)
-        raise Exception("value is not a string")
-
-    def get_as_boolean(self, setting: str, default: bool) -> bool:
-        s_value = self.settings.get(setting)
-        if s_value is None:
-            return default
-        if isinstance(s_value, str):
-            return bool(s_value)
-        raise Exception("value is not a string")
-
-    def get_as_list(self, setting: str, default: list[str] = []) -> list[str]:
-        s_value = self.settings.get(setting)
-        if s_value is None:
-            return default
-        if isinstance(s_value, str):
-            return s_value.split(",")
-        raise Exception("value is not a string")
-
-    # TODO: get_as_time, get_as_bytes_size
-
+    # TODO change to read_from
     @staticmethod
     def read_settings_from_stream(input: StreamInput) -> "Settings":
         settings: dict[str, Union[str, Dict]] = {}
@@ -72,6 +37,7 @@ class Settings:
             settings[key] = value
         return Settings(settings)
 
+    # TODO change to write_to
     @staticmethod
     def write_settings_to_stream(settings: "Settings", out: StreamOutput) -> None:
         out.write_v_int(len(settings.settings))
