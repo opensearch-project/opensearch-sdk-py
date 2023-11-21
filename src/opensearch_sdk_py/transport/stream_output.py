@@ -63,9 +63,9 @@ class StreamOutput(BytesIO):
     def write_long(self, i: int) -> int:
         return self.write(i.to_bytes(8, byteorder="big", signed=True))
 
-    def write_byte_array(self, b: bytes) -> int:
+    def write_byte_array(self, b: bytes) -> None:
         self.write_v_int(len(b))
-        return self.write(b)
+        self.write(b)
 
     # /**
     #  Writes the bytes reference, including a length header.
@@ -647,18 +647,17 @@ class StreamOutput(BytesIO):
 
     def write_generic_value(self, value: Any) -> None:
         if value is None:
-            # TODO: Handle negatives and make this -1
-            # https://github.com/opensearch-project/opensearch-sdk-py/issues/88
-            self.write_byte(0xFF)
+            self.write_byte(-1)
+        # bool is int subclass so must handle before other int types
+        elif isinstance(value, bool):
+            self.write_byte(5)
+            self.write_boolean(value)
         elif isinstance(value, str):
             self.write_byte(0)
             self.write_string(value)
         elif isinstance(value, int):
             self.write_byte(2)
-            self.write_int(value)
-        elif isinstance(value, bool):
-            self.write_byte(5)
-            self.write_boolean(value)
+            self.write_long(value)
         elif isinstance(value, bytes):
             self.write_byte(6)
             self.write_byte_array(value)
