@@ -22,26 +22,21 @@ class Settings:
     ) -> None:
         self.settings = settings
 
-    def get(self, setting: str, default: Optional[str] = None) -> Optional[str]:
-        s_value = self.settings.get(setting)
-        return str(s_value) if s_value else default
-
-    # TODO change to read_from
-    @staticmethod
-    def read_settings_from_stream(input: StreamInput) -> "Settings":
-        settings: dict[str, Union[str, Dict]] = {}
+    def read_from(self, input: StreamInput) -> "Settings":
         num_settings: int = input.read_v_int()
         for i in range(num_settings):
             key: str = input.read_string()
             value: Any = input.read_generic_value()
-            settings[key] = value
-        return Settings(settings)
+            self.settings[key] = value
+        return self
 
-    # TODO change to write_to
-    @staticmethod
-    def write_settings_to_stream(settings: "Settings", out: StreamOutput) -> None:
-        out.write_v_int(len(settings.settings))
-        for key, value in settings.settings.items():
+    def write_to(self, out: StreamOutput) -> "Settings":
+        out.write_v_int(len(self.settings))
+        for key, value in self.settings.items():
             out.write_string(key)
             out.write_generic_value(value)
-        return
+        return self
+
+    def get(self, setting: str, default: Optional[str] = None) -> Optional[str]:
+        s_value = self.settings.get(setting)
+        return str(s_value) if s_value else default
