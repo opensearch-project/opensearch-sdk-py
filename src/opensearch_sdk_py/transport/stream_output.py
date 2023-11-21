@@ -15,12 +15,13 @@ from opensearch_sdk_py.transport.version import Version
 
 
 class StreamOutput(BytesIO):
+    # writes a signed byte
     def write_byte(self, b: int) -> int:
-        return self.write(b.to_bytes(1, byteorder="big"))
+        return self.write(b.to_bytes(1, byteorder="big", signed=True))
 
-    #  writes an int as four bytes.
+    # writes a signed int as big-endian four bytes.
     def write_int(self, i: int) -> int:
-        return self.write(i.to_bytes(4, byteorder="big"))
+        return self.write(i.to_bytes(4, byteorder="big", signed=True))
 
     # writes an int in a variable-length format
     def write_v_int(self, i: int) -> int:
@@ -58,8 +59,9 @@ class StreamOutput(BytesIO):
     def write_version(self, version: Version) -> int:
         return self.write_v_int(version.id)
 
+    # writes a signed long as big-endian eight bytes.
     def write_long(self, i: int) -> int:
-        return self.write(i.to_bytes(8, byteorder="big"))
+        return self.write(i.to_bytes(8, byteorder="big", signed=True))
 
     def write_byte_array(self, b: bytes) -> int:
         self.write_v_int(len(b))
@@ -653,7 +655,7 @@ class StreamOutput(BytesIO):
             self.write_string(value)
         elif isinstance(value, int):
             self.write_byte(2)
-            self.write(value.to_bytes(8, "big", signed=True))
+            self.write_int(value)
         elif isinstance(value, bool):
             self.write_byte(5)
             self.write_boolean(value)
