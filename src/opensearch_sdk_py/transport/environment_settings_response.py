@@ -22,10 +22,10 @@ class EnvironmentSettingsResponse(TransportResponse):
 
     def read_from(self, input: StreamInput) -> "EnvironmentSettingsResponse":
         super().read_from(input)
-        self.environment_settings = Settings.read_settings_from_stream(input)
+        self.environment_settings = Settings().read_from(input)
         return self
 
     def write_to(self, output: StreamOutput) -> "EnvironmentSettingsResponse":
         super().write_to(output)
-        Settings.write_settings_to_stream(self.environment_settings, output)
+        self.environment_settings.write_to(output)
         return self
