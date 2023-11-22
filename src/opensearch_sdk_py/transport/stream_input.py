@@ -9,7 +9,7 @@
 
 import io
 from enum import Enum
-from typing import Any, Optional, Union
+from typing import Any, Callable, Optional, Union
 
 from opensearch_sdk_py.transport.version import Version
 
@@ -20,16 +20,16 @@ class StreamInput:
         self.data = io.BytesIO(input)
 
     def read_byte(self) -> int:
-        return self.data.read(1)[0]
+        return int.from_bytes(self.data.read(1), byteorder="big", signed=True)
 
     def read_bytes(self, len: int) -> bytes:
         return self.data.read(len)
 
     def read_int(self) -> int:
-        return ((self.read_byte() & 0xFF) << 24) | ((self.read_byte() & 0xFF) << 16) | ((self.read_byte() & 0xFF) << 8) | (self.read_byte() & 0xFF)
+        return int.from_bytes(self.data.read(4), byteorder="big", signed=True)
 
     def read_short(self) -> int:
-        return ((self.read_byte() & 0xFF) << 8) | (self.read_byte() & 0xFF)
+        return int.from_bytes(self.data.read(2), byteorder="big", signed=True)
 
     def read_boolean(self) -> bool:
         value = self.read_byte()
@@ -88,9 +88,8 @@ class StreamInput:
         else:
             return None
 
-    # reads eight bytes and returns a long
     def read_long(self) -> int:
-        return self.read_int() << 32 | self.read_int() & 0xFFFFFFFF
+        return int.from_bytes(self.data.read(8), byteorder="big", signed=True)
 
     # reads a long stored in variable-length format
     def read_v_long(self) -> int:
@@ -138,39 +137,22 @@ class StreamInput:
         return i
 
     def read_optional_v_long(self) -> Optional[int]:
-        if self.read_boolean():
-            return self.read_v_long()
-        else:
-            return None
+        return self.read_v_long() if self.read_boolean() else None
 
     def read_optional_long(self) -> Optional[int]:
-        if self.read_boolean():
-            return self.read_long()
-        else:
-            return None
+        return self.read_long() if self.read_boolean() else None
 
     def read_optional_string(self) -> Optional[str]:
-        if self.read_boolean():
-            return self.read_string()
-        else:
-            return None
+        return self.read_string() if self.read_boolean() else None
 
     def read_array_size(self) -> int:
         array_size = self.read_v_int()
-
         if array_size > 2**31:
             raise Exception(f"array length must be <= to {2**31} but was: {array_size}")
-
-        # if array_size < 0:
-        #    raise Exception(f"array size must be positive but was: {array_size}")
-
-        # ensureCanReadBytes(arraySize);
-
         return array_size
 
     def read_string(self) -> str:
-        char_count = self.read_array_size()
-        return str(self.read_bytes(char_count), "utf-8")
+        return str(self.read_bytes(self.read_array_size()), "utf-8")
 
     def read_string_array(self) -> list[str]:
         size = self.read_array_size()
@@ -229,6 +211,54 @@ class StreamInput:
             result[key] = value
 
         return result
+
+    def read_generic_value(self) -> Any:
+        type: int = self.read_byte()
+        if type == -1:
+            return None
+        reader: dict[int, Callable] = {
+            0: self.read_string,
+            1: self.read_int,
+            2: self.read_long,
+            # 3: self.read_float,
+            # 4: self.read_double,
+            5: self.read_boolean,
+            6: self.read_byte_array,
+            7: self.read_array_list,
+            # 8: self.read_array,
+            # 9: self.read_linked_hash_map,
+            # 10: self.read_hash_map,
+            11: self.read_byte,
+            # 12: self.read_date,
+            # 13: self.read_zoned_date_time,
+            # 14: self.read_bytes_reference,
+            # 15: self.read_text,
+            16: self.read_short,
+            # 17: self.read_int_array,
+            # 18: self.read_long_array,
+            # 19: self.read_float_array,
+            # 20: self.read_double_array,
+            # 21: self.read_bytes_ref,
+            # no 22
+            # 23: self.read_zoned_date_time,
+            # 24: self.read_collection,
+            # 25: self.read_collection,
+            # 26: self.read_big_integer,
+        }
+        try:
+            return reader[type]()
+        except KeyError:
+            raise Exception(f"Type {type} is not implemented")
+
+    def read_array_list(self) -> list[Any]:
+        result: list[Any] = list()
+        for i in range(self.read_v_int()):
+            result.append(self.read_generic_value())
+        return result
+
+    def read_byte_array(self) -> bytes:
+        size: int = self.read_array_size()
+        return self.read_bytes(size) if size > 0 else b""
 
     def read_enum(self, enum: Enum) -> Any:
         return enum(self.read_v_int())  # type:ignore

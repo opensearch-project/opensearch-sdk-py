@@ -21,10 +21,11 @@ from opensearch_sdk_py.rest.rest_execute_on_extension_response import RestExecut
 from opensearch_sdk_py.rest.rest_status import RestStatus
 from opensearch_sdk_py.server.async_extension_host import AsyncExtensionHost
 from opensearch_sdk_py.transport.acknowledged_response import AcknowledgedResponse
-from opensearch_sdk_py.transport.initialize_extension_response import InitializeExtensionResponse
+from opensearch_sdk_py.transport.extension_transport_request import ExtensionTransportRequest
 from opensearch_sdk_py.transport.outbound_message_request import OutboundMessageRequest
 from opensearch_sdk_py.transport.outbound_message_response import OutboundMessageResponse
 from opensearch_sdk_py.transport.register_rest_actions_request import RegisterRestActionsRequest
+from opensearch_sdk_py.transport.request_type import RequestType
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.tcp_header import TcpHeader
 from opensearch_sdk_py.transport.version import Version
@@ -140,8 +141,8 @@ class TestAsyncExtensionHost(unittest.TestCase):
         assert responses[1] is not None
         reply: TestAsyncExtensionHost.Response = responses[1]
         self.assertEqual(reply.response.thread_context_struct.request_headers, {"_system_index_access_allowed": "false"})
-        init_response = InitializeExtensionResponse().read_from(reply.remaining_input)
-        self.assertEqual(init_response.name, "hello-world")
+        extension_request = ExtensionTransportRequest(RequestType.GET_SETTINGS).read_from(reply.remaining_input)
+        self.assertEqual(extension_request.er.requestType, RequestType.REQUEST_EXTENSION_ENVIRONMENT_SETTINGS.value)
 
     def test_error_response(self) -> None:
         request1 = NettyTraceData.load("tests/transport/data/transport_service_handshake_request.txt").data

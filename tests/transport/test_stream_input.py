@@ -15,24 +15,23 @@ from opensearch_sdk_py.transport.stream_input import StreamInput
 
 class TestStreamInput(unittest.TestCase):
     def test_read_byte(self) -> None:
-        input = StreamInput(b"\x2a")
+        input = StreamInput(b"\x2a\xff")
         self.assertEqual(input.read_byte(), 42)
+        self.assertEqual(input.read_byte(), -1)
 
     def test_read_bytes(self) -> None:
         input = StreamInput(b"\x27\x10\x42")
         self.assertEqual(input.read_bytes(3), b"\x27\x10\x42")
 
     def test_read_int(self) -> None:
-        input = StreamInput(b"\x00\x00\x00\x2a\x00\x00\x00\x2a\x00")
+        input = StreamInput(b"\x00\x00\x00\x2a\xff\xff\xff\xff")
         self.assertEqual(input.read_int(), 42)
-        self.assertEqual(input.read_int(), 42)
-        self.assertRaises(IndexError, input.read_int)
+        self.assertEqual(input.read_int(), -1)
 
     def test_read_short(self) -> None:
-        input = StreamInput(b"\x12\x34\x56\x78\x90")
+        input = StreamInput(b"\x12\x34\xff\xff")
         self.assertEqual(input.read_short(), 4660)
-        self.assertEqual(input.read_short(), 22136)
-        self.assertRaises(IndexError, input.read_short)
+        self.assertEqual(input.read_short(), -1)
 
     def test_read_boolean(self) -> None:
         input = StreamInput(b"\x00\x01\x02")
@@ -68,16 +67,15 @@ class TestStreamInput(unittest.TestCase):
         self.assertEqual(str(v), "2.10.0.99")
 
     def test_read_optional_int(self) -> None:
-        input = StreamInput(b"\x01\x00\x00\x00\x2a\x00\x01")
+        input = StreamInput(b"\x01\x00\x00\x00\x2a\x01\xff\xff\xff\xff\x00")
         self.assertEqual(input.read_optional_int(), 42)
+        self.assertEqual(input.read_optional_int(), -1)
         self.assertEqual(input.read_optional_int(), None)
-        self.assertRaises(IndexError, input.read_optional_int)
 
     def test_read_long(self) -> None:
-        input = StreamInput(b"\x00\x00\x00\x01\x02\x03\x04\x05\x00\x00\x00\x01\x02\x03\x04\x05\x00")
+        input = StreamInput(b"\x00\x00\x00\x01\x02\x03\x04\x05\xff\xff\xff\xff\xff\xff\xff\xff")
         self.assertEqual(input.read_long(), 4328719365)
-        self.assertEqual(input.read_long(), 4328719365)
-        self.assertRaises(IndexError, input.read_long)
+        self.assertEqual(input.read_long(), -1)
 
     def test_read_v_long(self) -> None:
         input = StreamInput(b"\x2a")
@@ -112,10 +110,10 @@ class TestStreamInput(unittest.TestCase):
         self.assertRaises(Exception, input.read_optional_v_long)
 
     def test_read_optional_long(self) -> None:
-        input = StreamInput(b"\x01\x00\x00\x00\x00\x00\x00\x00\x2a\x00\x01")
+        input = StreamInput(b"\x01\x00\x00\x00\x00\x00\x00\x00\x2a\x01\xff\xff\xff\xff\xff\xff\xff\xff\x00")
         self.assertEqual(input.read_optional_long(), 42)
+        self.assertEqual(input.read_optional_long(), -1)
         self.assertEqual(input.read_optional_long(), None)
-        self.assertRaises(IndexError, input.read_optional_long)
 
     def test_read_optional_string(self) -> None:
         input = StreamInput(b"\x01\x04test")
@@ -166,6 +164,42 @@ class TestStreamInput(unittest.TestCase):
         self.assertEqual(len(dict), 2)
         self.assertSetEqual(dict["foo"], {"bar", "baz"})
         self.assertSetEqual(dict["qux"], set())
+
+    def test_read_generic_value(self) -> None:
+        # -1
+        input = StreamInput(b"\xff")
+        self.assertIsNone(input.read_generic_value())
+        # 0
+        input = StreamInput(b"\x00\x04test")
+        self.assertEqual(input.read_generic_value(), "test")
+        # 1
+        input = StreamInput(b"\x01\x00\x00\x00\x2a")
+        self.assertEqual(input.read_generic_value(), 42)
+        # 2
+        input = StreamInput(b"\x02\x00\x00\x00\x01\x02\x03\x04\x05")
+        self.assertEqual(input.read_generic_value(), 4328719365)
+        # 5
+        input = StreamInput(b"\x05\x01")
+        self.assertEqual(input.read_generic_value(), True)
+        # 6
+        input = StreamInput(b"\x06\x00")
+        self.assertEqual(input.read_generic_value(), b"")
+        input = StreamInput(b"\x06\x03\x27\x10\x42")
+        self.assertEqual(input.read_generic_value(), b"\x27\x10\x42")
+        # 7
+        input = StreamInput(b"\x07\x00")
+        self.assertEqual(input.read_generic_value(), [])
+        input = StreamInput(b"\x07\x02\x00\x03foo\x00\x03bar")
+        self.assertEqual(input.read_generic_value(), ["foo", "bar"])
+        # 11
+        input = StreamInput(b"\x0b\x2a")
+        self.assertEqual(input.read_generic_value(), 42)
+        # 16
+        input = StreamInput(b"\x10\x00\x2a")
+        self.assertEqual(input.read_generic_value(), 42)
+        # not implemented
+        input = StreamInput(b"\xfe")
+        self.assertRaises(Exception, input.read_generic_value)
 
     def test_read_enum(self) -> None:
         TestEnum = Enum("TestEnum", ["FOO", "BAR", "BAZ"], start=0)

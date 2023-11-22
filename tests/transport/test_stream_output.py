@@ -100,6 +100,11 @@ class TestStreamOutput(unittest.TestCase):
         out.write_long(5409454583320448)
         self.assertEqual(out.getvalue(), b"\x00\x13\x37\xde\xca\xde\x0f\x80")
 
+    def test_write_byte_array(self) -> None:
+        out = StreamOutput()
+        out.write_byte_array(b"test")
+        self.assertEqual(out.getvalue(), b"\x04test")
+
     def test_write_string(self) -> None:
         out = StreamOutput()
         out.write_string("test")
@@ -148,6 +153,23 @@ class TestStreamOutput(unittest.TestCase):
             ],
         )
         self.assertEqual(StreamOutput.string_to_string_collection_dict_size(d), len(out.getvalue()))
+
+    def test_write_array_list(self) -> None:
+        out = StreamOutput()
+        out.write_array_list(["foo", "bar"])
+        self.assertEqual(out.getvalue(), b"\x02\x00\x03foo\x00\x03bar")
+
+    def test_write_generic_value(self) -> None:
+        out = StreamOutput()
+        out.write_generic_value(None)
+        out.write_generic_value("test")
+        out.write_generic_value(42)
+        out.write_generic_value(True)
+        self.assertEqual(out.getvalue(), b"\xff\x00\x04test\x02\x00\x00\x00\x00\x00\x00\x00\x2a\05\01")
+        out = StreamOutput()
+        out.write_generic_value(b"test")
+        out.write_generic_value(["foo", "bar"])
+        self.assertEqual(out.getvalue(), b"\x06\x04test\x07\x02\x00\x03foo\x00\x03bar")
 
     def test_write_enum(self) -> None:
         TestEnum = Enum("TestEnum", ["FOO", "BAR", "BAZ"], start=0)

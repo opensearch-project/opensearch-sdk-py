@@ -11,7 +11,7 @@ import unittest
 from typing import Optional
 
 from opensearch_sdk_py.actions.internal.register_rest_actions_response_handler import RegisterRestActionsResponseHandler
-from opensearch_sdk_py.actions.request_handler import RequestHandler
+from opensearch_sdk_py.actions.response_handler import ResponseHandler
 from opensearch_sdk_py.actions.response_handlers import ResponseHandlers
 from opensearch_sdk_py.extension import Extension
 from opensearch_sdk_py.transport.acknowledged_response import AcknowledgedResponse
@@ -30,8 +30,9 @@ class TestResponseHandlers(unittest.TestCase):
     def setUp(self) -> None:
         self.extension = TestResponseHandlers.MyExtension()
         self.response_handlers = ResponseHandlers(self.extension)
-        next_handler = FakeRequestHandler(self.extension)
-        self.response_handlers.register(123, RegisterRestActionsResponseHandler(next_handler))
+        self.next_handler = FakeResponseHandler()
+        request = OutboundMessageRequest()
+        self.response_handlers.register(123, RegisterRestActionsResponseHandler(self.next_handler, request))
 
     def test_register_handlers(self) -> None:
         self.assertEqual(len(self.response_handlers), 1)
@@ -42,8 +43,8 @@ class TestResponseHandlers(unittest.TestCase):
         input = StreamInput(bytes(AcknowledgedResponse(status=True)))
         output = self.response_handlers.handle(response, input)
         self.assertEqual(len(self.response_handlers), 0)
-        self.assertEqual(output, None)
-        self.assertEqual(self.extension.test, "modified")
+        self.assertIsNone(output)
+        self.assertEqual(self.next_handler.test, "modified")
 
     def test_handle_unregistered(self) -> None:
         response = OutboundMessageResponse(request_id=1234)
@@ -52,13 +53,10 @@ class TestResponseHandlers(unittest.TestCase):
         self.assertIsNone(output)
 
 
-class FakeRequestHandler(RequestHandler):
-    def __init__(self, extension: Extension) -> None:
-        super().__init__("test-extension", extension)
-
+class FakeResponseHandler(ResponseHandler):
     def handle(self, request: OutboundMessageRequest, input: StreamInput = None) -> Optional[bytes]:
         return None
 
-    def send(self) -> StreamOutput:
-        self.extension.test = "modified"
+    def send(self, request: OutboundMessageRequest) -> StreamOutput:
+        self.test = "modified"
         return None

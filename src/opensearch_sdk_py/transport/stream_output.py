@@ -9,18 +9,19 @@
 
 from enum import Enum
 from io import BytesIO
-from typing import Union
+from typing import Any, Union
 
 from opensearch_sdk_py.transport.version import Version
 
 
 class StreamOutput(BytesIO):
+    # writes a signed byte
     def write_byte(self, b: int) -> int:
-        return self.write(b.to_bytes(1, byteorder="big"))
+        return self.write(b.to_bytes(1, byteorder="big", signed=True))
 
-    #  writes an int as four bytes.
+    # writes a signed int as big-endian four bytes.
     def write_int(self, i: int) -> int:
-        return self.write(i.to_bytes(4, byteorder="big"))
+        return self.write(i.to_bytes(4, byteorder="big", signed=True))
 
     # writes an int in a variable-length format
     def write_v_int(self, i: int) -> int:
@@ -58,18 +59,13 @@ class StreamOutput(BytesIO):
     def write_version(self, version: Version) -> int:
         return self.write_v_int(version.id)
 
+    # writes a signed long as big-endian eight bytes.
     def write_long(self, i: int) -> int:
-        return self.write(i.to_bytes(8, byteorder="big"))
+        return self.write(i.to_bytes(8, byteorder="big", signed=True))
 
-    # }
-    # /**
-    #  Writes an array of bytes.
-    #      #  @param b the bytes to write
-    #
-    # def write_byteArray(byte[] b) throws IOException {
-    #     writeVInt(b.length);
-    #     write_bytes(b, 0, b.length);
-    # }
+    def write_byte_array(self, b: bytes) -> None:
+        self.write_v_int(len(b))
+        self.write(b)
 
     # /**
     #  Writes the bytes reference, including a length header.
@@ -540,15 +536,12 @@ class StreamOutput(BytesIO):
     #         o.writeVInt(bytes.length);
     #         o.write_bytes(bytes);
     #     });
-    #     writers.put(List.class, (o, v) -> {
-    #         o.write_byte((byte) 7);
-    #         @SuppressWarnings("rawtypes")
-    #         final List list = (List) v;
-    #         o.writeVInt(list.size());
-    #         for (Object item : list) {
-    #             o.writeGenericValue(item);
-    #         }
-    #     });
+
+    def write_array_list(self, li: list[Any]) -> None:
+        self.write_v_int(len(li))
+        for i in li:
+            self.write_generic_value(i)
+
     #     writers.put(Object[].class, (o, v) -> {
     #         o.write_byte((byte) 8);
     #         final Object[] list = (Object[]) v;
@@ -652,17 +645,26 @@ class StreamOutput(BytesIO):
     #     }
     # }
 
-    # /**
-    #  Notice: when serialization a map, the stream out map with the stream in map maybe have the
-    #  different key-value orders, they will maybe have different stream order.
-    #  If want to keep stream out map and stream in map have the same stream order when stream,
-    #  can use {@code writeMapWithConsistentOrder}
-    #
-    # def writeGenericValue(@Nullable Object value) throws IOException {
-    #     if (value == null) {
-    #         write_byte((byte) -1);
-    #         return;
-    #     }
+    def write_generic_value(self, value: Any) -> None:
+        if value is None:
+            self.write_byte(-1)
+        # bool is int subclass so must handle before other int types
+        elif isinstance(value, bool):
+            self.write_byte(5)
+            self.write_boolean(value)
+        elif isinstance(value, str):
+            self.write_byte(0)
+            self.write_string(value)
+        elif isinstance(value, int):
+            self.write_byte(2)
+            self.write_long(value)
+        elif isinstance(value, bytes):
+            self.write_byte(6)
+            self.write_byte_array(value)
+        elif isinstance(value, list):
+            self.write_byte(7)
+            self.write_array_list(value)
+
     #     final Class<?> type = getGenericType(value);
     #     Writer<Object> writer = WriteableRegistry.getWriter(type);
     #     if (writer == null) {

@@ -23,13 +23,14 @@ class TestRegisterRestActionsResponseHandler(unittest.TestCase):
     def test_register_rest_actions_response_handler(self) -> None:
         input = StreamInput(bytes(OutboundMessageRequest(version=Version(2100099), message=AcknowledgedResponse(status=True))))
         omr = OutboundMessageRequest().read_from(input)
+        request = OutboundMessageRequest()
         next_handler = FakeResponseHandler()
-        output = RegisterRestActionsResponseHandler(next_handler).handle(omr, input)
+        output = RegisterRestActionsResponseHandler(next_handler, request).handle(omr, input)
         self.assertEqual(output, b"test")
 
         input = StreamInput(bytes(OutboundMessageRequest(version=Version(2100099), message=AcknowledgedResponse(status=False))))
         omr = OutboundMessageRequest().read_from(input)
-        output = RegisterRestActionsResponseHandler(next_handler).handle(omr, input)
+        output = RegisterRestActionsResponseHandler(next_handler, request).handle(omr, input)
         self.assertIsNone(output)
 
 
@@ -37,5 +38,5 @@ class FakeResponseHandler(ResponseHandler):
     def handle(self, request: OutboundMessageRequest, input: StreamInput = None) -> Optional[bytes]:
         pass
 
-    def send(self) -> StreamOutput:
+    def send(self, request: OutboundMessageRequest) -> StreamOutput:
         return b"test"

@@ -11,22 +11,18 @@ import logging
 
 from opensearch_sdk_py.actions.request_response_handler import RequestResponseHandler
 from opensearch_sdk_py.actions.response_handler import ResponseHandler
-from opensearch_sdk_py.transport.acknowledged_response import AcknowledgedResponse
+from opensearch_sdk_py.transport.environment_settings_response import EnvironmentSettingsResponse
 from opensearch_sdk_py.transport.outbound_message_request import OutboundMessageRequest
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
 
 
-class RegisterRestActionsResponseHandler(ResponseHandler):
-    def __init__(self, next_handler: RequestResponseHandler, request: OutboundMessageRequest) -> None:
+class EnvironmentSettingsResponseHandler(ResponseHandler):
+    def __init__(self, next_handler: RequestResponseHandler) -> None:
         self.next_handler = next_handler
-        self.request = request
 
     def handle(self, request: OutboundMessageRequest, input: StreamInput) -> StreamOutput:
-        ack_response = AcknowledgedResponse().read_from(input)
-        logging.debug(f"< {ack_response}")
-        if ack_response.status:
-            return self.next_handler.send(self.request)
-        else:
-            # TODO error handling
-            return None
+        env_response = EnvironmentSettingsResponse().read_from(input)
+        logging.debug(f"< {env_response}")
+        # TODO save the settings somewhere
+        return self.next_handler.send()
