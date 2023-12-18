@@ -24,7 +24,7 @@ class TestAsyncHost(unittest.TestCase):
             while True:
                 command = input.read_string()
                 if command == "PASS":
-                    pass
+                    return
                 elif command == "EXCEPTION":
                     self.terminating = True
                     raise Exception(command)
