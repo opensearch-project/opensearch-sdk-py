@@ -8,8 +8,6 @@
 #
 
 
-from symbol import varargslist
-
 from opensearch_sdk_py.settings.setting_property import SettingProperty
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
@@ -23,10 +21,10 @@ class IntegerParser:
         value: int = int(s)
         if not (IntegerParser.MIN_VALUE <= value <= IntegerParser.MAX_VALUE):
             filtered_s: str = " [" + s + "]" if self.is_filtered else ""
-            raise ValueError("Failed to parse value" + filtered_s + " for setting [" + self.key + "], must be between " + IntegerParser.MIN_VALUE + " and " + IntegerParser.MAX_VALUE)
+            raise ValueError("Failed to parse value" + filtered_s + " for setting [" + self.key + "], must be in a 32-bit unsigned integer range")
         return value
 
-    def __init__(self, min_value: int, max_value: int, key: str, *properties: varargslist(SettingProperty)) -> None:
+    def __init__(self, min_value: int, max_value: int, key: str, *properties: SettingProperty) -> None:
         self.min_value = min_value
         self.max_value = max_value
         self.key = key
@@ -36,7 +34,7 @@ class IntegerParser:
         self.min_value = input.read_int()
         self.max_value = input.read_int()
         self.key = input.read_string()
-        self.is_filtered = input.read_boolean
+        self.is_filtered = input.read_boolean()
         return self
 
     def write_to(self, output: StreamOutput) -> "IntegerParser":
