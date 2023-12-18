@@ -19,12 +19,12 @@ class IntegerParser:
 
     def __call__(self, s: str) -> int:
         value: int = int(s)
-        if not (IntegerParser.MIN_VALUE <= value <= IntegerParser.MAX_VALUE):
+        if not (self.min_value <= value <= self.max_value):
             filtered_s: str = " [" + s + "]" if self.is_filtered else ""
-            raise ValueError("Failed to parse value" + filtered_s + " for setting [" + self.key + "], must be in a 32-bit unsigned integer range")
+            raise ValueError("Failed to parse value" + filtered_s + " for setting [" + self.key + "], must be between " + str(self.min_value) + " and " + str(self.max_value))
         return value
 
-    def __init__(self, min_value: int, max_value: int, key: str, *properties: SettingProperty) -> None:
+    def __init__(self, min_value: int = MIN_VALUE, max_value: int = MAX_VALUE, key: str = "", *properties: SettingProperty) -> None:
         self.min_value = min_value
         self.max_value = max_value
         self.key = key
