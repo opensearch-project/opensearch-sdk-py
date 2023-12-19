@@ -8,15 +8,14 @@
 #
 
 
+from enum import Enum
 from typing import Any, Callable, Optional
 
-from opensearch_sdk_py.settings.setting_property import SettingProperty
-from opensearch_sdk_py.settings.setting_type import SettingType
 from opensearch_sdk_py.settings.settings import Settings
 
 
 class Setting:
-    def __init__(self, type: SettingType, key: str, default_value: Callable[[Settings], str], fallback: Optional["Setting"], parser: Callable[[str], Any], validator: Optional[Callable], *properties: SettingProperty) -> None:
+    def __init__(self, type: "Setting.Type", key: str, default_value: Callable[[Settings], str], fallback: Optional["Setting"], parser: Callable[[str], Any], validator: Optional[Callable], *properties: "Setting.Property") -> None:
         self.type = type
         self.key = key
         self.default_value = default_value
@@ -29,3 +28,7 @@ class Setting:
         # TODO Add validation
         value = settings.get(self.key)
         return self.parser(value) if value else self.parser(self.default_value(settings))
+
+    Property = Enum("SettingProperty", ["FILTERED", "DYNAMIC", "FINAL", "DEPRECATED", "NODE_SCOPE", "CONSISTENT", "INDEX_SCOPE", "NOT_COPYABLE_ON_RESIZE", "INTERNAL_INDEX", "PRIVATE_INDEX", "EXTENSION_SCOPE"], start=0)
+
+    Type = Enum("SettingType", ["BOOLEAN", "INTEGER", "LONG", "FLOAT", "DOUBLE", "STRING", "TIME_VALUE", "BYTE_SIZE_VALUE", "VERSION"], start=0)

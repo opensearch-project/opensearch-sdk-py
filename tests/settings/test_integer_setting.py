@@ -10,7 +10,7 @@
 import unittest
 
 from opensearch_sdk_py.settings.integer_setting import IntegerSetting
-from opensearch_sdk_py.settings.setting_property import SettingProperty
+from opensearch_sdk_py.settings.setting import Setting
 from opensearch_sdk_py.settings.settings import Settings
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
@@ -29,15 +29,15 @@ class TestSetting(unittest.TestCase):
         self.assertRaises(ValueError, IntegerSetting, "key", 0, 0, IntegerSetting.MAX_VALUE + 1)
 
     def test_parser(self) -> None:
-        parser = IntegerSetting.Parser(0, 100, "foo", SettingProperty.FILTERED)
+        parser = IntegerSetting.Parser(0, 100, "foo", Setting.Property.FILTERED)
         self.assertEqual(parser.min_value, 0)
         self.assertEqual(parser.max_value, 100)
         self.assertEqual(parser.key, "foo")
         self.assertTrue(parser.is_filtered)
 
     def test_parser_read_write(self) -> None:
-        parser = IntegerSetting.Parser(0, 100, "foo", SettingProperty.DYNAMIC, SettingProperty.NODE_SCOPE)
-        self.assertEqual(parser.min_value, 0)
+        parser = IntegerSetting.Parser(-100, 100, "foo", Setting.Property.DYNAMIC, Setting.Property.NODE_SCOPE)
+        self.assertEqual(parser.min_value, -100)
         self.assertEqual(parser.max_value, 100)
         self.assertEqual(parser.key, "foo")
         self.assertFalse(parser.is_filtered)
@@ -47,7 +47,7 @@ class TestSetting(unittest.TestCase):
         input = StreamInput(output.getvalue())
         parser = IntegerSetting.Parser(0, 0, "").read_from(input)
 
-        self.assertEqual(parser.min_value, 0)
+        self.assertEqual(parser.min_value, -100)
         self.assertEqual(parser.max_value, 100)
         self.assertEqual(parser.key, "foo")
         self.assertFalse(parser.is_filtered)
