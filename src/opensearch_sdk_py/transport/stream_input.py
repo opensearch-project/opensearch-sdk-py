@@ -35,6 +35,9 @@ class StreamInput:
     def read_float(self) -> float:
         return float(struct.unpack(">f", self.read_bytes(4))[0])
 
+    def read_double(self) -> float:
+        return float(struct.unpack(">d", self.read_bytes(8))[0])
+
     def read_boolean(self) -> bool:
         value = self.read_byte()
         if value == 0:

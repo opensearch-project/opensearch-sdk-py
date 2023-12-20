@@ -286,9 +286,8 @@ class StreamOutput(BytesIO):
     def write_float(self, v: float) -> None:
         self.write(struct.pack(">f", v))
 
-    # def writeDouble(double v) throws IOException {
-    #     writeLong(Double.doubleToLongBits(v));
-    # }
+    def write_double(self, v: float) -> None:
+        self.write(struct.pack(">d", v))
 
     # def writeOptionalDouble(@Nullable Double v) throws IOException {
     #     if (v == null) {
