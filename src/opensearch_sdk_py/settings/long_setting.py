@@ -13,12 +13,12 @@ from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
 
 
-class IntegerSetting(Setting):
-    MIN_VALUE: int = -(2**31)
-    MAX_VALUE: int = 2**31 - 1
+class LongSetting(Setting):
+    MIN_VALUE: int = -(2**63)
+    MAX_VALUE: int = 2**63 - 1
 
     def __init__(self, key: str, default_value: int, min_value: int = MIN_VALUE, max_value: int = MAX_VALUE, *properties: Setting.Property) -> None:
-        parser: IntegerSetting.Parser = IntegerSetting.Parser(min_value, max_value, key, properties)
+        parser: LongSetting.Parser = LongSetting.Parser(min_value, max_value, key, properties)
         parser.bounds_check(default_value)
         super().__init__(Setting.Type.INTEGER, key, lambda s: str(default_value), None, parser, None, properties)
 
@@ -27,10 +27,10 @@ class IntegerSetting(Setting):
             return self.bounds_check(int(s))
 
         def __init__(self, min_value: int, max_value: int, key: str, *properties: Setting.Property) -> None:
-            if not (IntegerSetting.MIN_VALUE <= min_value <= IntegerSetting.MAX_VALUE):
-                raise ValueError("min_value must be within signed 32-bit integer range")
-            if not (IntegerSetting.MIN_VALUE <= max_value <= IntegerSetting.MAX_VALUE):
-                raise ValueError("max_value must be within signed 32-bit integer range")
+            if not (LongSetting.MIN_VALUE <= min_value <= LongSetting.MAX_VALUE):
+                raise ValueError("min_value must be within signed 64-bit integer range")
+            if not (LongSetting.MIN_VALUE <= max_value <= LongSetting.MAX_VALUE):
+                raise ValueError("max_value must be within signed 64-bit integer range")
             self.min_value = min_value
             self.max_value = max_value
             self.key = key
@@ -41,16 +41,16 @@ class IntegerSetting(Setting):
                 raise ValueError("Value for setting [" + self.key + "], must be between " + str(self.min_value) + " and " + str(self.max_value))
             return value
 
-        def read_from(self, input: StreamInput) -> "IntegerSetting.Parser":
-            self.min_value = input.read_int()
-            self.max_value = input.read_int()
+        def read_from(self, input: StreamInput) -> "LongSetting.Parser":
+            self.min_value = input.read_long()
+            self.max_value = input.read_long()
             self.key = input.read_string()
             self.is_filtered = input.read_boolean()
             return self
 
-        def write_to(self, output: StreamOutput) -> "IntegerSetting.Parser":
-            output.write_int(self.min_value)
-            output.write_int(self.max_value)
+        def write_to(self, output: StreamOutput) -> "LongSetting.Parser":
+            output.write_long(self.min_value)
+            output.write_long(self.max_value)
             output.write_string(self.key)
             output.write_boolean(self.is_filtered)
             return self
