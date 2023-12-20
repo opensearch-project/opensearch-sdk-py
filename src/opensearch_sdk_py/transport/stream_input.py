@@ -8,6 +8,7 @@
 #
 
 import io
+import struct
 from enum import Enum
 from typing import Any, Callable, Optional, Union
 
@@ -30,6 +31,9 @@ class StreamInput:
 
     def read_short(self) -> int:
         return int.from_bytes(self.data.read(2), byteorder="big", signed=True)
+
+    def read_float(self) -> float:
+        return float(struct.unpack(">f", self.read_bytes(4))[0])
 
     def read_boolean(self) -> bool:
         value = self.read_byte()

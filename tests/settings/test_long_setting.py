@@ -55,6 +55,6 @@ class TestLongSetting(unittest.TestCase):
     def test_parsing(self) -> None:
         parser = LongSetting.Parser(0, 100, "foo")
         self.assertEqual(parser("42"), 42)
-        self.assertRaises(ValueError, parser, "not an long")
+        self.assertRaises(ValueError, parser, "not a long")
         self.assertRaises(ValueError, parser, -1)
         self.assertRaises(ValueError, parser, 101)

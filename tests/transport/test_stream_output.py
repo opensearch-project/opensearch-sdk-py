@@ -110,6 +110,14 @@ class TestStreamOutput(unittest.TestCase):
         out.write_string("test")
         self.assertEqual(out.getvalue(), b"\x04test")
 
+    def test_write_float(self) -> None:
+        out = StreamOutput()
+        out.write_float(2.718281828459045)
+        self.assertEqual(out.getvalue(), b"\x40\x2d\xf8\x54")
+        out = StreamOutput()
+        out.write_float(float(-0.0))
+        self.assertEqual(out.getvalue(), b"\x80\x00\x00\x00")
+
     def test_write_boolean(self) -> None:
         out = StreamOutput()
         out.write_boolean(True)

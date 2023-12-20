@@ -7,6 +7,7 @@
 # compatible open source license.
 #
 
+import struct
 from enum import Enum
 from io import BytesIO
 from typing import Any, Union
@@ -282,9 +283,8 @@ class StreamOutput(BytesIO):
     #     }
     # }
 
-    # def writeFloat(float v) throws IOException {
-    #     writeInt(Float.floatToIntBits(v));
-    # }
+    def write_float(self, v: float) -> None:
+        self.write(struct.pack(">f", v))
 
     # def writeDouble(double v) throws IOException {
     #     writeLong(Double.doubleToLongBits(v));

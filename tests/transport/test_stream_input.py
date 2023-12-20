@@ -33,6 +33,11 @@ class TestStreamInput(unittest.TestCase):
         self.assertEqual(input.read_short(), 4660)
         self.assertEqual(input.read_short(), -1)
 
+    def test_read_float(self) -> None:
+        input = StreamInput(b"\x40\x49\x0f\xdb\x7f\x80\x00\x00")
+        self.assertAlmostEqual(input.read_float(), 3.1415927410125732)
+        self.assertAlmostEqual(input.read_float(), float("inf"))
+
     def test_read_boolean(self) -> None:
         input = StreamInput(b"\x00\x01\x02")
         self.assertEqual(input.read_boolean(), False)
