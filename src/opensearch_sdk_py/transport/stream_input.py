@@ -12,6 +12,8 @@ import struct
 from enum import Enum
 from typing import Any, Callable, Optional, Union
 
+from opensearch_sdk_py.transport.time_unit import TimeUnit
+from opensearch_sdk_py.transport.time_value import TimeValue
 from opensearch_sdk_py.transport.version import Version
 
 
@@ -274,3 +276,8 @@ class StreamInput:
 
     def read_enum(self, enum: Enum) -> Any:
         return enum(self.read_v_int())  # type:ignore
+
+    def read_time_value(self) -> TimeValue:
+        duration = self.read_z_long()
+        unit = self.read_enum(TimeUnit)
+        return TimeValue(duration, unit)

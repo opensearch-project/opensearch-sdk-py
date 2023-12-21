@@ -41,6 +41,21 @@ class TimeValue:
         else:
             raise ValueError(f"Invalid TimeValue: {value}")
 
+    def to_nanos(self) -> int:
+        if self.time_unit == TimeUnit.NANOSECONDS:
+            return self.duration
+        if self.time_unit == TimeUnit.MICROSECONDS:
+            return self.duration * 10**3
+        if self.time_unit == TimeUnit.MILLISECONDS:
+            return self.duration * 10**6
+        if self.time_unit == TimeUnit.SECONDS:
+            return self.duration * 10**9
+        if self.time_unit == TimeUnit.MINUTES:
+            return self.duration * 10**9 * 60
+        if self.time_unit == TimeUnit.HOURS:
+            return self.duration * 10**9 * 60**2
+        return self.duration * 10**9 * 60**2 * 24
+
     def __str__(self) -> str:
         unit = {v: k for k, v in self.TIME_UNIT_MAPPING.items()}[self.time_unit]
         return f"{self.duration}{unit}"

@@ -11,7 +11,10 @@ import unittest
 from enum import Enum
 from typing import Any
 
+from opensearch_sdk_py.settings.time_value_setting import TimeValueSetting
 from opensearch_sdk_py.transport.stream_output import StreamOutput
+from opensearch_sdk_py.transport.time_unit import TimeUnit
+from opensearch_sdk_py.transport.time_value import TimeValue
 from opensearch_sdk_py.transport.version import Version
 
 
@@ -234,3 +237,14 @@ class TestStreamOutput(unittest.TestCase):
         out = StreamOutput()
         out.write_enum(TestEnum.BAZ)
         self.assertEqual(out.getvalue(), b"\x02")
+
+    def test_write_time_value(self) -> None:
+        out = StreamOutput()
+        out.write_time_value(TimeValue(5, TimeUnit.MINUTES))
+        self.assertEqual(out.getvalue(), b"\x0a\x04")
+        out = StreamOutput()
+        out.write_time_value(TimeValueSetting.MINUS_ONE)
+        self.assertEqual(out.getvalue(), b"\x03\x02")
+        out = StreamOutput()
+        out.write_time_value(TimeValueSetting.ZERO)
+        self.assertEqual(out.getvalue(), b"\x00\x00")

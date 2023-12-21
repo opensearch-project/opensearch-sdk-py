@@ -30,3 +30,19 @@ class TestTimeValue(unittest.TestCase):
 
         self.assertRaises(ValueError, TimeValue.parse, "no digits")
         self.assertRaises(ValueError, TimeValue.parse, "9 weeks")
+
+    def test_time_value_to_nanos(self) -> None:
+        tv = TimeValue(42, TimeUnit.NANOSECONDS)
+        self.assertEqual(tv.to_nanos(), 42)
+        tv = TimeValue(42, TimeUnit.MICROSECONDS)
+        self.assertEqual(tv.to_nanos(), 42_000)
+        tv = TimeValue(42, TimeUnit.MILLISECONDS)
+        self.assertEqual(tv.to_nanos(), 42_000_000)
+        tv = TimeValue(42, TimeUnit.SECONDS)
+        self.assertEqual(tv.to_nanos(), 42_000_000_000)
+        tv = TimeValue(42, TimeUnit.MINUTES)
+        self.assertEqual(tv.to_nanos(), 42_000_000_000 * 60)
+        tv = TimeValue(42, TimeUnit.HOURS)
+        self.assertEqual(tv.to_nanos(), 42_000_000_000 * 3600)
+        tv = TimeValue(42, TimeUnit.DAYS)
+        self.assertEqual(tv.to_nanos(), 42_000_000_000 * 86400)

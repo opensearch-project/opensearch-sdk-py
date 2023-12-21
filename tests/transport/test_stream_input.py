@@ -11,6 +11,7 @@ import unittest
 from enum import Enum
 
 from opensearch_sdk_py.transport.stream_input import StreamInput
+from opensearch_sdk_py.transport.time_unit import TimeUnit
 
 
 class TestStreamInput(unittest.TestCase):
@@ -258,3 +259,15 @@ class TestStreamInput(unittest.TestCase):
         TestEnum = Enum("TestEnum", ["FOO", "BAR", "BAZ"], start=0)
         input = StreamInput(b"\x01")
         self.assertEqual(input.read_enum(TestEnum), TestEnum.BAR)
+
+    def test_read_time_value(self) -> None:
+        input = StreamInput(b"\x0a\x04")
+        tv = input.read_time_value()
+        self.assertEqual(tv.duration, 5)
+        self.assertEqual(tv.time_unit, TimeUnit.MINUTES)
+        input = StreamInput(b"\x03\x02")
+        tv = input.read_time_value()
+        self.assertEqual(tv.duration, -1)
+        input = StreamInput(b"\x00\x00")
+        tv = input.read_time_value()
+        self.assertEqual(tv.duration, 0)
