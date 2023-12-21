@@ -143,6 +143,11 @@ class StreamInput:
         i |= ((b)) << 63
         return i
 
+    # zig-zag encoding cf. https://developers.google.com/protocol-buffers/docs/encoding?hl=en
+    def read_z_long(self) -> int:
+        z = self.read_v_long()
+        return (z >> 1) * (-1 if (z & 1) else 1)
+
     def read_optional_v_long(self) -> Optional[int]:
         return self.read_v_long() if self.read_boolean() else None
 
