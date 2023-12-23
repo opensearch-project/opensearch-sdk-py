@@ -52,7 +52,7 @@ class TestDoubleSetting(unittest.TestCase):
 
     def test_parsing(self) -> None:
         parser = DoubleSetting.Parser(0.0, 100.0, "foo")
-        self.assertAlmostEqual(parser("42.0"), 42.0)
-        self.assertRaises(ValueError, parser, "not a double")
-        self.assertRaises(ValueError, parser, -1.0)
-        self.assertRaises(ValueError, parser, 101.0)
+        self.assertAlmostEqual(parser.parse("42.0"), 42.0)
+        self.assertRaises(ValueError, parser.parse, "not a double")
+        self.assertRaises(ValueError, parser.parse, -1.0)
+        self.assertRaises(ValueError, parser.parse, 101.0)

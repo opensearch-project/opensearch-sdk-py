@@ -7,7 +7,7 @@
 # compatible open source license.
 #
 
-
+from opensearch_sdk_py.settings.parser import Parser as SettingParser
 from opensearch_sdk_py.settings.setting import Setting
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
@@ -24,10 +24,7 @@ class TimeValueSetting(Setting):
         parser.bounds_check(default_value)
         super().__init__(Setting.Type.TIME_VALUE, key, lambda s: str(default_value), None, parser, None, properties)
 
-    class Parser:
-        def __call__(self, s: str) -> TimeValue:
-            return self.bounds_check(TimeValue.parse(s))
-
+    class Parser(SettingParser):
         def __init__(self, min_value: TimeValue, max_value: TimeValue, key: str, *properties: Setting.Property) -> None:
             if min_value.duration < -1:
                 raise ValueError("min_value must be positive or -1 if undefined")
@@ -37,6 +34,9 @@ class TimeValueSetting(Setting):
             self.max_value = max_value
             self.key = key
             self.is_filtered: bool = Setting.Property.FILTERED in properties
+
+        def parse(self, s: str) -> TimeValue:
+            return self.bounds_check(TimeValue.parse(s))
 
         def bounds_check(self, value: TimeValue) -> TimeValue:
             if self.min_value.duration >= 0 and self.min_value.to_nanos() > value.to_nanos():

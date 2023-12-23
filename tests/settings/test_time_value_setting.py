@@ -72,11 +72,11 @@ class TestTimeValueSetting(unittest.TestCase):
 
     def test_parsing(self) -> None:
         parser = TimeValueSetting.Parser(TimeValue(5, TimeUnit.MINUTES), TimeValue(10, TimeUnit.MINUTES), "foo")
-        eight_minutes = parser("8m")
+        eight_minutes = parser.parse("8m")
         self.assertEqual(eight_minutes.duration, 8)
         self.assertEqual(eight_minutes.time_unit, TimeUnit.MINUTES)
         self.assertEqual(str(eight_minutes), "8m")
-        self.assertRaises(ValueError, parser, "not a time value")
-        self.assertRaises(ValueError, parser, "-2m")
-        self.assertRaises(ValueError, parser, "2m")
-        self.assertRaises(ValueError, parser, "12m")
+        self.assertRaises(ValueError, parser.parse, "not a time value")
+        self.assertRaises(ValueError, parser.parse, "-2m")
+        self.assertRaises(ValueError, parser.parse, "2m")
+        self.assertRaises(ValueError, parser.parse, "12m")

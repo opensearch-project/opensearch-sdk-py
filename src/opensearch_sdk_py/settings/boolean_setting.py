@@ -7,7 +7,7 @@
 # compatible open source license.
 #
 
-
+from opensearch_sdk_py.settings.parser import Parser as SettingParser
 from opensearch_sdk_py.settings.setting import Setting
 
 
@@ -16,7 +16,7 @@ class BooleanSetting(Setting):
         parser: BooleanSetting.Parser = BooleanSetting.Parser()
         super().__init__(Setting.Type.BOOLEAN, key, lambda s: str(default_value), None, parser, None, properties)
 
-    class Parser:
-        def __call__(self, s: str) -> bool:
+    class Parser(SettingParser):
+        def parse(self, s: str) -> bool:
             # match Java behavior: True (ignoring case) is true, otherwise false
             return s.lower() == "true"

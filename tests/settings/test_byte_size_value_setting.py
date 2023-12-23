@@ -54,11 +54,11 @@ class TestByteSizeValueSetting(unittest.TestCase):
 
     def test_parsing(self) -> None:
         parser = ByteSizeValueSetting.Parser(ByteSizeValue(5, ByteSizeUnit.KB), ByteSizeValue(10, ByteSizeUnit.KB), "foo")
-        eight_kb = parser("8k")
+        eight_kb = parser.parse("8k")
         self.assertEqual(eight_kb.size, 8)
         self.assertEqual(eight_kb.unit, ByteSizeUnit.KB)
         self.assertEqual(str(eight_kb), "8kb")
-        self.assertRaises(ValueError, parser, "not a byte size value")
-        self.assertRaises(ValueError, parser, "-2kb")
-        self.assertRaises(ValueError, parser, "2k")
-        self.assertRaises(ValueError, parser, "12k")
+        self.assertRaises(ValueError, parser.parse, "not a byte size value")
+        self.assertRaises(ValueError, parser.parse, "-2kb")
+        self.assertRaises(ValueError, parser.parse, "2k")
+        self.assertRaises(ValueError, parser.parse, "12k")

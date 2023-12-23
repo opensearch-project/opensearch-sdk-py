@@ -7,7 +7,7 @@
 # compatible open source license.
 #
 
-
+from opensearch_sdk_py.settings.parser import Parser as SettingParser
 from opensearch_sdk_py.settings.setting import Setting
 from opensearch_sdk_py.transport.byte_size_unit import ByteSizeUnit
 from opensearch_sdk_py.transport.byte_size_value import ByteSizeValue
@@ -24,10 +24,7 @@ class ByteSizeValueSetting(Setting):
         parser.bounds_check(default_value)
         super().__init__(Setting.Type.TIME_VALUE, key, lambda s: str(default_value), None, parser, None, properties)
 
-    class Parser:
-        def __call__(self, s: str) -> ByteSizeValue:
-            return self.bounds_check(ByteSizeValue.parse(s))
-
+    class Parser(SettingParser):
         def __init__(self, min_value: ByteSizeValue, max_value: ByteSizeValue, key: str) -> None:
             if min_value.size < -1:
                 raise ValueError("min_value must be positive or -1 if undefined")
@@ -36,6 +33,9 @@ class ByteSizeValueSetting(Setting):
             self.min_value = min_value
             self.max_value = max_value
             self.key = key
+
+        def parse(self, s: str) -> ByteSizeValue:
+            return self.bounds_check(ByteSizeValue.parse(s))
 
         def bounds_check(self, value: ByteSizeValue) -> ByteSizeValue:
             if self.min_value.size >= 0 and self.min_value.to_bytes() > value.to_bytes():

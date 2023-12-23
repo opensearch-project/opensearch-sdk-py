@@ -7,7 +7,7 @@
 # compatible open source license.
 #
 
-
+from opensearch_sdk_py.settings.parser import Parser as SettingParser
 from opensearch_sdk_py.settings.setting import Setting
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
@@ -22,10 +22,7 @@ class LongSetting(Setting):
         parser.bounds_check(default_value)
         super().__init__(Setting.Type.INTEGER, key, lambda s: str(default_value), None, parser, None, properties)
 
-    class Parser:
-        def __call__(self, s: str) -> int:
-            return self.bounds_check(int(s))
-
+    class Parser(SettingParser):
         def __init__(self, min_value: int, max_value: int, key: str, *properties: Setting.Property) -> None:
             if not (LongSetting.MIN_VALUE <= min_value <= LongSetting.MAX_VALUE):
                 raise ValueError("min_value must be within signed 64-bit integer range")
@@ -35,6 +32,9 @@ class LongSetting(Setting):
             self.max_value = max_value
             self.key = key
             self.is_filtered: bool = Setting.Property.FILTERED in properties
+
+        def parse(self, s: str) -> int:
+            return self.bounds_check(int(s))
 
         def bounds_check(self, value: int) -> int:
             if not (self.min_value <= value <= self.max_value):

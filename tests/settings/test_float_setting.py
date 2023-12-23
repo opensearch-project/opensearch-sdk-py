@@ -52,7 +52,7 @@ class TestFloatSetting(unittest.TestCase):
 
     def test_parsing(self) -> None:
         parser = FloatSetting.Parser(0.0, 100.0, "foo")
-        self.assertAlmostEqual(parser("42.0"), 42.0)
-        self.assertRaises(ValueError, parser, "not a float")
-        self.assertRaises(ValueError, parser, -1.0)
-        self.assertRaises(ValueError, parser, 101.0)
+        self.assertAlmostEqual(parser.parse("42.0"), 42.0)
+        self.assertRaises(ValueError, parser.parse, "not a float")
+        self.assertRaises(ValueError, parser.parse, -1.0)
+        self.assertRaises(ValueError, parser.parse, 101.0)
