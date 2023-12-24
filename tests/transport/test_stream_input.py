@@ -11,6 +11,7 @@ import unittest
 from enum import Enum
 
 from opensearch_sdk_py.transport.stream_input import StreamInput
+from opensearch_sdk_py.transport.time_unit import TimeUnit
 
 
 class TestStreamInput(unittest.TestCase):
@@ -32,6 +33,15 @@ class TestStreamInput(unittest.TestCase):
         input = StreamInput(b"\x12\x34\xff\xff")
         self.assertEqual(input.read_short(), 4660)
         self.assertEqual(input.read_short(), -1)
+
+    def test_read_float(self) -> None:
+        input = StreamInput(b"\x40\x49\x0f\xdb\x7f\x80\x00\x00")
+        self.assertAlmostEqual(input.read_float(), 3.1415927410125732)
+        self.assertAlmostEqual(input.read_float(), float("inf"))
+
+    def test_read_double(self) -> None:
+        input = StreamInput(b"\x40\x05\xBF\x0A\x8B\x14\x57\x69")
+        self.assertAlmostEqual(input.read_double(), 2.718281828459045)
 
     def test_read_boolean(self) -> None:
         input = StreamInput(b"\x00\x01\x02")
@@ -114,6 +124,50 @@ class TestStreamInput(unittest.TestCase):
         self.assertEqual(input.read_optional_long(), 42)
         self.assertEqual(input.read_optional_long(), -1)
         self.assertEqual(input.read_optional_long(), None)
+
+    def test_read_z_long(self) -> None:
+        input = StreamInput(b"\x2a")
+        self.assertEqual(input.read_z_long(), 21)
+        input = StreamInput(b"\x2b")
+        self.assertEqual(input.read_z_long(), -21)
+        input = StreamInput(b"\x80\x01")
+        self.assertEqual(input.read_z_long(), 64)
+        input = StreamInput(b"\x81\x01")
+        self.assertEqual(input.read_z_long(), -64)
+        input = StreamInput(b"\x80\x80\x01")
+        self.assertEqual(input.read_z_long(), 64 * 128)
+        input = StreamInput(b"\x81\x80\x01")
+        self.assertEqual(input.read_z_long(), -64 * 128)
+        input = StreamInput(b"\x80\x80\x80\x01")
+        self.assertEqual(input.read_z_long(), 64 * 128**2)
+        input = StreamInput(b"\x81\x80\x80\x01")
+        self.assertEqual(input.read_z_long(), -64 * 128**2)
+        input = StreamInput(b"\x80\x80\x80\x80\x01")
+        self.assertEqual(input.read_z_long(), 64 * 128**3)
+        input = StreamInput(b"\x81\x80\x80\x80\x01")
+        self.assertEqual(input.read_z_long(), -64 * 128**3)
+        input = StreamInput(b"\x80\x80\x80\x80\x80\x01")
+        self.assertEqual(input.read_z_long(), 64 * 128**4)
+        input = StreamInput(b"\x81\x80\x80\x80\x80\x01")
+        self.assertEqual(input.read_z_long(), -64 * 128**4)
+        input = StreamInput(b"\x80\x80\x80\x80\x80\x80\x01")
+        self.assertEqual(input.read_z_long(), 64 * 128**5)
+        input = StreamInput(b"\x81\x80\x80\x80\x80\x80\x01")
+        self.assertEqual(input.read_z_long(), -64 * 128**5)
+        input = StreamInput(b"\x80\x80\x80\x80\x80\x80\x80\x01")
+        self.assertEqual(input.read_z_long(), 64 * 128**6)
+        input = StreamInput(b"\x81\x80\x80\x80\x80\x80\x80\x01")
+        self.assertEqual(input.read_z_long(), -64 * 128**6)
+        input = StreamInput(b"\x80\x80\x80\x80\x80\x80\x80\x80\x01")
+        self.assertEqual(input.read_z_long(), 64 * 128**7)
+        input = StreamInput(b"\x81\x80\x80\x80\x80\x80\x80\x80\x01")
+        self.assertEqual(input.read_z_long(), -64 * 128**7)
+        input = StreamInput(b"\x80\x80\x80\x80\x80\x80\x80\x80\x80\x01")
+        self.assertEqual(input.read_z_long(), 64 * 128**8)
+        input = StreamInput(b"\x81\x80\x80\x80\x80\x80\x80\x80\x80\x01")
+        self.assertEqual(input.read_z_long(), -64 * 128**8)
+        input = StreamInput(b"\x80\x80\x80\x80\x80\x80\x80\x80\x80\x80\x01")
+        self.assertRaises(Exception, input.read_z_long)
 
     def test_read_optional_string(self) -> None:
         input = StreamInput(b"\x01\x04test")
@@ -205,3 +259,15 @@ class TestStreamInput(unittest.TestCase):
         TestEnum = Enum("TestEnum", ["FOO", "BAR", "BAZ"], start=0)
         input = StreamInput(b"\x01")
         self.assertEqual(input.read_enum(TestEnum), TestEnum.BAR)
+
+    def test_read_time_value(self) -> None:
+        input = StreamInput(b"\x0a\x04")
+        tv = input.read_time_value()
+        self.assertEqual(tv.duration, 5)
+        self.assertEqual(tv.time_unit, TimeUnit.MINUTES)
+        input = StreamInput(b"\x03\x02")
+        tv = input.read_time_value()
+        self.assertEqual(tv.duration, -1)
+        input = StreamInput(b"\x00\x00")
+        tv = input.read_time_value()
+        self.assertEqual(tv.duration, 0)

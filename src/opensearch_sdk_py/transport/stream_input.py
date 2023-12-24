@@ -8,9 +8,12 @@
 #
 
 import io
+import struct
 from enum import Enum
 from typing import Any, Callable, Optional, Union
 
+from opensearch_sdk_py.transport.time_unit import TimeUnit
+from opensearch_sdk_py.transport.time_value import TimeValue
 from opensearch_sdk_py.transport.version import Version
 
 
@@ -30,6 +33,12 @@ class StreamInput:
 
     def read_short(self) -> int:
         return int.from_bytes(self.data.read(2), byteorder="big", signed=True)
+
+    def read_float(self) -> float:
+        return float(struct.unpack(">f", self.read_bytes(4))[0])
+
+    def read_double(self) -> float:
+        return float(struct.unpack(">d", self.read_bytes(8))[0])
 
     def read_boolean(self) -> bool:
         value = self.read_byte()
@@ -135,6 +144,11 @@ class StreamInput:
             raise Exception(f"Invalid vlong ({b} << 63) | {i}")
         i |= ((b)) << 63
         return i
+
+    # zig-zag encoding cf. https://developers.google.com/protocol-buffers/docs/encoding?hl=en
+    def read_z_long(self) -> int:
+        z = self.read_v_long()
+        return (z >> 1) * (-1 if (z & 1) else 1)
 
     def read_optional_v_long(self) -> Optional[int]:
         return self.read_v_long() if self.read_boolean() else None
@@ -262,3 +276,8 @@ class StreamInput:
 
     def read_enum(self, enum: Enum) -> Any:
         return enum(self.read_v_int())  # type:ignore
+
+    def read_time_value(self) -> TimeValue:
+        duration = self.read_z_long()
+        unit = self.read_enum(TimeUnit)
+        return TimeValue(duration, unit)

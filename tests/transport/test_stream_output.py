@@ -11,7 +11,10 @@ import unittest
 from enum import Enum
 from typing import Any
 
+from opensearch_sdk_py.settings.time_value_setting import TimeValueSetting
 from opensearch_sdk_py.transport.stream_output import StreamOutput
+from opensearch_sdk_py.transport.time_unit import TimeUnit
+from opensearch_sdk_py.transport.time_value import TimeValue
 from opensearch_sdk_py.transport.version import Version
 
 
@@ -69,6 +72,51 @@ class TestStreamOutput(unittest.TestCase):
         self.assertEqual(out.getvalue(), b"\x80\x80\x80\x80\x01")
         self.assertEqual(StreamOutput.v_int_size(268435456), 5)
 
+    def test_write_v_long(self) -> None:
+        out = StreamOutput()
+        out.write_v_long(42)
+        self.assertEqual(out.getvalue(), b"\x2a")
+        out = StreamOutput()
+        out.write_v_long(2**7 - 1)
+        self.assertEqual(out.getvalue(), b"\x7f")
+        out = StreamOutput()
+        out.write_v_long(2**14 - 1)
+        self.assertEqual(out.getvalue(), b"\xff\x7f")
+        out = StreamOutput()
+        out.write_v_long(2**63 - 1)
+        self.assertEqual(out.getvalue(), b"\xff\xff\xff\xff\xff\xff\xff\xff\x7f")
+        out = StreamOutput()
+        out.write_v_long(2**63)
+        self.assertEqual(out.getvalue(), b"\x80\x80\x80\x80\x80\x80\x80\x80\x80\x01")
+
+    def test_write_z_long(self) -> None:
+        out = StreamOutput()
+        out.write_z_long(21)
+        self.assertEqual(out.getvalue(), b"\x2a")
+        out = StreamOutput()
+        out.write_z_long(-21)
+        self.assertEqual(out.getvalue(), b"\x2b")
+        out = StreamOutput()
+        out.write_z_long(64)
+        self.assertEqual(out.getvalue(), b"\x80\x01")
+        out = StreamOutput()
+        out.write_z_long(-64)
+        self.assertEqual(out.getvalue(), b"\x81\x01")
+        out = StreamOutput()
+        out.write_z_long(2**13)
+        self.assertEqual(out.getvalue(), b"\x80\x80\x01")
+        out = StreamOutput()
+        out.write_z_long(-(2**13))
+        self.assertEqual(out.getvalue(), b"\x81\x80\x01")
+        out = StreamOutput()
+        out.write_z_long(2**62)
+        self.assertEqual(out.getvalue(), b"\x80\x80\x80\x80\x80\x80\x80\x80\x80\x01")
+        out = StreamOutput()
+        out.write_z_long(-(2**62))
+        self.assertEqual(out.getvalue(), b"\x81\x80\x80\x80\x80\x80\x80\x80\x80\x01")
+        out = StreamOutput()
+        self.assertRaises(ValueError, out.write_z_long, 2**63)
+
     def test_write_version(self) -> None:
         out = StreamOutput()
         v = Version(2100099)
@@ -109,6 +157,19 @@ class TestStreamOutput(unittest.TestCase):
         out = StreamOutput()
         out.write_string("test")
         self.assertEqual(out.getvalue(), b"\x04test")
+
+    def test_write_float(self) -> None:
+        out = StreamOutput()
+        out.write_float(2.718281828459045)
+        self.assertEqual(out.getvalue(), b"\x40\x2d\xf8\x54")
+        out = StreamOutput()
+        out.write_float(float(-0.0))
+        self.assertEqual(out.getvalue(), b"\x80\x00\x00\x00")
+
+    def test_write_double(self) -> None:
+        out = StreamOutput()
+        out.write_double(2.718281828459045)
+        self.assertEqual(out.getvalue(), b"\x40\x05\xBF\x0A\x8B\x14\x57\x69")
 
     def test_write_boolean(self) -> None:
         out = StreamOutput()
@@ -176,3 +237,14 @@ class TestStreamOutput(unittest.TestCase):
         out = StreamOutput()
         out.write_enum(TestEnum.BAZ)
         self.assertEqual(out.getvalue(), b"\x02")
+
+    def test_write_time_value(self) -> None:
+        out = StreamOutput()
+        out.write_time_value(TimeValue(5, TimeUnit.MINUTES))
+        self.assertEqual(out.getvalue(), b"\x0a\x04")
+        out = StreamOutput()
+        out.write_time_value(TimeValueSetting.MINUS_ONE)
+        self.assertEqual(out.getvalue(), b"\x03\x02")
+        out = StreamOutput()
+        out.write_time_value(TimeValueSetting.ZERO)
+        self.assertEqual(out.getvalue(), b"\x00\x00")

@@ -7,10 +7,12 @@
 # compatible open source license.
 #
 
+import struct
 from enum import Enum
 from io import BytesIO
 from typing import Any, Union
 
+from opensearch_sdk_py.transport.time_value import TimeValue
 from opensearch_sdk_py.transport.version import Version
 
 
@@ -126,17 +128,9 @@ class StreamOutput(BytesIO):
     #     write_bytes(buffer, 0, 8);
     # }
 
-    # /**
-    #  Writes a non-negative long in a variable-length format. Writes between one and ten bytes. Smaller values take fewer bytes. Negative
-    #  numbers use ten bytes and trip assertions (if running in tests) so prefer {@link #writeLong(long)} or {@link #writeZLong(long)} for
-    #  negative numbers.
-    #
-    # def writeVLong(long i) throws IOException {
-    #     if (i < 0) {
-    #         throw new IllegalStateException("Negative longs unsupported, use writeLong or writeZLong for negative numbers [" + i + "]");
-    #     }
-    #     writeVLongNoCheck(i);
-    # }
+    def write_v_long(self, i: int) -> int:
+        # algorithm is identical, adding to match read_v_long
+        return self.write_v_int(i)
 
     # def writeOptionalVLong(@Nullable Long l) throws IOException {
     #     if (l == null) {
@@ -147,40 +141,12 @@ class StreamOutput(BytesIO):
     #     }
     # }
 
-    # /**
-    #  Writes a long in a variable-length format without first checking if it is negative. Package private for testing. Use
-    #  {@link #writeVLong(long)} instead.
-    #
-    # def writeVLongNoCheck(long i) throws IOException {
-    #     final byte[] buffer = scratch.get();
-    #     int index = 0;
-    #     while ((i & ~0x7F) != 0) {
-    #         buffer[index++] = ((byte) ((i & 0x7f) | 0x80));
-    #         i >>>= 7;
-    #     }
-    #     buffer[index++] = ((byte) i);
-    #     write_bytes(buffer, 0, index);
-    # }
-
-    # /**
-    #  Writes a long in a variable-length format. Writes between one and ten bytes.
-    #  Values are remapped by sliding the sign bit into the lsb and then encoded as an unsigned number
-    #  e.g., 0 -;&gt; 0, -1 -;&gt; 1, 1 -;&gt; 2, ..., Long.MIN_VALUE -;&gt; -1, Long.MAX_VALUE -;&gt; -2
-    #  Numbers with small absolute value will have a small encoding
-    #  If the numbers are known to be non-negative, use {@link #writeVLong(long)}
-    #
-    # def writeZLong(long i) throws IOException {
-    #     final byte[] buffer = scratch.get();
-    #     int index = 0;
-    #     // zig-zag encoding cf. https://developers.google.com/protocol-buffers/docs/encoding?hl=en
-    #     long value = BitUtil.zigZagEncode(i);
-    #     while ((value & 0xFFFFFFFFFFFFFF80L) != 0L) {
-    #         buffer[index++] = (byte) ((value & 0x7F) | 0x80);
-    #         value >>>= 7;
-    #     }
-    #     buffer[index++] = (byte) (value & 0x7F);
-    #     write_bytes(buffer, 0, index);
-    # }
+    # zig-zag encoding cf. https://developers.google.com/protocol-buffers/docs/encoding?hl=en
+    def write_z_long(self, i: int) -> int:
+        zigzag_value = 2 * abs(i) + (1 if i < 0 else 0)
+        if zigzag_value >> 64 > 0:
+            raise ValueError(f"{i} is too large for 64-bit zigzag format")
+        return self.write_v_long(zigzag_value)
 
     # def writeOptionalLong(@Nullable Long l) throws IOException {
     #     if (l == null) {
@@ -282,13 +248,11 @@ class StreamOutput(BytesIO):
     #     }
     # }
 
-    # def writeFloat(float v) throws IOException {
-    #     writeInt(Float.floatToIntBits(v));
-    # }
+    def write_float(self, v: float) -> None:
+        self.write(struct.pack(">f", v))
 
-    # def writeDouble(double v) throws IOException {
-    #     writeLong(Double.doubleToLongBits(v));
-    # }
+    def write_double(self, v: float) -> None:
+        self.write(struct.pack(">d", v))
 
     # def writeOptionalDouble(@Nullable Double v) throws IOException {
     #     if (v == null) {
@@ -1069,13 +1033,9 @@ class StreamOutput(BytesIO):
     #     }
     # }
 
-    # /**
-    #  Write a {@link TimeValue} to the stream
-    #
-    # def writeTimeValue(TimeValue timeValue) throws IOException {
-    #     writeZLong(timeValue.duration());
-    #     write_byte((byte) timeValue.timeUnit().ordinal());
-    # }
+    def write_time_value(self, tv: TimeValue) -> None:
+        self.write_z_long(tv.duration)
+        self.write_byte(tv.time_unit.value)
 
     # /**
     #  Write an optional {@link TimeValue} to the stream.
