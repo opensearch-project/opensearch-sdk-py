@@ -72,7 +72,7 @@ jobs:
           path: opensearch-sdk-py
 
       - name: Set up Poetry
-        uses: abatilo/actions-poetry@v2
+        uses: abatilo/actions-poetry@v3
         with:
           poetry-version: "1.5.1"
 
