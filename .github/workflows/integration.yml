@@ -31,7 +31,7 @@ jobs:
 
       - name: Restore Cached Build
         id: cache-restore
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@v4
         with:
           path: opensearch/distribution/archives/linux-tar/build/distributions
           key: ${{ steps.get-key.outputs.key }}
@@ -48,7 +48,7 @@ jobs:
 
       - name: Save Cached Build
         if: steps.cache-restore.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v3
+        uses: actions/cache/save@v4
         with:
           path: opensearch/distribution/archives/linux-tar/build/distributions
           key: ${{ steps.get-key.outputs.key }}
