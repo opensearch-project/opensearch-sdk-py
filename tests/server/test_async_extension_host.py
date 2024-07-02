@@ -141,6 +141,7 @@ class TestAsyncExtensionHost(unittest.TestCase):
         assert responses[1] is not None
         reply: TestAsyncExtensionHost.Response = responses[1]
         self.assertEqual(reply.response.thread_context_struct.request_headers, {"_system_index_access_allowed": "false"})
+        self.assertEqual(reply.response.version.id ^ Version.MASK, Version.MIN_COMPAT)
         extension_request = ExtensionTransportRequest(RequestType.GET_SETTINGS).read_from(reply.remaining_input)
         self.assertEqual(extension_request.er.requestType, RequestType.REQUEST_EXTENSION_ENVIRONMENT_SETTINGS.value)
 

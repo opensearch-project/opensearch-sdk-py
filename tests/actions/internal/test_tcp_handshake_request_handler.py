@@ -44,6 +44,7 @@ class TestTcpHandshakeRequestHandler(unittest.TestCase):
         input = StreamInput(output.getvalue())
         response = OutboundMessageResponse()
         response.read_from(input)
+        self.assertEqual(response.version.id ^ Version.MASK, Version.MIN_COMPAT)
         message = TransportHandshakerHandshakeResponse()
         message.read_from(input)
         self.assertEqual(message.version.id, Version.CURRENT_ID)

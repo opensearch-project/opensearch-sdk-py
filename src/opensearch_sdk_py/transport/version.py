@@ -9,6 +9,7 @@
 class Version:
     MASK = 0x08000000
     CURRENT = 3000099
+    MIN_COMPAT = 7099999
     CURRENT_ID = CURRENT ^ MASK
 
     def __init__(self, id: int = 0) -> None:
