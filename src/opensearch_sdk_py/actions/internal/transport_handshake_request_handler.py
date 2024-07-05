@@ -20,6 +20,7 @@ from opensearch_sdk_py.transport.stream_output import StreamOutput
 from opensearch_sdk_py.transport.transport_address import TransportAddress
 from opensearch_sdk_py.transport.transport_service_handshake_request import TransportServiceHandshakeRequest
 from opensearch_sdk_py.transport.transport_service_handshake_response import TransportServiceHandshakeResponse
+from opensearch_sdk_py.transport.version import Version
 
 
 class TransportHandshakeRequestHandler(RequestHandler):
@@ -46,7 +47,7 @@ class TransportHandshakeRequestHandler(RequestHandler):
                     },
                 )
             ),
-            request.version,
+            Version(Version.MIN_COMPAT),
             request.request_id,
             request.is_handshake,
             request.is_compress,

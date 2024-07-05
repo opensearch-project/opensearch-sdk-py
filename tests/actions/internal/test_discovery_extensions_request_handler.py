@@ -15,8 +15,10 @@ from opensearch_sdk_py.api.action_extension import ActionExtension
 from opensearch_sdk_py.extension import Extension
 from opensearch_sdk_py.rest.extension_rest_handler import ExtensionRestHandler
 from opensearch_sdk_py.transport.outbound_message_request import OutboundMessageRequest
+from opensearch_sdk_py.transport.outbound_message_response import OutboundMessageResponse
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
+from opensearch_sdk_py.transport.version import Version
 from tests.transport.data.netty_trace_data import NettyTraceData
 
 
@@ -46,3 +48,5 @@ class TestDiscoveryExtensionsRequestHandler(unittest.TestCase):
         output = self.handler.handle(request, input)
         self.assertIsInstance(output, StreamOutput)
         self.assertEqual(self.handler.response.request_id, 10)
+        message = OutboundMessageResponse().read_from(StreamInput(output.getvalue()))
+        self.assertEqual(message.version.id ^ Version.MASK, Version.MIN_COMPAT)

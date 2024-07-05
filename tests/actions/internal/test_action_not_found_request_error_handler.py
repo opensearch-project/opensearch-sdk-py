@@ -41,3 +41,4 @@ class TestActionNotFoundRequestHandler(unittest.TestCase):
         message = OutboundMessageResponse().read_from(StreamInput(response.getvalue()))
         self.assertEqual(message.request_id, self.request.request_id)
         self.assertEqual(message.message_bytes, None)
+        self.assertEqual(message.version.id ^ Version.MASK, Version.MIN_COMPAT)

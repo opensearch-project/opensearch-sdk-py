@@ -64,6 +64,7 @@ class TestExtensionsRestRequestHandler(unittest.TestCase):
         input = StreamInput(output.getvalue())
         response = OutboundMessageResponse()
         response.read_from(input)
+        self.assertEqual(response.version.id ^ Version.MASK, Version.MIN_COMPAT)
         message = RestExecuteOnExtensionResponse()
         message.read_from(input)
         self.assertEqual(RestStatus.OK, message.status)

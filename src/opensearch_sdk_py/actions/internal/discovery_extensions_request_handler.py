@@ -23,6 +23,7 @@ from opensearch_sdk_py.transport.register_rest_actions_request import RegisterRe
 from opensearch_sdk_py.transport.request_type import RequestType
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
+from opensearch_sdk_py.transport.version import Version
 
 
 class DiscoveryExtensionsRequestHandler(RequestHandler):
@@ -43,7 +44,7 @@ class DiscoveryExtensionsRequestHandler(RequestHandler):
             request.thread_context_struct,
             request.features,
             InitializeExtensionResponse(self.extension.name, self.extension.implemented_interfaces),
-            request.version,
+            Version(Version.MIN_COMPAT),
             request.request_id,
             request.is_handshake,
             request.is_compress,
@@ -54,7 +55,7 @@ class DiscoveryExtensionsRequestHandler(RequestHandler):
             thread_context=request.thread_context_struct,
             features=request.features,
             message=ExtensionTransportRequest(RequestType.REQUEST_EXTENSION_ENVIRONMENT_SETTINGS),
-            version=request.version,
+            version=Version(Version.MIN_COMPAT),
             action="internal:discovery/enviornmentsettings",
         )
         settings_response_handler = EnvironmentSettingsResponseHandler(self)
@@ -65,7 +66,7 @@ class DiscoveryExtensionsRequestHandler(RequestHandler):
             thread_context=request.thread_context_struct,
             features=request.features,
             message=RegisterRestActionsRequest(self.extension.name, self.extension.named_routes),
-            version=request.version,
+            version=Version(Version.MIN_COMPAT),
             action="internal:discovery/registerrestactions",
         )
         register_response_handler = RegisterRestActionsResponseHandler(settings_response_handler, settings_request)

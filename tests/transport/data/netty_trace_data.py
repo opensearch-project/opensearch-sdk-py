@@ -10,7 +10,6 @@
 import re
 from typing import Optional, Union
 
-
 #
 # Read netty-formatted log data.
 #
@@ -22,6 +21,14 @@ from typing import Optional, Union
 # |00000020| 6e 61 6c 3a 74 63 70 2f 68 61 6e 64 73 68 61 6b |nal:tcp/handshak|
 # |00000030| 65 00 04 a3 8e b7 41                            |e.....A         |
 # +--------+-------------------------------------------------+----------------+
+#
+# Handshake version notes: 0x200b83 at byte 15 is 2100099 (2.10.0 was last minor release for this log).
+# This is the minimum compatible version. For version 3.x is last 2.x minor version.
+# For version 2.x is 7100099, see computeMinCompatVersion() in
+# https://github.com/opensearch-project/OpenSearch/blob/main/libs/core/src/main/java/org/opensearch/Version.java
+# The 0xa38eb741 at the end of the message is (Vint) 3000099 the OpenSearch version sending the request.
+
+
 class NettyTraceData:
     class InvalidTraceDataFormat(Exception):
         pass

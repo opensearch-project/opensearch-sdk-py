@@ -17,6 +17,7 @@ from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
 from opensearch_sdk_py.transport.transport_handshaker_handshake_request import TransportHandshakerHandshakeRequest
 from opensearch_sdk_py.transport.transport_handshaker_handshake_response import TransportHandshakerHandshakeResponse
+from opensearch_sdk_py.transport.version import Version
 
 
 class TcpHandshakeRequestHandler(RequestHandler):
@@ -29,8 +30,8 @@ class TcpHandshakeRequestHandler(RequestHandler):
         self.response = OutboundMessageResponse(
             request.thread_context_struct,
             request.features,
-            TransportHandshakerHandshakeResponse(request.version),
-            request.version,
+            TransportHandshakerHandshakeResponse(Version(Version.CURRENT)),
+            Version(Version.MIN_COMPAT),
             request.request_id,
             request.is_handshake,
             request.is_compress,

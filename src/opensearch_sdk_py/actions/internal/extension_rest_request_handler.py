@@ -17,6 +17,7 @@ from opensearch_sdk_py.transport.outbound_message_request import OutboundMessage
 from opensearch_sdk_py.transport.outbound_message_response import OutboundMessageResponse
 from opensearch_sdk_py.transport.stream_input import StreamInput
 from opensearch_sdk_py.transport.stream_output import StreamOutput
+from opensearch_sdk_py.transport.version import Version
 
 
 class ExtensionRestRequestHandler(RequestHandler):
@@ -41,7 +42,7 @@ class ExtensionRestRequestHandler(RequestHandler):
                 consumed_params=response.consumed_params,
                 content_consumed=response.content_consumed,
             ),
-            request.version,
+            Version(Version.MIN_COMPAT),
             request.request_id,
             request.is_handshake,
             request.is_compress,
