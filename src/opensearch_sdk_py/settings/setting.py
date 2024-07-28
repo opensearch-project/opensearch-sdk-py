@@ -32,6 +32,6 @@ class Setting:
             self.validator.validate(value)
         return self.parser.parse(value) if value else self.parser.parse(self.default_value(settings))
 
-    Property = Enum("SettingProperty", ["FILTERED", "DYNAMIC", "FINAL", "DEPRECATED", "NODE_SCOPE", "CONSISTENT", "INDEX_SCOPE", "NOT_COPYABLE_ON_RESIZE", "INTERNAL_INDEX", "PRIVATE_INDEX", "EXTENSION_SCOPE"], start=0)
+    Property = Enum("Property", ["FILTERED", "DYNAMIC", "FINAL", "DEPRECATED", "NODE_SCOPE", "CONSISTENT", "INDEX_SCOPE", "NOT_COPYABLE_ON_RESIZE", "INTERNAL_INDEX", "PRIVATE_INDEX", "EXTENSION_SCOPE"], start=0)
 
-    Type = Enum("SettingType", ["BOOLEAN", "INTEGER", "LONG", "FLOAT", "DOUBLE", "STRING", "TIME_VALUE", "BYTE_SIZE_VALUE", "VERSION"], start=0)
+    Type = Enum("Type", ["BOOLEAN", "INTEGER", "LONG", "FLOAT", "DOUBLE", "STRING", "TIME_VALUE", "BYTE_SIZE_VALUE", "VERSION"], start=0)
