@@ -35,6 +35,6 @@ jobs:
           poetry run coverage run --source=src -m pytest -v
           poetry run coverage xml
       - name: Upload Coverage Report
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           files: ./coverage.xml
