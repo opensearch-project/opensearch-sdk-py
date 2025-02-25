@@ -6,5 +6,5 @@ This document contains a list of maintainers in this repo. See [opensearch-proje
 
 | Maintainer         | GitHub ID                               | Affiliation |
 | ------------------ | --------------------------------------- | ----------- |
-| Daniel Doubrovkine | [dblock](https://github.com/dblock)     | Amazon      |
+| Daniel Doubrovkine | [dblock](https://github.com/dblock)     | Independent |
 | Daniel Widdis      | [dbwiddis](https://github.com/dbwiddis) | Amazon      |
