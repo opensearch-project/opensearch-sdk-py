@@ -27,7 +27,7 @@ pytest-cov = "*"
 mock = "^5.1.0"
 types-mock = "^5.1.0.2"
 httpx = "*"
-poetry-exec-plugin = "^0.3.6"
+poetry-exec-plugin = "^1.0.0"
 
 [tool.isort]
 profile = "black"
