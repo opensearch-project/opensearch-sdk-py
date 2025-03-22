@@ -1544,6 +1544,18 @@ files = [
 ptyprocess = ">=0.5"
 
 [[package]]
+name = "pip"
+version = "25.0.1"
+description = "The PyPA recommended tool for installing Python packages."
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "pip-25.0.1-py3-none-any.whl", hash = "sha256:c46efd13b6aa8279f33f2864459c8ce587ea6a1a59ee20de055868d8f7688f7f"},
+    {file = "pip-25.0.1.tar.gz", hash = "sha256:88f96547ea48b940a3a385494e181e29fb8637898f88d88737c5049780f196ea"},
+]
+
+[[package]]
 name = "pkginfo"
 version = "1.12.1.2"
 description = "Query metadata from sdists / bdists / installed packages."
@@ -1643,18 +1655,19 @@ files = [
 
 [[package]]
 name = "poetry-exec-plugin"
-version = "0.3.6"
+version = "1.0.1"
 description = "A plugin for poetry that allows you to execute scripts defined in your pyproject.toml, just like you can in npm or pipenv."
 optional = false
-python-versions = ">=3.7,<4.0"
+python-versions = "<4.0,>=3.9"
 groups = ["main"]
 files = [
-    {file = "poetry-exec-plugin-0.3.6.tar.gz", hash = "sha256:c7a379e575095e78db946dd578941b0dd73f8f112dad5ddd62aaf41bfe6439bf"},
-    {file = "poetry_exec_plugin-0.3.6-py3-none-any.whl", hash = "sha256:a0d427faddcf71aa2f97eff1f42bb9736c69b84bf23105076849898a582fb0a5"},
+    {file = "poetry_exec_plugin-1.0.1-py3-none-any.whl", hash = "sha256:4b087b2fd111efce435f03e050e2caeb57ec76ac112de89438532c44ea85ec7c"},
+    {file = "poetry_exec_plugin-1.0.1.tar.gz", hash = "sha256:7813b965b0a621de63bbb323c038c4388a139363113d13b9ec1f694bb29ecf13"},
 ]
 
 [package.dependencies]
-poetry = ">=1.2.0.a2,<2.0.0"
+pip = ">=25.0.1,<26.0.0"
+poetry = ">=1.2.0,<3.0.0"
 toml = ">=0.10.2,<0.11.0"
 
 [[package]]
@@ -2672,4 +2685,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9.2,<4.0"
-content-hash = "e1a152546a5ff2cfb33a9b6fdeb02e0b5a628f46cd51bc4248d95235d0d8c719"
+content-hash = "dc8cda508746780ed96ead2c47c245c6330d4ce044f67faa13c441ca700f8460"
