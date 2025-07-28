@@ -1,3 +1,13 @@
+**This Repository has been archived as it is no longer actively maintained.**
+
+If you wish to continue development of this project, please either:
+ - Open a request at https://github.com/opensearch-project/.github indicating your desire to take over and maintain this project, or
+ - Fork the project and develop it independenly.
+
+-----
+
+Previous content below.
+
 - [OpenSearch Python SDK](#opensearch-python-sdk)
     - [Developing](#developing)
     - [Copyright and License](#copyright-and-license)
